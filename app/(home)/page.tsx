@@ -69,7 +69,6 @@ export default async function Page() {
     <>
       <HomeCarousel items={data.carousels} />
       <div className="md:p-4 md:space-y-4 bg-border">
-      <BrowsingHistoryList />
         <HomeCard cards={cards} />
         <Card className="w-full rounded-none">
           <CardContent className="p-4 items-center gap-3">
@@ -85,6 +84,7 @@ export default async function Page() {
             />
           </CardContent>
         </Card>
+        <BrowsingHistoryList />
       </div>
     </>
   );
