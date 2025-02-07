@@ -6,7 +6,8 @@ import { CartSchema,
   UserInputSchema,
   UserSignInSchema,
   ReviewInputSchema,
-  UserSignUpSchema,  } from "@/lib/validator";
+  UserSignUpSchema,
+  UserNameSchema,  } from "@/lib/validator";
 import { z } from "zod";
 
 export type IProductInput = z.infer<typeof ProductInputSchema>;
@@ -48,3 +49,4 @@ export type IReviewDetails = IReviewInput & {
     name: string
   }
 }
+export type IUserName = z.infer<typeof UserNameSchema>
