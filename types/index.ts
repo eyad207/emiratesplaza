@@ -7,12 +7,14 @@ import { CartSchema,
   UserSignInSchema,
   ReviewInputSchema,
   UserSignUpSchema,
+  WebPageInputSchema,
   UserNameSchema,  } from "@/lib/validator";
 import { z } from "zod";
 
 export type IProductInput = z.infer<typeof ProductInputSchema>;
 export type Data = {
   users: IUserInput[]
+  webPages: IWebPageInput[]
   products: IProductInput[];
   headerMenus: {
     name: string;
@@ -58,3 +60,5 @@ export type IOrderList = IOrderInput & {
   }
   createdAt: Date
 }
+// webpage
+export type IWebPageInput = z.infer<typeof WebPageInputSchema>
