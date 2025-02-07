@@ -45,6 +45,7 @@ export default function OrderDetailsForm({
         <Card>
           <CardContent className='p-4 gap-4'>
             <h2 className='text-xl pb-4'>Shipping Address</h2>
+            <p style={{ fontWeight: 'bold' }}>Recipt sent to your login email address</p>
             <p>
               {shippingAddress.fullName} {shippingAddress.phone}
             </p>
