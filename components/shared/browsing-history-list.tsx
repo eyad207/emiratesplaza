@@ -4,24 +4,26 @@ import React, { useEffect } from 'react'
 import ProductSlider from './product/product-slider'
 import { Separator } from '../ui/separator'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export default function BrowsingHistoryList({
   className,
 }: {
   className?: string
 }) {
+  const t = useTranslations('Home')
   const { products } = useBrowsingHistory()
   return (
     products.length !== 0 && (
       <div className='bg-background'>
         <Separator className={cn('mb-4', className)} />
         <ProductList
-          title={"Related to items that you've viewed"}
+          title={t("Related to items that you've viewed")}
           type='related'
         />
         <Separator className='mb-4' />
         <ProductList
-          title={'Your browsing history'}
+          title={t('Your browsing history')}
           hideDetails
           type='history'
         />
@@ -32,19 +34,21 @@ export default function BrowsingHistoryList({
 
 function ProductList({
   title,
+  excludeId = '',
   type = 'history',
   hideDetails = false,
 }: {
   title: string
   type: 'history' | 'related'
   hideDetails?: boolean
+  excludeId?: string
 }) {
   const { products } = useBrowsingHistory()
   const [data, setData] = React.useState([])
   useEffect(() => {
     const fetchProducts = async () => {
       const res = await fetch(
-        `/api/products/browsing-history?type=${type}&categories=${products
+        `/api/products/browsing-history?type=${type}&excludeId=${excludeId}&categories=${products
           .map((product) => product.category)
           .join(',')}&ids=${products.map((product) => product.id).join(',')}`
       )
@@ -52,15 +56,11 @@ function ProductList({
       setData(data)
     }
     fetchProducts()
-  }, [products, type])
+  }, [excludeId, products, type])
 
   return (
     data.length > 0 && (
-      <ProductSlider
-        title={title}
-        products={data}
-        hideDetails={hideDetails}
-      />
+      <ProductSlider title={title} products={data} hideDetails={hideDetails} />
     )
   )
 }

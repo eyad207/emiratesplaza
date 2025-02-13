@@ -86,7 +86,7 @@ export const toSlug = (text: string): string =>
     .replace(/-+/g, "-")
 
 const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
-  currency: "USD",
+  currency: "AED",
   style: "currency",
   minimumFractionDigits: 2,
 });

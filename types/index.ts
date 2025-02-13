@@ -8,12 +8,19 @@ import { CartSchema,
   ReviewInputSchema,
   UserSignUpSchema,
   WebPageInputSchema,
+  CarouselSchema,
+  DeliveryDateSchema,
+  PaymentMethodSchema,
+  SettingInputSchema,
+  SiteCurrencySchema,
+  SiteLanguageSchema,
   UserNameSchema,  } from "@/lib/validator";
 import { z } from "zod";
 
 export type IProductInput = z.infer<typeof ProductInputSchema>;
 export type Data = {
   users: IUserInput[]
+  settings: ISettingInput[]
   webPages: IWebPageInput[]
   products: IProductInput[];
   headerMenus: {
@@ -34,7 +41,16 @@ export type Data = {
   }[];
 };
 
-
+// setting
+export type ICarousel = z.infer<typeof CarouselSchema>
+export type ISettingInput = z.infer<typeof SettingInputSchema>
+export type ClientSetting = ISettingInput & {
+  currency: string
+}
+export type SiteLanguage = z.infer<typeof SiteLanguageSchema>
+export type SiteCurrency = z.infer<typeof SiteCurrencySchema>
+export type PaymentMethod = z.infer<typeof PaymentMethodSchema>
+export type DeliveryDate = z.infer<typeof DeliveryDateSchema>
 // user
 export type IUserInput = z.infer<typeof UserInputSchema>
 export type IUserSignIn = z.infer<typeof UserSignInSchema>

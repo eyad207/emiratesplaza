@@ -1,6 +1,8 @@
 import { toSlug } from "./utils";
 import { Data, IProductInput, IUserInput } from "@/types";
 import bcrypt from "bcryptjs";
+import { i18n } from '@/i18n-config'
+
 const users: IUserInput[] = [
   {
     name: "John",
@@ -1238,6 +1240,94 @@ We also provide helpful resources such as order tracking, product guides, and FA
       slug: 'shipping',
       content: 'Shipping Rates & Policies',
       isPublished: true,
+    },
+  ],
+  settings: [
+    {
+      common: {
+        freeShippingMinPrice: 35,
+        isMaintenanceMode: false,
+        defaultTheme: 'Light',
+        defaultColor: 'Gold',
+        pageSize: 9,
+      },
+      site: {
+        name: 'EmiratesPlaza',
+        description:
+          'EmiratesPlaza is a platform that allows you to buy products online.',
+        keywords: 'Buy products online, EmiratesPlaza is a platform',
+        url: 'https://next-mongo-ecommerce-final.vercel.app',
+        logo: '/icons/logo.svg',
+        slogan: 'Spend less, enjoy more.',
+        author: 'Next Ecommerce',
+        copyright: '2000-2024, Next-Ecommerce.com, Inc. or its affiliates',
+        email: 'admin@example.com',
+        address: '123, Main Street, Anytown, CA, Zip 12345',
+        phone: '+1 (123) 456-7890',
+      },
+      carousels: [
+        {
+          title: 'Most Popular Shoes For Sale',
+          buttonCaption: 'Shop Now',
+          image: '/images/banner3.jpg',
+          url: '/search?category=Shoes',
+        },
+        {
+          title: 'Best Sellers in T-Shirts',
+          buttonCaption: 'Shop Now',
+          image: '/images/banner1.jpg',
+          url: '/search?category=T-Shirts',
+        },
+        {
+          title: 'Best Deals on Wrist Watches',
+          buttonCaption: 'See More',
+          image: '/images/banner2.jpg',
+          url: '/search?category=Wrist Watches',
+        },
+      ],
+      availableLanguages: i18n.locales.map((locale) => ({
+        code: locale.code,
+        name: locale.name,
+      })),
+      defaultLanguage: 'en-US',
+      availableCurrencies: [
+        {
+          name: 'United States Dollar',
+          code: 'USD',
+          symbol: '$',
+          convertRate: 1,
+        },
+        { name: 'Euro', code: 'EUR', symbol: '€', convertRate: 0.96 },
+        { name: 'UAE Dirham', code: 'AED', symbol: 'AED', convertRate: 3.67 },
+      ],
+      defaultCurrency: 'AED',
+      availablePaymentMethods: [
+        { name: 'PayPal', commission: 0 },
+        { name: 'Stripe', commission: 0 },
+        { name: 'Cash On Delivery', commission: 0 },
+      ],
+      defaultPaymentMethod: 'PayPal',
+      availableDeliveryDates: [
+        {
+          name: 'Tomorrow',
+          daysToDeliver: 1,
+          shippingPrice: 12.9,
+          freeShippingMinPrice: 0,
+        },
+        {
+          name: 'Next 3 Days',
+          daysToDeliver: 3,
+          shippingPrice: 6.9,
+          freeShippingMinPrice: 0,
+        },
+        {
+          name: 'Next 5 Days',
+          daysToDeliver: 5,
+          shippingPrice: 4.9,
+          freeShippingMinPrice: 35,
+        },
+      ],
+      defaultDeliveryDate: 'Next 5 Days',
     },
   ],
 };

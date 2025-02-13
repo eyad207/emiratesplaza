@@ -1,39 +1,38 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { APP_DESCRIPTION, APP_NAME, APP_SLOGAN } from '@/lib/constants'
-import ClientProviders from '@/components/shared/client-providers'
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
+import { getSetting } from '@/lib/actions/setting.actions'
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+})
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
+const { site } = await getSetting()
 export const metadata: Metadata = {
   title: {
-    template: `%s | ${APP_NAME}`,
-    default: `${APP_NAME}. ${APP_SLOGAN}`,
+    template: `%s | ${site.name}`,
+    default: `${site.name}. ${site.slogan}`,
   },
-  description: APP_DESCRIPTION,
+  description: site.description,
 }
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClientProviders>{children}</ClientProviders>
-        </body>
+        <div>{children}</div>
+      </body>
     </html>
-  );
+  )
 }
