@@ -4,6 +4,7 @@ import { redirect, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
+import useSettingStore from '@/hooks/use-setting-store'
 import {
   Form,
   FormControl,
@@ -20,7 +21,6 @@ import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignInSchema } from '@/lib/validator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
-import { APP_NAME } from '@/lib/constants'
 
 const signInDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -34,6 +34,9 @@ const signInDefaultValues =
       }
 
 export default function CredentialsSignInForm() {
+  const {
+    setting: { site },
+  } = useSettingStore()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
@@ -104,7 +107,7 @@ export default function CredentialsSignInForm() {
             <Button type='submit'>Sign In</Button>
           </div>
           <div className='text-sm'>
-            By signing in, you agree to {APP_NAME}&apos;s{' '}
+            By signing in, you agree to {site.name}&apos;s{' '}
             <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
             <Link href='/page/privacy-policy'>Privacy Notice.</Link>
           </div>

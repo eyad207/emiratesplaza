@@ -3,13 +3,14 @@ import Link from 'next/link'
 import React from 'react'
 import Menu from '@/components/shared/header/menu'
 import { AdminNav } from './admin-nav'
-import { APP_NAME } from '@/lib/constants'
+import { getSetting } from '@/lib/actions/setting.actions'
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const { site } = await getSetting()
   return (
     <>
       <div className='flex flex-col'>
@@ -20,7 +21,7 @@ export default async function AdminLayout({
                 src='/icons/logo.svg'
                 width={48}
                 height={48}
-                alt={`${APP_NAME} logo`}
+                alt={`${site.name} logo`}
               />
             </Link>
             <AdminNav className='mx-6 hidden md:flex' />

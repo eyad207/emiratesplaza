@@ -8,9 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 import CredentialsSignInForm from './credentials-signin-form'
 import { Button } from '@/components/ui/button'
-import { APP_NAME } from '@/lib/constants'
 import { GoogleSignInForm } from './google-signin-form'
-
+import { getSetting } from '@/lib/actions/setting.actions'
 
 export const metadata: Metadata = {
   title: 'Sign In',
@@ -29,7 +28,7 @@ export default async function SignIn(props: {
   if (session) {
     return redirect(callbackUrl)
   }
-
+  const { site } = await getSetting()
   return (
     <div className='w-full'>
       <Card>
@@ -41,16 +40,16 @@ export default async function SignIn(props: {
             <CredentialsSignInForm />
           </div>
           <SeparatorWithOr />
-            <div className='mt-4'>
-              <GoogleSignInForm />
-            </div>
+          <div className='mt-4'>
+            <GoogleSignInForm />
+          </div>
         </CardContent>
       </Card>
-      <SeparatorWithOr>New to {APP_NAME}?</SeparatorWithOr>
+      <SeparatorWithOr>New to {site.name}?</SeparatorWithOr>
 
       <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
         <Button className='w-full' variant='outline'>
-          Create your {APP_NAME} account
+          Create your {site.name} account
         </Button>
       </Link>
     </div>
