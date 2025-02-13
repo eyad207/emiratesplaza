@@ -8,11 +8,11 @@ import AppInitializer from './app-initializer'
 import { ClientSetting } from '@/types'
 
 export default function ClientProviders({
-  children,
   setting,
+  children,
 }: {
-  children: React.ReactNode
   setting: ClientSetting
+  children: React.ReactNode
 }) {
   const visible = useCartSidebar()
 

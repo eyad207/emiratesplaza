@@ -6,12 +6,12 @@ import {
   Heading,
   Html,
   Img,
+  Link,
   Preview,
   Row,
   Section,
   Tailwind,
   Text,
-  Link,
 } from '@react-email/components'
 
 import { formatCurrency } from '@/lib/utils'

@@ -10,8 +10,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
-import { ChevronDownIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { ChevronDownIcon } from 'lucide-react'
 
 type RatingSummaryProps = {
   asPopover?: boolean
@@ -29,12 +29,12 @@ export default function RatingSummary({
   numReviews = 0,
   ratingDistribution = [],
 }: RatingSummaryProps) {
+  const t = useTranslations()
   const RatingDistribution = () => {
     const ratingPercentageDistribution = ratingDistribution.map((x) => ({
       ...x,
       percentage: Math.round((x.count / numReviews) * 100),
     }))
-    const t = useTranslations()
 
     return (
       <>
@@ -49,6 +49,7 @@ export default function RatingSummary({
         <div className='text-lg '>
           {t('Product.numReviews ratings', { numReviews })}
         </div>
+
         <div className='space-y-3'>
           {ratingPercentageDistribution
             .sort((a, b) => b.rating - a.rating)
@@ -60,7 +61,7 @@ export default function RatingSummary({
                 <div className='text-sm'>
                   {' '}
                   {t('Product.rating star', { rating })}
-                </div>{' '}
+                </div>
                 <Progress value={percentage} className='h-4' />
                 <div className='text-sm text-right'>{percentage}%</div>
               </div>
@@ -69,7 +70,7 @@ export default function RatingSummary({
       </>
     )
   }
-  const t = useTranslations()
+
   return asPopover ? (
     <div className='flex items-center gap-1'>
       <Popover>

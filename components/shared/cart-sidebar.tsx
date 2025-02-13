@@ -6,9 +6,6 @@ import { Button, buttonVariants } from '../ui/button'
 import { Separator } from '../ui/separator'
 import { ScrollArea } from '../ui/scroll-area'
 import Image from 'next/image'
-import useSettingStore from '@/hooks/use-setting-store'
-import { useLocale, useTranslations } from 'next-intl'
-import { getDirection } from '@/i18n-config'
 import {
   Select,
   SelectContent,
@@ -17,7 +14,10 @@ import {
   SelectValue,
 } from '../ui/select'
 import { TrashIcon } from 'lucide-react'
+import useSettingStore from '@/hooks/use-setting-store'
 import ProductPrice from './product/product-price'
+import { useLocale, useTranslations } from 'next-intl'
+import { getDirection } from '@/i18n-config'
 
 export default function CartSidebar() {
   const {
@@ -32,6 +32,7 @@ export default function CartSidebar() {
   } = useSettingStore()
 
   const t = useTranslations()
+
   const locale = useLocale()
   return (
     <div className='w-32 overflow-y-auto'>

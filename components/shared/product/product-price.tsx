@@ -2,6 +2,7 @@
 import useSettingStore from '@/hooks/use-setting-store'
 import { cn, round2 } from '@/lib/utils'
 import { useFormatter, useTranslations } from 'next-intl'
+
 const ProductPrice = ({
   price,
   className,
@@ -70,7 +71,7 @@ const ProductPrice = ({
               currency: currency.code,
               currencyDisplay: 'narrowSymbol',
             })}
-          </span>{' '}
+          </span>
         </div>
       </div>
     </div>
@@ -85,14 +86,14 @@ const ProductPrice = ({
         </div>
       </div>
       <div className='text-muted-foreground text-xs py-2'>
-        List price: {t('Product.List price')}:{' '}
+        {t('Product.List price')}:{' '}
         <span className='line-through'>
           {format.number(convertedListPrice, {
             style: 'currency',
             currency: currency.code,
             currencyDisplay: 'narrowSymbol',
           })}
-        </span>{' '}
+        </span>
       </div>
     </div>
   )

@@ -2,17 +2,17 @@
 import useBrowsingHistory from '@/hooks/use-browsing-history'
 import React, { useEffect } from 'react'
 import ProductSlider from './product/product-slider'
+import { useTranslations } from 'next-intl'
 import { Separator } from '../ui/separator'
 import { cn } from '@/lib/utils'
-import { useTranslations } from 'next-intl'
 
 export default function BrowsingHistoryList({
   className,
 }: {
   className?: string
 }) {
-  const t = useTranslations('Home')
   const { products } = useBrowsingHistory()
+  const t = useTranslations('Home')
   return (
     products.length !== 0 && (
       <div className='bg-background'>
@@ -34,14 +34,14 @@ export default function BrowsingHistoryList({
 
 function ProductList({
   title,
-  excludeId = '',
   type = 'history',
   hideDetails = false,
+  excludeId = '',
 }: {
   title: string
   type: 'history' | 'related'
-  hideDetails?: boolean
   excludeId?: string
+  hideDetails?: boolean
 }) {
   const { products } = useBrowsingHistory()
   const [data, setData] = React.useState([])

@@ -1,12 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { getAllCategories } from '@/lib/actions/product.actions'
 import Menu from './menu'
 import Search from './search'
-import Sidebar from './sidebar'
 import data from '@/lib/data'
+import Sidebar from './sidebar'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { getTranslations } from 'next-intl/server'
-import { getAllCategories } from '@/lib/actions/product.actions'
 
 export default async function Header() {
   const categories = await getAllCategories()
@@ -30,6 +30,7 @@ export default async function Header() {
               {site.name}
             </Link>
           </div>
+
           <div className='hidden md:block flex-1 max-w-xl'>
             <Search />
           </div>

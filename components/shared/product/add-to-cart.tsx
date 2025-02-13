@@ -12,9 +12,9 @@ import {
 import useCartStore from '@/hooks/use-cart-store'
 import { useToast } from '@/hooks/use-toast'
 import { OrderItem } from '@/types'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
 
 export default function AddToCart({
   item,
@@ -23,14 +23,15 @@ export default function AddToCart({
   item: OrderItem
   minimal?: boolean
 }) {
-  //PROMPT: add quantity state
-  const t = useTranslations()
   const router = useRouter()
   const { toast } = useToast()
 
   const { addItem } = useCartStore()
 
+  //PROMPT: add quantity state
   const [quantity, setQuantity] = useState(1)
+
+  const t = useTranslations()
 
   return minimal ? (
     <Button
@@ -69,7 +70,7 @@ export default function AddToCart({
         <SelectTrigger className=''>
           <SelectValue>
             {t('Product.Quantity')}: {quantity}
-          </SelectValue>{' '}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent position='popper'>
           {Array.from({ length: item.countInStock }).map((_, i) => (

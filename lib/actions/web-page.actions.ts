@@ -5,8 +5,10 @@ import { revalidatePath } from 'next/cache'
 import { connectToDatabase } from '@/lib/db'
 import WebPage, { IWebPage } from '@/lib/db/models/web-page.model'
 import { formatError } from '@/lib/utils'
+
 import { WebPageInputSchema, WebPageUpdateSchema } from '../validator'
 import { z } from 'zod'
+
 // CREATE
 export async function createWebPage(data: z.infer<typeof WebPageInputSchema>) {
   try {
@@ -38,7 +40,6 @@ export async function updateWebPage(data: z.infer<typeof WebPageUpdateSchema>) {
     return { success: false, message: formatError(error) }
   }
 }
-
 // DELETE
 export async function deleteWebPage(id: string) {
   try {

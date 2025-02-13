@@ -3,11 +3,11 @@
 import { ShoppingCartIcon } from 'lucide-react'
 import Link from 'next/link'
 import useIsMounted from '@/hooks/use-is-mounted'
+import useShowSidebar from '@/hooks/use-cart-sidebar'
 import { cn } from '@/lib/utils'
 import useCartStore from '@/hooks/use-cart-store'
 import { useLocale, useTranslations } from 'next-intl'
 import { getDirection } from '@/i18n-config'
-import useShowSidebar from '@/hooks/use-cart-sidebar'
 
 export default function CartButton() {
   const isMounted = useIsMounted()
@@ -37,6 +37,7 @@ export default function CartButton() {
           </span>
         )}
         <span className='font-bold'>{t('Header.Cart')}</span>
+
         {showSidebar && (
           <div
             className={`absolute top-[20px] ${

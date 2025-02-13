@@ -11,16 +11,17 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl'
 import { ICarousel } from '@/types'
 
 export function HomeCarousel({ items }: { items: ICarousel[] }) {
-  const t = useTranslations('Home')
   const plugin = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true })
   )
+
+  const t = useTranslations('Home')
 
   return (
     <Carousel
