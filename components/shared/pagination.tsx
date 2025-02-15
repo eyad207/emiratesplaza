@@ -22,6 +22,8 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
   const onClick = (btnType: string) => {
     const pageValue = btnType === 'next' ? Number(page) + 1 : Number(page) - 1
 
+    if (!searchParams) return
+
     const newUrl = formUrlQuery({
       params: searchParams.toString(),
       key: urlParamName || 'page',
@@ -33,7 +35,9 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
 
   const t = useTranslations()
   return (
-    <div className='flex items-center gap-2'>
+    <div className='flex items-center gap-3' style={{ marginTop: '100px' }}>
+      {' '}
+      {/* Add inline style for margin-top */}
       <Button
         size='lg'
         variant='outline'
