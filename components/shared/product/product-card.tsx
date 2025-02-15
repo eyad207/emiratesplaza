@@ -94,7 +94,7 @@ const ProductCard = ({
   )
 
   return hideBorder ? (
-    <div className='flex flex-col'>
+    <div className='flex flex-col transition-transform transform hover:scale-105 shadow-md h-full m-4'>
       <ProductImage />
       {!hideDetails && (
         <>
@@ -106,7 +106,7 @@ const ProductCard = ({
       )}
     </div>
   ) : (
-    <Card className='flex flex-col  '>
+    <Card className='flex flex-col transition-transform transform hover:scale-105 shadow-md h-full m-4'>
       <CardHeader className='p-3'>
         <ProductImage />
       </CardHeader>

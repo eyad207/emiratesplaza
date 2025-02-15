@@ -13,39 +13,19 @@ const ImageHover = ({
   alt: string
 }) => {
   const [isHovered, setIsHovered] = useState(false)
-  let hoverTimeout: any
-  const handleMouseEnter = () => {
-    hoverTimeout = setTimeout(() => setIsHovered(true), 1000) // 1 second delay
-  }
-
-  const handleMouseLeave = () => {
-    clearTimeout(hoverTimeout)
-    setIsHovered(false)
-  }
 
   return (
     <div
-      className='relative h-52'
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      className='relative h-full w-full'
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <Image
-        src={src}
+        src={isHovered ? hoverSrc : src}
         alt={alt}
         fill
         sizes='80vw'
-        className={`object-contain transition-opacity duration-500 ${
-          isHovered ? 'opacity-0' : 'opacity-100'
-        }`}
-      />
-      <Image
-        src={hoverSrc}
-        alt={alt}
-        fill
-        sizes='80vw'
-        className={`absolute inset-0 object-contain transition-opacity duration-500 ${
-          isHovered ? 'opacity-100' : 'opacity-0'
-        }`}
+        className='object-contain'
       />
     </div>
   )
