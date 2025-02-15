@@ -29,7 +29,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'flex flex-col hover:scale-105 transition-transform',
+                    'flex flex-col transition-transform duration-500 ease-in-out hover:translate-y-[-5px]', // Update hover animation
                     item.className
                   )}
                 >
@@ -49,7 +49,10 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
           </CardContent>
           {card.link && (
             <CardFooter>
-              <Link href={card.link.href} className='mt-4 block'>
+              <Link
+                href={card.link.href}
+                className='mt-4 block transition-transform duration-500 ease-in-out hover:translate-y-[-5px]' // Update hover animation
+              >
                 {card.link.text}
               </Link>
             </CardFooter>
