@@ -40,11 +40,15 @@ export default async function HomePage() {
         name: category,
         image: `/images/${toSlug(category)}.jpg`,
         href: `/search?category=${category}`,
+        className: 'transition-transform duration-300 hover:scale-105', // Add hover animation
       })),
     },
     {
       title: t('Explore New Arrivals'),
-      items: newArrivals,
+      items: newArrivals.map((item) => ({
+        ...item,
+        className: 'transition-transform duration-300 hover:scale-105', // Add hover animation
+      })),
       link: {
         text: t('View All'),
         href: '/search?tag=new-arrival',
@@ -52,7 +56,10 @@ export default async function HomePage() {
     },
     {
       title: t('Discover Best Sellers'),
-      items: bestSellers,
+      items: bestSellers.map((item) => ({
+        ...item,
+        className: 'transition-transform duration-300 hover:scale-105', // Add hover animation
+      })),
       link: {
         text: t('View All'),
         href: '/search?tag=new-arrival',
@@ -60,7 +67,10 @@ export default async function HomePage() {
     },
     {
       title: t('Featured Products'),
-      items: featureds,
+      items: featureds.map((item) => ({
+        ...item,
+        className: 'transition-transform duration-300 hover:scale-105', // Add hover animation
+      })),
       link: {
         text: t('Shop Now'),
         href: '/search?tag=new-arrival',
@@ -83,13 +93,12 @@ export default async function HomePage() {
             <ProductSlider
               title={t('Best Selling Products')}
               products={bestSellingProducts}
-              hideDetails
             />
           </CardContent>
         </Card>
       </div>
 
-      <div className='p-4 bg-background'>
+      <div className='md:p-4 md:space-y-4 bg-border'>
         <BrowsingHistoryList />
       </div>
     </>

@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 
 type CardItem = {
   title: string
@@ -11,6 +12,7 @@ type CardItem = {
     items?: string[]
     image: string
     href: string
+    className?: string
   }[]
 }
 
@@ -26,7 +28,10 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className='flex flex-col'
+                  className={cn(
+                    'flex flex-col hover:scale-105 transition-transform',
+                    item.className
+                  )}
                 >
                   <Image
                     src={item.image}

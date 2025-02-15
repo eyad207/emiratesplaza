@@ -35,7 +35,7 @@ export function HomeCarousel({ items }: { items: ICarousel[] }) {
         {items.map((item) => (
           <CarouselItem key={item.title}>
             <Link href={item.url}>
-              <div className='flex aspect-[16/6] items-center justify-center p-6 relative -m-1'>
+              <div className='flex aspect-[16/6] items-center justify-center p-6 relative -m-1 transition-transform duration-300 hover:scale-105'>
                 <Image
                   src={item.image}
                   alt={item.title}
