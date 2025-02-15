@@ -24,7 +24,7 @@ export default function Footer() {
   const locale = useLocale()
   const t = useTranslations()
   return (
-    <footer className='bg-black  text-white underline-link'>
+    <footer className='bg-black  text-white underline-link mt-10'>
       <div className='w-full'>
         <Button
           variant='ghost'
