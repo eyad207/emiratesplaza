@@ -3,7 +3,12 @@
 import bcrypt from 'bcryptjs'
 import { auth, signIn, signOut } from '@/auth'
 import { IUserName, IUserSignIn, IUserSignUp } from '@/types'
-import { UserSignUpSchema, UserUpdateSchema } from '../validator'
+import {
+  UserSignUpSchema,
+  UserUpdateSchema,
+  UserEmailSchema,
+  UserPasswordSchema,
+} from '../validator'
 import { connectToDatabase } from '../db'
 import User, { IUser } from '../db/models/user.model'
 import { formatError } from '../utils'
@@ -81,6 +86,60 @@ export async function updateUserName(user: IUserName) {
     return {
       success: true,
       message: 'User updated successfully',
+      data: JSON.parse(JSON.stringify(updatedUser)),
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+
+export async function updateUserEmail(
+  emailData: z.infer<typeof UserEmailSchema>
+) {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+    const currentUser = await User.findById(session?.user?.id)
+    if (!currentUser) throw new Error('User not found')
+
+    const isMatch = await bcrypt.compare(
+      emailData.password,
+      currentUser.password
+    )
+    if (!isMatch) throw new Error('Password is incorrect')
+
+    currentUser.email = emailData.email
+    const updatedUser = await currentUser.save()
+    return {
+      success: true,
+      message: 'Email updated successfully',
+      data: JSON.parse(JSON.stringify(updatedUser)),
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+
+export async function updateUserPassword(
+  passwordData: z.infer<typeof UserPasswordSchema>
+) {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+    const currentUser = await User.findById(session?.user?.id)
+    if (!currentUser) throw new Error('User not found')
+
+    const isMatch = await bcrypt.compare(
+      passwordData.oldPassword,
+      currentUser.password
+    )
+    if (!isMatch) throw new Error('Old password is incorrect')
+
+    currentUser.password = await bcrypt.hash(passwordData.password, 5)
+    const updatedUser = await currentUser.save()
+    return {
+      success: true,
+      message: 'Password updated successfully',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
   } catch (error) {

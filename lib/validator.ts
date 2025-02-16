@@ -155,8 +155,27 @@ const UserName = z
   .min(2, { message: 'Username must be at least 2 characters' })
   .max(50, { message: 'Username must be at most 30 characters' })
 const Email = z.string().min(1, 'Email is required').email('Email is invalid')
-const Password = z.string().min(3, 'Password must be at least 3 characters')
+const Password = z.string().min(6, 'Password must be at least 6 characters')
 const UserRole = z.string().min(1, 'role is required')
+
+const UserEmail = z.string().email('Email is invalid')
+const UserPassword = z.string().min(6, 'Password must be at least 6 characters')
+
+export const UserEmailSchema = z.object({
+  email: UserEmail,
+  password: UserPassword,
+})
+
+export const UserPasswordSchema = z
+  .object({
+    oldPassword: UserPassword,
+    password: UserPassword,
+    confirmPassword: UserPassword,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  })
 
 export const UserUpdateSchema = z.object({
   _id: MongoId,
