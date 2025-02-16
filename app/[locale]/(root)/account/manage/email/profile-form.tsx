@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
@@ -22,7 +22,7 @@ import { UserEmailSchema } from '@/lib/validator'
 
 export const ProfileForm = () => {
   const router = useRouter()
-  const { data: session, update } = useSession()
+  const { data: session } = useSession()
   const form = useForm<z.infer<typeof UserEmailSchema>>({
     resolver: zodResolver(UserEmailSchema),
     defaultValues: {
@@ -40,19 +40,11 @@ export const ProfileForm = () => {
         description: res.message,
       })
 
-    const { data, message } = res
-    const newSession = {
-      ...session,
-      user: {
-        ...session?.user,
-        email: data.email,
-      },
-    }
-    await update(newSession)
     toast({
-      description: message,
+      description: res.message,
     })
-    router.push('/account/manage')
+    await signOut()
+    router.push('/signin')
   }
   return (
     <Form {...form}>

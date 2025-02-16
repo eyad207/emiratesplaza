@@ -110,9 +110,10 @@ export async function updateUserEmail(
 
     currentUser.email = emailData.email
     const updatedUser = await currentUser.save()
+    await signOut({ redirect: false })
     return {
       success: true,
-      message: 'Email updated successfully',
+      message: 'Email updated successfully. Please sign in again.',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
   } catch (error) {
@@ -137,9 +138,10 @@ export async function updateUserPassword(
 
     currentUser.password = await bcrypt.hash(passwordData.password, 5)
     const updatedUser = await currentUser.save()
+    await signOut({ redirect: false })
     return {
       success: true,
-      message: 'Password updated successfully',
+      message: 'Password updated successfully. Please sign in again.',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
   } catch (error) {
