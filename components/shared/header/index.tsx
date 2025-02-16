@@ -7,13 +7,20 @@ import data from '@/lib/data'
 import Sidebar from './sidebar'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { getTranslations } from 'next-intl/server'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { EllipsisVerticalIcon } from 'lucide-react'
 
 export default async function Header() {
   const categories = await getAllCategories()
   const { site } = await getSetting()
   const t = await getTranslations()
   return (
-    <header className='bg-black  text-white'>
+    <header className='bg-dark-blue text-white'>
       <div className='px-2'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center'>
@@ -40,9 +47,9 @@ export default async function Header() {
           <Search />
         </div>
       </div>
-      <div className='flex items-center px-3 mb-[1px]  bg-gray-800'>
+      <div className='flex items-center justify-center px-3 mb-[1px] bg-dark-blue-darker'>
         <Sidebar categories={categories} />
-        <div className='flex items-center flex-wrap gap-3 overflow-hidden   max-h-[42px]'>
+        <div className='flex items-center flex-wrap gap-3 overflow-hidden max-h-[42px]'>
           {data.headerMenus.map((menu) => (
             <Link
               href={menu.href}
@@ -52,6 +59,20 @@ export default async function Header() {
               {t('Header.' + menu.name)}
             </Link>
           ))}
+        </div>
+        <div className='md:hidden block'>
+          <DropdownMenu>
+            <DropdownMenuTrigger className='header-button'>
+              <EllipsisVerticalIcon className='h-6 w-6' />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {data.headerMenus.map((menu) => (
+                <DropdownMenuItem key={menu.href} asChild>
+                  <Link href={menu.href}>{t('Header.' + menu.name)}</Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

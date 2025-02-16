@@ -7,7 +7,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import useSettingStore from '@/hooks/use-setting-store'
@@ -23,17 +22,23 @@ export default function LanguageSwitcher() {
     await setCurrencyOnServer(newCurrency)
     setCurrency(newCurrency)
   }
+
+  const currentCurrency = availableCurrencies.find((c) => c.code === currency)
+
+  const displaySymbol =
+    currentCurrency?.code === 'AED' ? 'د.إ' : currentCurrency?.symbol
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='header-button h-[41px]'>
         <div className='flex items-center gap-1'>
-          <span className='text-l'>{currency}</span>
+          <span className='text-l'>
+            {displaySymbol} {currency}
+          </span>
           <ChevronDownIcon />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56'>
-        <DropdownMenuSeparator />
-
         <DropdownMenuLabel>Currency</DropdownMenuLabel>
         <DropdownMenuRadioGroup
           value={currency}
@@ -41,7 +46,7 @@ export default function LanguageSwitcher() {
         >
           {availableCurrencies.map((c) => (
             <DropdownMenuRadioItem key={c.name} value={c.code}>
-              {c.symbol} {c.code}
+              {c.code === 'AED' ? 'د.إ' : c.symbol} {c.code}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
