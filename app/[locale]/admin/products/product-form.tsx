@@ -25,7 +25,6 @@ import { ProductInputSchema, ProductUpdateSchema } from '@/lib/validator'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toSlug } from '@/lib/utils'
 import { IProductInput } from '@/types'
-import { useState } from 'react'
 
 const productDefaultValues: IProductInput =
   process.env.NODE_ENV === 'development'
@@ -124,61 +123,7 @@ const ProductForm = ({
   }
   const images = form.watch('images')
 
-  const [colors, setColors] = useState(
-    product?.colors.map((color) => ({
-      color,
-      sizes: [{ size: '', stock: 0 }],
-    })) || []
-  )
-
-  const addColor = () => {
-    setColors([...colors, { color: '', sizes: [{ size: '', stock: 0 }] }])
-  }
-
-  const handleColorChange = (index: number, value: string) => {
-    const newColors = [...colors]
-    newColors[index].color = value
-    setColors(newColors)
-  }
-
-  const addSize = (colorIndex: number) => {
-    const newColors = [...colors]
-    newColors[colorIndex].sizes.push({ size: '', stock: 0 })
-    setColors(newColors)
-  }
-
-  const handleSizeChange = (
-    colorIndex: number,
-    sizeIndex: number,
-    value: string
-  ) => {
-    const newColors = [...colors]
-    newColors[colorIndex].sizes[sizeIndex].size = value
-    setColors(newColors)
-  }
-
-  const handleStockChange = (
-    colorIndex: number,
-    sizeIndex: number,
-    value: number
-  ) => {
-    const newColors = [...colors]
-    newColors[colorIndex].sizes[sizeIndex].stock = value
-    setColors(newColors)
-  }
-
-  const removeColor = (index: number) => {
-    const newColors = [...colors]
-    newColors.splice(index, 1)
-    setColors(newColors)
-  }
-
-  const removeSize = (colorIndex: number, sizeIndex: number) => {
-    const newColors = [...colors]
-    newColors[colorIndex].sizes.splice(sizeIndex, 1)
-    setColors(newColors)
-  }
-
+  console.log(form.formState.errors)
   return (
     <Form {...form}>
       <form
@@ -320,7 +265,7 @@ const ProductForm = ({
                   <CardContent className='space-y-2 mt-2 min-h-48'>
                     <div className='flex justify-start items-center space-x-2'>
                       {images.map((image: string, index: number) => (
-                        <div key={image} className='relative'>
+                        <div key={index} className='relative'>
                           <Image
                             src={image}
                             alt='product image'
@@ -336,9 +281,9 @@ const ProductForm = ({
                               )
                               form.setValue('images', updatedImages)
                             }}
-                            className='absolute top-0 right-0 bg-red-500 text-white rounded-full p-0.5 text-xs'
+                            className='absolute top-0 right-0 bg-red-600 text-white rounded-full p-1 w-4 h-4 flex items-center justify-center'
                           >
-                            &times;
+                            X
                           </button>
                         </div>
                       ))}
@@ -360,87 +305,6 @@ const ProductForm = ({
                   </CardContent>
                 </Card>
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className='flex flex-col gap-5 md:flex-row'>
-          <FormField
-            control={form.control}
-            name='colors'
-            render={() => (
-              <FormItem className='w-full'>
-                <FormLabel>Colors</FormLabel>
-                <Card>
-                  <CardContent className='space-y-2 mt-2 min-h-48'>
-                    {colors.map((color, colorIndex) => (
-                      <div key={colorIndex} className='space-y-2'>
-                        <div className='flex items-center space-x-2'>
-                          <Input
-                            value={color.color}
-                            onChange={(e) =>
-                              handleColorChange(colorIndex, e.target.value)
-                            }
-                            placeholder='Enter color'
-                          />
-                          <Button
-                            type='button'
-                            onClick={() => removeColor(colorIndex)}
-                          >
-                            Remove Color
-                          </Button>
-                        </div>
-                        {color.sizes.map((size, sizeIndex) => (
-                          <div
-                            key={sizeIndex}
-                            className='flex items-center space-x-2'
-                          >
-                            <Input
-                              value={size.size}
-                              onChange={(e) =>
-                                handleSizeChange(
-                                  colorIndex,
-                                  sizeIndex,
-                                  e.target.value
-                                )
-                              }
-                              placeholder='Enter size'
-                            />
-                            <Input
-                              type='number'
-                              value={size.stock}
-                              onChange={(e) =>
-                                handleStockChange(
-                                  colorIndex,
-                                  sizeIndex,
-                                  Number(e.target.value)
-                                )
-                              }
-                              placeholder='Enter stock'
-                            />
-                            <Button
-                              type='button'
-                              onClick={() => removeSize(colorIndex, sizeIndex)}
-                            >
-                              Remove Size
-                            </Button>
-                          </div>
-                        ))}
-                        <Button
-                          type='button'
-                          onClick={() => addSize(colorIndex)}
-                        >
-                          Add Size
-                        </Button>
-                      </div>
-                    ))}
-                    <Button type='button' onClick={addColor}>
-                      Add Color
-                    </Button>
-                  </CardContent>
-                </Card>
                 <FormMessage />
               </FormItem>
             )}
