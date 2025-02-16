@@ -209,7 +209,7 @@ export async function getMyOrders({
 }
 export async function getOrderById(orderId: string): Promise<IOrder> {
   await connectToDatabase()
-  const order = await Order.findById(orderId)
+  const order = await Order.findById(orderId).populate('user', 'email')
   return JSON.parse(JSON.stringify(order))
 }
 

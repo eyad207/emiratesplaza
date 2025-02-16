@@ -39,7 +39,7 @@ export default function AccountPage() {
               <div>
                 <h2 className='text-xl font-bold'>Login & security</h2>
                 <p className='text-muted-foreground'>
-                  Manage password, email and mobile number
+                  Manage name, password and email
                 </p>
               </div>
             </CardContent>

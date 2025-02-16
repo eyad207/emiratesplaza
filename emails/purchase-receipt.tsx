@@ -55,6 +55,8 @@ PurchaseReceiptEmail.PreviewProps = {
         slug: 'product-1',
         category: 'Category 1',
         countInStock: 10,
+        color: 'Red',
+        size: 'M',
       },
     ],
     paymentMethod: 'PayPal',
@@ -123,6 +125,10 @@ export default async function PurchaseReceiptEmail({
                     <Link href={`${site.url}/product/${item.slug}`}>
                       <Text className='mx-2 my-0'>
                         {item.name} x {item.quantity}
+                      </Text>
+                      <Text className='mx-2 my-0'>
+                        Color: {item.color || 'None'}, Size:{' '}
+                        {item.size || 'None'}
                       </Text>
                     </Link>
                   </Column>

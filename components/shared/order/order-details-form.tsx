@@ -48,6 +48,9 @@ export default function OrderDetailsForm({
         <Card>
           <CardContent className='p-4 gap-4'>
             <h2 className='text-xl pb-4'>Shipping Address</h2>
+            <p className='pb-4 font-bold'>
+              The recipt has been sent to your login email
+            </p>
             <p>
               {shippingAddress.fullName} {shippingAddress.phone}
             </p>
@@ -93,6 +96,8 @@ export default function OrderDetailsForm({
                   <TableHead>Item</TableHead>
                   <TableHead>Quantity</TableHead>
                   <TableHead>Price</TableHead>
+                  <TableHead>Color</TableHead>
+                  <TableHead>Size</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -116,6 +121,12 @@ export default function OrderDetailsForm({
                       <span className='px-2'>{item.quantity}</span>
                     </TableCell>
                     <TableCell className='text-right'>${item.price}</TableCell>
+                    <TableCell>
+                      <span className='px-2'>{item.color || 'None'}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className='px-2'>{item.size || 'None'}</span>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
