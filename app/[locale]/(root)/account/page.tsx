@@ -1,6 +1,6 @@
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import { Card, CardContent } from '@/components/ui/card'
-import { Home, PackageCheckIcon, User } from 'lucide-react'
+import { PackageCheckIcon, User } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import React from 'react'
@@ -40,22 +40,6 @@ export default function AccountPage() {
                 <h2 className='text-xl font-bold'>Login & security</h2>
                 <p className='text-muted-foreground'>
                   Manage password, email and mobile number
-                </p>
-              </div>
-            </CardContent>
-          </Link>
-        </Card>
-
-        <Card>
-          <Link href='/account/addresses'>
-            <CardContent className='flex items-start gap-4 p-6'>
-              <div>
-                <Home className='w-12 h-12' />
-              </div>
-              <div>
-                <h2 className='text-xl font-bold'>Addresses</h2>
-                <p className='text-muted-foreground'>
-                  Edit, remove or set default address
                 </p>
               </div>
             </CardContent>
