@@ -186,6 +186,7 @@ const generateOrder = async (
     deliveredAt: calculatePastDate(i),
     createdAt: calculatePastDate(i),
     expectedDeliveryDate: calculateFutureDate(i % 2),
+    isShipped: false,
     ...calcDeliveryDateAndPriceForSeed({
       items: items.map((item) => ({
         ...item,

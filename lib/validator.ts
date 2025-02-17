@@ -135,6 +135,8 @@ export const OrderInputSchema = z.object({
     ),
   isDelivered: z.boolean().default(false),
   deliveredAt: z.date().optional(),
+  isShipped: z.boolean().default(false),
+  shippedAt: z.date().optional(),
   isPaid: z.boolean().default(false),
   paidAt: z.date().optional(),
 })

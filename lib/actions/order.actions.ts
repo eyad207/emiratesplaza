@@ -128,12 +128,36 @@ export async function deliverOrder(orderId: string) {
     }>('user', 'name email')
     if (!order) throw new Error('Order not found')
     if (!order.isPaid) throw new Error('Order is not paid')
-    order.isDelivered = true
-    order.deliveredAt = new Date()
+    order.isDelivered = !order.isDelivered
+    order.deliveredAt = order.isDelivered ? new Date() : undefined
     await order.save()
-    if (order.user.email) await sendAskReviewOrderItems({ order })
+    if (order.user?.email) await sendAskReviewOrderItems({ order })
     revalidatePath(`/account/orders/${orderId}`)
-    return { success: true, message: 'Order delivered successfully' }
+    return {
+      success: true,
+      message: 'Order delivery status updated successfully',
+    }
+  } catch (err) {
+    return { success: false, message: formatError(err) }
+  }
+}
+
+export async function shipOrder(orderId: string) {
+  try {
+    await connectToDatabase()
+    const order = await Order.findById(orderId).populate<{
+      user: { email: string; name: string }
+    }>('user', 'name email')
+    if (!order) throw new Error('Order not found')
+    if (!order.isPaid) throw new Error('Order is not paid')
+    order.isShipped = !order.isShipped
+    order.shippedAt = order.isShipped ? new Date() : undefined
+    await order.save()
+    revalidatePath(`/account/orders/${orderId}`)
+    return {
+      success: true,
+      message: 'Order shipping status updated successfully',
+    }
   } catch (err) {
     return { success: false, message: formatError(err) }
   }

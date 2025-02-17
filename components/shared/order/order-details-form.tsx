@@ -2,6 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -18,7 +22,11 @@ import { cn, formatDateTime } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import ProductPrice from '../product/product-price'
 import ActionButton from '../action-button'
-import { deliverOrder, updateOrderToPaid } from '@/lib/actions/order.actions'
+import {
+  deliverOrder,
+  shipOrder,
+  updateOrderToPaid,
+} from '@/lib/actions/order.actions'
 
 export default function OrderDetailsForm({
   order,
@@ -37,10 +45,52 @@ export default function OrderDetailsForm({
     paymentMethod,
     isPaid,
     paidAt,
-    isDelivered,
+    isDelivered: initialIsDelivered,
     deliveredAt,
     expectedDeliveryDate,
   } = order
+
+  const [isPending, startTransition] = useTransition()
+  const [isDelivered, setIsDelivered] = useState(initialIsDelivered)
+  const [isShipped, setIsShipped] = useState(order.isShipped || false)
+  const router = useRouter()
+  const { toast } = useToast()
+
+  const handleDeliveryStatusChange = async () => {
+    startTransition(async () => {
+      const res = await deliverOrder(order._id)
+      if (res.success) {
+        setIsDelivered(!isDelivered)
+        toast({
+          description: res.message,
+        })
+        router.refresh()
+      } else {
+        toast({
+          variant: 'destructive',
+          description: res.message,
+        })
+      }
+    })
+  }
+
+  const handleShippingStatusChange = async () => {
+    startTransition(async () => {
+      const res = await shipOrder(order._id)
+      if (res.success) {
+        setIsShipped(!isShipped)
+        toast({
+          description: res.message,
+        })
+        router.refresh()
+      } else {
+        toast({
+          variant: 'destructive',
+          description: res.message,
+        })
+      }
+    })
+  }
 
   return (
     <div className='grid md:grid-cols-3 md:gap-5'>
@@ -59,7 +109,14 @@ export default function OrderDetailsForm({
               {shippingAddress.province}, {shippingAddress.postalCode},{' '}
               {shippingAddress.country}{' '}
             </p>
-
+            {isShipped ? (
+              <Badge>Shipped</Badge>
+            ) : (
+              <div>
+                {' '}
+                <Badge variant='destructive'>Not shipped</Badge>
+              </div>
+            )}
             {isDelivered ? (
               <Badge>
                 Delivered at {formatDateTime(deliveredAt!).dateTime}
@@ -182,11 +239,23 @@ export default function OrderDetailsForm({
                 action={() => updateOrderToPaid(order._id)}
               />
             )}
-            {isAdmin && isPaid && !isDelivered && (
-              <ActionButton
-                caption='Mark as delivered'
-                action={() => deliverOrder(order._id)}
-              />
+            {isAdmin && isPaid && (
+              <Button
+                onClick={handleShippingStatusChange}
+                disabled={isPending}
+                variant={isShipped ? 'outline' : 'default'}
+              >
+                {isShipped ? 'Unmark as Shipped' : 'Mark as Shipped'}
+              </Button>
+            )}
+            {isAdmin && isPaid && (
+              <Button
+                onClick={handleDeliveryStatusChange}
+                disabled={isPending}
+                variant={isDelivered ? 'outline' : 'default'}
+              >
+                {isDelivered ? 'Unmark as Delivered' : 'Mark as Delivered'}
+              </Button>
             )}
           </CardContent>
         </Card>
