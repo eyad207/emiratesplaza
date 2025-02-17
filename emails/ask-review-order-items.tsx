@@ -26,6 +26,8 @@ type OrderInformationProps = {
 AskReviewOrderItemsEmail.PreviewProps = {
   order: {
     _id: '123',
+    createdAt: new Date(),
+    updatedAt: new Date(),
     isPaid: true,
     paidAt: new Date(),
     totalPrice: 100,
@@ -61,7 +63,7 @@ AskReviewOrderItemsEmail.PreviewProps = {
     paymentMethod: 'PayPal',
     expectedDeliveryDate: new Date(),
     isDelivered: true,
-  } as IOrder,
+  } as unknown as IOrder,
 } satisfies OrderInformationProps
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
 

@@ -427,7 +427,9 @@ const ProductForm = ({
           ))}
           <Button
             type='button'
-            onClick={() => appendColor({ color: '', sizes: [] })}
+            onClick={() =>
+              appendColor({ color: '', sizes: [{ size: '', countInStock: 0 }] })
+            }
           >
             Add Color
           </Button>

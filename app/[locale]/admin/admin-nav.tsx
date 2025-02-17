@@ -36,7 +36,7 @@ export function AdminNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
-  const pathname = usePathname()
+  const pathname = usePathname() || ''
   const t = useTranslations('Admin')
   return (
     <nav

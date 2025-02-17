@@ -94,7 +94,6 @@ const generateOrder = async (
   products: any
 ): Promise<IOrderInput> => {
   const product1 = await Product.findById(products[i % products.length])
-
   const product2 = await Product.findById(
     products[
       i % products.length >= products.length - 1
@@ -112,6 +111,22 @@ const generateOrder = async (
 
   if (!product1 || !product2 || !product3) throw new Error('Product not found')
 
+  const getRandomColorAndSize = (product: any) => {
+    const colorIndex = Math.floor(Math.random() * product.colors.length)
+    const sizeIndex = Math.floor(
+      Math.random() * product.colors[colorIndex].sizes.length
+    )
+    return {
+      color: product.colors[colorIndex].color,
+      size: product.colors[colorIndex].sizes[sizeIndex].size,
+      countInStock: product.colors[colorIndex].sizes[sizeIndex].countInStock,
+    }
+  }
+
+  const item1 = getRandomColorAndSize(product1)
+  const item2 = getRandomColorAndSize(product2)
+  const item3 = getRandomColorAndSize(product3)
+
   const items = [
     {
       clientId: generateId(),
@@ -122,7 +137,10 @@ const generateOrder = async (
       image: product1.images[0],
       category: product1.category,
       price: product1.price,
-      countInStock: product1.countInStock,
+      color: item1.color,
+      size: item1.size,
+      countInStock: item1.countInStock,
+      colors: product1.colors,
     },
     {
       clientId: generateId(),
@@ -131,9 +149,12 @@ const generateOrder = async (
       slug: product2.slug,
       quantity: 2,
       image: product2.images[0],
-      category: product1.category,
+      category: product2.category,
       price: product2.price,
-      countInStock: product1.countInStock,
+      color: item2.color,
+      size: item2.size,
+      countInStock: item2.countInStock,
+      colors: product2.colors,
     },
     {
       clientId: generateId(),
@@ -142,9 +163,12 @@ const generateOrder = async (
       slug: product3.slug,
       quantity: 3,
       image: product3.images[0],
-      category: product1.category,
+      category: product3.category,
       price: product3.price,
-      countInStock: product1.countInStock,
+      color: item3.color,
+      size: item3.size,
+      countInStock: item3.countInStock,
+      colors: product3.colors,
     },
   ]
 
@@ -163,7 +187,20 @@ const generateOrder = async (
     createdAt: calculatePastDate(i),
     expectedDeliveryDate: calculateFutureDate(i % 2),
     ...calcDeliveryDateAndPriceForSeed({
-      items: items,
+      items: items.map((item) => ({
+        ...item,
+        colors: [
+          {
+            color: item.color,
+            sizes: [
+              {
+                size: item.size,
+                countInStock: item.countInStock,
+              },
+            ],
+          },
+        ],
+      })),
       shippingAddress: data.users[i % users.length].address,
       deliveryDateIndex: i % 2,
     }),

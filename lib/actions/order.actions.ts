@@ -82,6 +82,7 @@ export async function updateOrderToPaid(orderId: string) {
     return { success: false, message: formatError(err) }
   }
 }
+
 const updateProductStock = async (orderId: string) => {
   const session = await mongoose.connection.startSession()
 
@@ -100,12 +101,14 @@ const updateProductStock = async (orderId: string) => {
       const product = await Product.findById(item.product).session(session)
       if (!product) throw new Error('Product not found')
 
-      product.countInStock -= item.quantity
-      await Product.updateOne(
-        { _id: product._id },
-        { countInStock: product.countInStock },
-        opts
-      )
+      const color = product.colors.find((c) => c.color === item.color)
+      if (!color) throw new Error('Color not found')
+
+      const size = color.sizes.find((s) => s.size === item.size)
+      if (!size) throw new Error('Size not found')
+
+      size.countInStock -= item.quantity
+      await product.save(opts)
     }
     await session.commitTransaction()
     session.endSession()
@@ -116,6 +119,7 @@ const updateProductStock = async (orderId: string) => {
     throw error
   }
 }
+
 export async function deliverOrder(orderId: string) {
   try {
     await connectToDatabase()
