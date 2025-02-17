@@ -294,6 +294,7 @@ export async function approvePayPalOrder(
     }
     await order.save()
     await sendPurchaseReceipt({ order })
+    await updateProductStock(order._id)
     revalidatePath(`/account/orders/${orderId}`)
     return {
       success: true,
