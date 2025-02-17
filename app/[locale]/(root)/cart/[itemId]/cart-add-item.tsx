@@ -25,6 +25,7 @@ export default function CartAddItem({ itemId }: { itemId: string }) {
 
   const t = useTranslations()
   if (!item) return notFound()
+
   return (
     <div>
       <div className='grid grid-cols-1 md:grid-cols-2 md:gap-4'>

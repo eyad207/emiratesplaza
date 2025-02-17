@@ -596,7 +596,12 @@ const CheckoutForm = () => {
                                 </SelectTrigger>
                                 <SelectContent position='popper'>
                                   {Array.from({
-                                    length: item.countInStock,
+                                    length:
+                                      item.colors
+                                        .find((c) => c.color === item.color)
+                                        ?.sizes.find(
+                                          (s) => s.size === item.size
+                                        )?.countInStock || 0,
                                   }).map((_, i) => (
                                     <SelectItem key={i + 1} value={`${i + 1}`}>
                                       {i + 1}

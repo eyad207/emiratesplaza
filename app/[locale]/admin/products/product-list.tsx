@@ -30,6 +30,16 @@ type ProductListDataProps = {
   to: number
   from: number
 }
+
+const getTotalCountInStock = (product: IProduct) => {
+  return product.colors.reduce((total, color) => {
+    return (
+      total +
+      color.sizes.reduce((sizeTotal, size) => sizeTotal + size.countInStock, 0)
+    )
+  }, 0)
+}
+
 const ProductList = () => {
   const [page, setPage] = useState<number>(1)
   const [inputValue, setInputValue] = useState<string>('')
@@ -135,7 +145,7 @@ const ProductList = () => {
                   </TableCell>
                   <TableCell className='text-right'>${product.price}</TableCell>
                   <TableCell>{product.category}</TableCell>
-                  <TableCell>{product.countInStock}</TableCell>
+                  <TableCell>{getTotalCountInStock(product)}</TableCell>
                   <TableCell>{product.avgRating}</TableCell>
                   <TableCell>{product.isPublished ? 'Yes' : 'No'}</TableCell>
                   <TableCell>

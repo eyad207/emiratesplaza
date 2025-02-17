@@ -41,11 +41,15 @@ const useCartStore = create(
         )
 
         if (existItem) {
-          if (existItem.countInStock < quantity + existItem.quantity) {
+          const colorObj = existItem.colors.find((c) => c.color === item.color)
+          const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
+          if (sizeObj && sizeObj.countInStock < quantity + existItem.quantity) {
             throw new Error('Not enough items in stock')
           }
         } else {
-          if (item.countInStock < item.quantity) {
+          const colorObj = item.colors.find((c) => c.color === item.color)
+          const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
+          if (sizeObj && sizeObj.countInStock < item.quantity) {
             throw new Error('Not enough items in stock')
           }
         }

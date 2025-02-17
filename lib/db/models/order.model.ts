@@ -7,6 +7,29 @@ export interface IOrder extends Document, IOrderInput {
   updatedAt: Date
 }
 
+const sizeSchema = new Schema({
+  size: {
+    type: String,
+    required: true,
+  },
+  countInStock: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+})
+
+const colorSchema = new Schema({
+  color: {
+    type: String,
+    required: true,
+  },
+  sizes: {
+    type: [sizeSchema],
+    default: [],
+  },
+})
+
 const orderSchema = new Schema<IOrder>(
   {
     user: {
@@ -27,10 +50,13 @@ const orderSchema = new Schema<IOrder>(
         image: { type: String, required: true },
         category: { type: String, required: true },
         price: { type: Number, required: true },
-        countInStock: { type: Number, required: true },
         quantity: { type: Number, required: true },
         size: { type: String },
         color: { type: String },
+        colors: {
+          type: [colorSchema],
+          default: [],
+        },
       },
     ],
     shippingAddress: {

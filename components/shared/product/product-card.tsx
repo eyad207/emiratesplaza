@@ -72,6 +72,7 @@ const ProductCard = ({
       />
     </div>
   )
+
   const AddButton = () => (
     <div className='w-full text-center'>
       <AddToCart
@@ -79,15 +80,15 @@ const ProductCard = ({
         item={{
           clientId: generateId(),
           product: product._id,
-          size: product.sizes[0],
-          color: product.colors[0],
-          countInStock: product.countInStock,
+          size: product.colors[0]?.sizes[0]?.size,
+          color: product.colors[0]?.color,
           name: product.name,
           slug: product.slug,
           category: product.category,
           price: round2(product.price),
           quantity: 1,
           image: product.images[0],
+          colors: product.colors,
         }}
       />
     </div>

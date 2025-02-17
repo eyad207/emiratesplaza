@@ -62,7 +62,9 @@ PurchaseReceiptEmail.PreviewProps = {
     paymentMethod: 'PayPal',
     expectedDeliveryDate: new Date(),
     isDelivered: true,
-  } as IOrder,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  } as unknown as IOrder,
 } satisfies OrderInformationProps
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
 
@@ -151,6 +153,16 @@ export default async function PurchaseReceiptEmail({
                 </Row>
               ))}
             </Section>
+            {typeof order.user === 'object' && order.user.email && (
+              <Section>
+                <Text className='text-gray-500'>
+                  If you have any questions, please contact us at{' '}
+                  <Link href={`mailto:${order.user.email}`}>
+                    {order.user.email}
+                  </Link>
+                </Text>
+              </Section>
+            )}
           </Container>
         </Body>
       </Tailwind>

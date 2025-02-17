@@ -56,6 +56,21 @@ export default async function ProductDetails(props: {
   })
 
   const t = await getTranslations()
+
+  const selectedColor = color || product.colors[0]?.color
+  const selectedSize = size || product.colors[0]?.sizes[0]?.size
+
+  const getSizesForColor = (color: string) => {
+    const colorObj = product.colors.find((c) => c.color === color)
+    return colorObj ? colorObj.sizes : []
+  }
+
+  const getCountInStockForSelectedVariant = () => {
+    const sizes = getSizesForColor(selectedColor)
+    const sizeObj = sizes.find((s) => s.size === selectedSize)
+    return sizeObj ? sizeObj.countInStock : 0
+  }
+
   return (
     <div>
       <AddToBrowsingHistory id={product._id} category={product.category} />
@@ -93,8 +108,8 @@ export default async function ProductDetails(props: {
             <div>
               <SelectVariant
                 product={product}
-                size={size || product.sizes[0]}
-                color={color || product.colors[0]}
+                size={selectedSize}
+                color={selectedColor}
               />
             </div>
             <Separator className='my-2' />
@@ -112,14 +127,15 @@ export default async function ProductDetails(props: {
               <CardContent className='p-4 flex flex-col  gap-4'>
                 <ProductPrice price={product.price} />
 
-                {product.countInStock > 0 && product.countInStock <= 3 && (
-                  <div className='text-destructive font-bold'>
-                    {t('Product.Only X left in stock - order soon', {
-                      count: product.countInStock,
-                    })}
-                  </div>
-                )}
-                {product.countInStock !== 0 ? (
+                {getCountInStockForSelectedVariant() > 0 &&
+                  getCountInStockForSelectedVariant() <= 3 && (
+                    <div className='text-destructive font-bold'>
+                      {t('Product.Only X left in stock - order soon', {
+                        count: getCountInStockForSelectedVariant(),
+                      })}
+                    </div>
+                  )}
+                {getCountInStockForSelectedVariant() !== 0 ? (
                   <div className='text-green-700 text-xl'>
                     {t('Product.In Stock')}
                   </div>
@@ -129,21 +145,21 @@ export default async function ProductDetails(props: {
                   </div>
                 )}
 
-                {product.countInStock !== 0 && (
+                {getCountInStockForSelectedVariant() !== 0 && (
                   <div className='flex justify-center items-center'>
                     <AddToCart
                       item={{
                         clientId: generateId(),
                         product: product._id,
-                        countInStock: product.countInStock,
                         name: product.name,
                         slug: product.slug,
                         category: product.category,
                         price: round2(product.price),
                         quantity: 1,
                         image: product.images[0],
-                        size: size || product.sizes[0],
-                        color: color || product.colors[0],
+                        size: selectedSize,
+                        color: selectedColor,
+                        colors: product.colors,
                       }}
                     />
                   </div>

@@ -17,6 +17,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import { OrderItem } from '@/types'
 
 export default function CartPage() {
   const {
@@ -33,6 +34,19 @@ export default function CartPage() {
   } = useSettingStore()
 
   const t = useTranslations()
+
+  const getSizesForColor = (item: OrderItem, color: string) => {
+    const colorObj = item.colors.find((c) => c.color === color)
+    return colorObj ? colorObj.sizes : []
+  }
+
+  const getCountInStockForSelectedVariant = (item: OrderItem) => {
+    if (!item.color || !item.size) return 0
+    const sizes = getSizesForColor(item, item.color)
+    const sizeObj = sizes.find((s) => s.size === item.size)
+    return sizeObj ? sizeObj.countInStock : 0
+  }
+
   return (
     <div>
       <div className='grid grid-cols-1 md:grid-cols-4  md:gap-4'>
@@ -116,7 +130,7 @@ export default function CartPage() {
                             </SelectTrigger>
                             <SelectContent position='popper'>
                               {Array.from({
-                                length: item.countInStock,
+                                length: getCountInStockForSelectedVariant(item),
                               }).map((_, i) => (
                                 <SelectItem key={i + 1} value={`${i + 1}`}>
                                   {i + 1}

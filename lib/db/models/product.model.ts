@@ -7,6 +7,29 @@ export interface IProduct extends Document, IProductInput {
   updatedAt: Date
 }
 
+const sizeSchema = new Schema({
+  size: {
+    type: String,
+    required: true,
+  },
+  countInStock: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+})
+
+const colorSchema = new Schema({
+  color: {
+    type: String,
+    required: true,
+  },
+  sizes: {
+    type: [sizeSchema],
+    default: [],
+  },
+})
+
 const productSchema = new Schema<IProduct>(
   {
     name: {
@@ -39,13 +62,11 @@ const productSchema = new Schema<IProduct>(
       type: Number,
       required: true,
     },
-    countInStock: {
-      type: Number,
-      required: true,
-    },
     tags: { type: [String], default: ['new arrival'] },
-    colors: { type: [String], default: ['White', 'Red', 'Black'] },
-    sizes: { type: [String], default: ['S', 'M', 'L'] },
+    colors: {
+      type: [colorSchema],
+      default: [],
+    },
     avgRating: {
       type: Number,
       required: true,

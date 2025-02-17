@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -37,13 +37,11 @@ const productDefaultValues: IProductInput =
         description: 'This is a sample description of the product.',
         price: 99.99,
         listPrice: 0,
-        countInStock: 15,
         numReviews: 0,
         avgRating: 0,
         numSales: 0,
         isPublished: false,
         tags: [],
-        sizes: [],
         colors: [],
         ratingDistribution: [],
         reviews: [],
@@ -57,13 +55,11 @@ const productDefaultValues: IProductInput =
         description: '',
         price: 0,
         listPrice: 0,
-        countInStock: 0,
         numReviews: 0,
         avgRating: 0,
         numSales: 0,
         isPublished: false,
         tags: [],
-        sizes: [],
         colors: [],
         ratingDistribution: [],
         reviews: [],
@@ -123,7 +119,24 @@ const ProductForm = ({
   }
   const images = form.watch('images')
 
-  console.log(form.formState.errors)
+  const {
+    fields: colorFields,
+    append: appendColor,
+    remove: removeColor,
+  } = useFieldArray({
+    control: form.control,
+    name: 'colors',
+  })
+
+  const {
+    fields: sizeFields,
+    append: appendSize,
+    remove: removeSize,
+  } = useFieldArray({
+    control: form.control,
+    name: 'colors.0.sizes', // Assuming sizes are nested under the first color
+  })
+
   return (
     <Form {...form}>
       <form
@@ -235,23 +248,6 @@ const ProductForm = ({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name='countInStock'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Count In Stock</FormLabel>
-                <FormControl>
-                  <Input
-                    type='number'
-                    placeholder='Enter product count in stock'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
 
         <div className='flex flex-col gap-5 md:flex-row'>
@@ -351,6 +347,92 @@ const ProductForm = ({
             )}
           />
         </div>
+
+        <div>
+          <FormLabel>Colors and Sizes</FormLabel>
+          {colorFields.map((colorField, colorIndex) => (
+            <div key={colorField.id} className='mb-4'>
+              <div className='flex items-center gap-2'>
+                <FormField
+                  control={form.control}
+                  name={`colors.${colorIndex}.color`}
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel>Color</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Enter color' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type='button'
+                  variant='destructive'
+                  onClick={() => removeColor(colorIndex)}
+                >
+                  Remove Color
+                </Button>
+              </div>
+              <div className='ml-4'>
+                {sizeFields.map((sizeField, sizeIndex) => (
+                  <div key={sizeField.id} className='flex items-center gap-2'>
+                    <FormField
+                      control={form.control}
+                      name={`colors.${colorIndex}.sizes.${sizeIndex}.size`}
+                      render={({ field }) => (
+                        <FormItem className='w-full'>
+                          <FormLabel>Size</FormLabel>
+                          <FormControl>
+                            <Input placeholder='Enter size' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`colors.${colorIndex}.sizes.${sizeIndex}.countInStock`}
+                      render={({ field }) => (
+                        <FormItem className='w-full'>
+                          <FormLabel>Count In Stock</FormLabel>
+                          <FormControl>
+                            <Input
+                              type='number'
+                              placeholder='Enter count in stock'
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type='button'
+                      variant='destructive'
+                      onClick={() => removeSize(sizeIndex)}
+                    >
+                      Remove Size
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type='button'
+                  onClick={() => appendSize({ size: '', countInStock: 0 })}
+                >
+                  Add Size
+                </Button>
+              </div>
+            </div>
+          ))}
+          <Button
+            type='button'
+            onClick={() => appendColor({ color: '', sizes: [] })}
+          >
+            Add Color
+          </Button>
+        </div>
+
         <div>
           <Button
             type='submit'

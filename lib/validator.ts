@@ -14,6 +14,19 @@ const Price = (field: string) =>
       `${field} must have exactly two decimal places (e.g., 49.99)`
     )
 
+const SizeSchema = z.object({
+  size: z.string(),
+  countInStock: z.coerce
+    .number()
+    .int()
+    .nonnegative('Count in stock must be a non-negative number'),
+})
+
+const ColorSchema = z.object({
+  color: z.string(),
+  sizes: z.array(SizeSchema).default([]),
+})
+
 export const ReviewInputSchema = z.object({
   product: MongoId,
   user: MongoId,
@@ -37,13 +50,8 @@ export const ProductInputSchema = z.object({
   isPublished: z.boolean(),
   price: Price('Price'),
   listPrice: Price('List price'),
-  countInStock: z.coerce
-    .number()
-    .int()
-    .nonnegative('count in stock must be a non-negative number'),
   tags: z.array(z.string()).default([]),
-  sizes: z.array(z.string()).default([]),
-  colors: z.array(z.string()).default([]),
+  colors: z.array(ColorSchema).default([]),
   avgRating: z.coerce
     .number()
     .min(0, 'Average rating must be at least 0')
@@ -77,10 +85,7 @@ export const OrderItemSchema = z.object({
     .number()
     .int()
     .nonnegative('Quantity must be a non-negative number'),
-  countInStock: z
-    .number()
-    .int()
-    .nonnegative('Quantity must be a non-negative number'),
+  colors: z.array(ColorSchema).default([]),
   image: z.string().min(1, 'Image is required'),
   price: Price('Price'),
   size: z.string().optional(),
