@@ -179,7 +179,7 @@ const ProductForm = ({
                       onClick={() => {
                         form.setValue('slug', toSlug(form.getValues('name')))
                       }}
-                      className='absolute right-2 top-2.5'
+                      className='absolute right-2 mt-2 bg-slate-500 hover:bg-slate-600 dark: border-r-2 text-white rounded-md p-1'
                     >
                       Generate
                     </button>
@@ -227,7 +227,7 @@ const ProductForm = ({
             name='listPrice'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>List Price</FormLabel>
+                <FormLabel>Price before discount (in $)</FormLabel>
                 <FormControl>
                   <Input placeholder='Enter product list price' {...field} />
                 </FormControl>
@@ -240,7 +240,7 @@ const ProductForm = ({
             name='price'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Net Price</FormLabel>
+                <FormLabel>Net Price (in $)</FormLabel>
                 <FormControl>
                   <Input placeholder='Enter product price' {...field} />
                 </FormControl>
@@ -335,14 +335,15 @@ const ProductForm = ({
             control={form.control}
             name='isPublished'
             render={({ field }) => (
-              <FormItem className='space-x-2 items-center'>
+              <FormItem className='space-x-2 items-center justify-center'>
                 <FormControl>
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    className=''
                   />
                 </FormControl>
-                <FormLabel>Is Published?</FormLabel>
+                <FormLabel className=''>Is Published?</FormLabel>
               </FormItem>
             )}
           />
