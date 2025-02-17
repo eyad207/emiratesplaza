@@ -160,6 +160,7 @@ export default async function PurchaseReceiptEmail({
                   <Link href={`mailto:${order.user.email}`}>
                     {order.user.email}
                   </Link>
+                  note: you can not reply to this email.
                 </Text>
               </Section>
             )}
