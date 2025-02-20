@@ -107,12 +107,13 @@ export default function CredentialsSignInForm() {
             <Button type='submit'>Sign In</Button>
           </div>
           <div className='text-sm'>
+            <span className='mr-1'> Forgot Password?</span>
             <button
               type='button'
               onClick={() => router.push('/forgot-password')}
               className='text-blue-600 hover:underline'
             >
-              Forgot Password?
+              Reset it here
             </button>
           </div>
           <div className='text-sm'>

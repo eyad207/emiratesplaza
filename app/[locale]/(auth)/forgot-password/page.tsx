@@ -14,8 +14,12 @@ import {
 import { toast } from '@/hooks/use-toast'
 import { UserEmailSchema } from '@/lib/validator'
 import { sendResetPasswordEmail } from '@/lib/actions/user.actions'
+import { useRouter } from 'next/navigation'
+////////
 
 export default function ForgotPasswordPage() {
+  const router = useRouter()
+
   const form = useForm({
     resolver: zodResolver(UserEmailSchema),
     defaultValues: { email: '' },
@@ -51,6 +55,11 @@ export default function ForgotPasswordPage() {
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <h1 className='text-2xl font-bold bg-orange-400 py-2 text-center rounded-xl mb-5'>
+            Forgot Password
+          </h1>
+        </div>
         <div className='space-y-6'>
           <FormField
             control={control}
@@ -67,6 +76,15 @@ export default function ForgotPasswordPage() {
           />
           <div>
             <Button type='submit'>Send Reset Email</Button>
+          </div>
+          <div className='text-sm'>
+            <button
+              type='button'
+              onClick={() => router.push('/sign-in')}
+              className='text-blue-600 hover:underline'
+            >
+              Sign-in?
+            </button>
           </div>
         </div>
       </form>
