@@ -1,9 +1,8 @@
 'use client'
-import { redirect, useSearchParams } from 'next/navigation'
+import { redirect, useSearchParams, useRouter } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import Link from 'next/link'
 import useSettingStore from '@/hooks/use-setting-store'
 import {
   Form,
@@ -39,6 +38,7 @@ export default function CredentialsSignInForm() {
   } = useSettingStore()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams?.get('callbackUrl') || '/'
+  const router = useRouter()
 
   const form = useForm<IUserSignIn>({
     resolver: zodResolver(UserSignInSchema),
@@ -107,9 +107,31 @@ export default function CredentialsSignInForm() {
             <Button type='submit'>Sign In</Button>
           </div>
           <div className='text-sm'>
+            <button
+              type='button'
+              onClick={() => router.push('/forgot-password')}
+              className='text-blue-600 hover:underline'
+            >
+              Forgot Password?
+            </button>
+          </div>
+          <div className='text-sm'>
             By signing in, you agree to {site.name}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
-            <Link href='/page/privacy-policy'>Privacy Notice.</Link>
+            <button
+              type='button'
+              onClick={() => router.push('/page/conditions-of-use')}
+              className='text-blue-600 hover:underline'
+            >
+              Conditions of Use
+            </button>{' '}
+            and{' '}
+            <button
+              type='button'
+              onClick={() => router.push('/page/privacy-policy')}
+              className='text-blue-600 hover:underline'
+            >
+              Privacy Notice.
+            </button>
           </div>
         </div>
       </form>

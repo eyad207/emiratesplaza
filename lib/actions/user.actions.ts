@@ -192,3 +192,23 @@ export async function getUserById(userId: string) {
   if (!user) throw new Error('User not found')
   return JSON.parse(JSON.stringify(user)) as IUser
 }
+
+export async function sendResetPasswordEmail(email: string) {
+  try {
+    const response = await fetch('/api/send-reset-password-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to send reset password email')
+    }
+
+    return { success: true, message: 'Password reset email sent successfully' }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
