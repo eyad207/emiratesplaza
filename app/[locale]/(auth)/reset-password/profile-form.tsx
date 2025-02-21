@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
@@ -43,7 +43,8 @@ export const ProfileForm = () => {
     toast({
       description: res.message,
     })
-    router.push('/account/manage')
+    signOut()
+    router.push('/signin')
   }
   return (
     <Form {...form}>
