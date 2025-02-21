@@ -6,7 +6,7 @@ import { checkEmailRegistered } from '@/lib/actions/user.actions'
 import { toast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
-import { EmailTemplate } from '@/email-templates/test-email'
+import { EmailTemplate } from '@/emails/test-email'
 
 const TestEmailButton = ({ email }: { email: string }) => {
   const [currentEmail, setCurrentEmail] = useState(email)
