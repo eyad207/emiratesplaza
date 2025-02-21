@@ -212,3 +212,13 @@ export async function sendResetPasswordEmail(email: string) {
     return { success: false, message: formatError(error) }
   }
 }
+
+export async function checkEmailRegistered(email: string) {
+  try {
+    await connectToDatabase()
+    const user = await User.findOne({ email })
+    return !!user
+  } catch {
+    return false
+  }
+}

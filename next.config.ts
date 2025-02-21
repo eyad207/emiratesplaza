@@ -2,6 +2,12 @@ import type { NextConfig } from 'next'
 import withNextIntl from 'next-intl/plugin'
 
 const nextConfig: NextConfig = withNextIntl()({
+  experimental: {
+    serverActions: {
+      bodySizeLimit: undefined,
+      allowedOrigins: undefined,
+    },
+  },
   images: {
     remotePatterns: [
       {

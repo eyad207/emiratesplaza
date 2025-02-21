@@ -1,7 +1,6 @@
 'use client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Form,
@@ -15,6 +14,7 @@ import { toast } from '@/hooks/use-toast'
 import { UserEmailSchema } from '@/lib/validator'
 import { sendResetPasswordEmail } from '@/lib/actions/user.actions'
 import { useRouter } from 'next/navigation'
+import TestEmailButton from '@/components/TestEmailButton'
 ////////
 
 export default function ForgotPasswordPage() {
@@ -25,7 +25,8 @@ export default function ForgotPasswordPage() {
     defaultValues: { email: '' },
   })
 
-  const { control, handleSubmit } = form
+  const { control, handleSubmit, watch } = form
+  const email = watch('email')
 
   const onSubmit = async (data: { email: string }) => {
     try {
@@ -75,8 +76,9 @@ export default function ForgotPasswordPage() {
             )}
           />
           <div>
-            <Button type='submit'>Send Reset Email</Button>
+            <TestEmailButton email={email} />
           </div>
+          <div></div>
           <div className='text-sm'>
             <button
               type='button'
