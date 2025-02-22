@@ -1,12 +1,10 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { sendEmail } from '@/lib/actions/emails/sendEmail'
 import { Button } from '@/components/ui/button'
 import { checkEmailRegistered } from '@/lib/actions/user.actions'
 import { toast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
-import { EmailTemplate } from '@/emails/test-email'
 
 const TestEmailButton = ({ email }: { email: string }) => {
   const [currentEmail, setCurrentEmail] = useState(email)
@@ -24,6 +22,55 @@ const TestEmailButton = ({ email }: { email: string }) => {
     setGeneratedCode(code)
     setTimeout(() => setGeneratedCode(''), 15 * 60 * 1000) // Code expires in 15 minutes
     return code
+  }
+
+  const getUserFirstName = async (email: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/getUserFirstName', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user first name')
+      }
+
+      const data = await response.json()
+      return data.firstName
+    } catch (error) {
+      console.error('Failed to fetch user first name:', error)
+      return 'User'
+    }
+  }
+
+  const sendVerificationCode = async (
+    email: string,
+    code: string,
+    firstName: string
+  ) => {
+    try {
+      const response = await fetch('/api/sendVerificationCode', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, code, firstName }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send email')
+      }
+    } catch (error) {
+      console.error('Failed to send email:', error)
+      toast({
+        title: 'Error',
+        description: 'Failed to send email. Please try again later.',
+        variant: 'destructive',
+      })
+    }
   }
 
   const handleSubmit = async () => {
@@ -47,13 +94,8 @@ const TestEmailButton = ({ email }: { email: string }) => {
     }
 
     const code = generateCode()
-
-    await sendEmail({
-      from: 'EmiratesPlaza <eyadlaza@bruerforalle.no>',
-      to: [currentEmail],
-      subject: 'Your Verification Code',
-      react: <EmailTemplate firstName='Eyad' code={code} />,
-    })
+    const firstName = await getUserFirstName(currentEmail) // Get the user's first name
+    await sendVerificationCode(currentEmail, code, firstName)
 
     setCodeSent(true)
     toast({
