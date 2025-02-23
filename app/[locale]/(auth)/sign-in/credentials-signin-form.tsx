@@ -21,17 +21,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignInSchema } from '@/lib/validator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 
-const signInDefaultValues =
-  process.env.NODE_ENV === 'development'
-    ? {
-        email: 'admin@example.com',
-        password: '123456',
-      }
-    : {
-        email: '',
-        password: '',
-      }
-
 export default function CredentialsSignInForm() {
   const {
     setting: { site },
@@ -42,7 +31,10 @@ export default function CredentialsSignInForm() {
 
   const form = useForm<IUserSignIn>({
     resolver: zodResolver(UserSignInSchema),
-    defaultValues: signInDefaultValues,
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   })
 
   const { control, handleSubmit } = form
