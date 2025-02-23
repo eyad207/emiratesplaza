@@ -11,11 +11,19 @@ const TestEmailButton = ({ email }: { email: string }) => {
   const [codeSent, setCodeSent] = useState(false)
   const [code, setCode] = useState('')
   const [generatedCode, setGeneratedCode] = useState('')
+  const [countdown, setCountdown] = useState(0)
   const router = useRouter()
 
   useEffect(() => {
     setCurrentEmail(email)
   }, [email])
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [countdown])
 
   const generateCode = () => {
     const code = Math.floor(100000 + Math.random() * 900000).toString()
@@ -98,6 +106,7 @@ const TestEmailButton = ({ email }: { email: string }) => {
     await sendVerificationCode(currentEmail, code, firstName)
 
     setCodeSent(true)
+    setCountdown(60) // Set countdown to 60 seconds
     toast({
       title: 'Success',
       description: 'Email sent successfully',
@@ -119,7 +128,20 @@ const TestEmailButton = ({ email }: { email: string }) => {
 
   return (
     <div>
-      <Button onClick={handleSubmit}>Send Code</Button>
+      <div className='flex items-center'>
+        <Button
+          onClick={handleSubmit}
+          disabled={countdown > 0}
+          className={countdown > 0 ? 'opacity-50' : ''}
+        >
+          Send Code
+        </Button>
+        {countdown > 0 && (
+          <span className='ml-2 text-sm text-gray-600'>
+            Resend in {countdown} seconds
+          </span>
+        )}
+      </div>
       {codeSent && (
         <div className='mt-4'>
           <label
