@@ -1,36 +1,118 @@
-import { Metadata } from 'next'
-import { SessionProvider } from 'next-auth/react'
+'use client'
 
-import { auth } from '@/auth'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Input } from '@/components/ui/input'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { toast } from '@/hooks/use-toast'
+import { ResetPasswordSchema } from '@/lib/validator'
+import { Button } from '@/components/ui/button'
 
-import { ProfileForm } from './profile-form'
-import { Card, CardContent } from '@/components/ui/card'
-import { getSetting } from '@/lib/actions/setting.actions'
+export default function ResetPasswordPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const email = searchParams ? searchParams.get('email') : null
 
-const PAGE_TITLE = 'Change Your Password'
-export const metadata: Metadata = {
-  title: PAGE_TITLE,
-}
+  const form = useForm({
+    resolver: zodResolver(ResetPasswordSchema),
+    defaultValues: { password: '', confirmPassword: '' },
+  })
 
-export default async function ProfilePage() {
-  const session = await auth()
-  const { site } = await getSetting()
+  const onSubmit = async (data: {
+    password: string
+    confirmPassword: string
+  }) => {
+    try {
+      console.log('Form data:', data) // Debugging line
+      const response = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password: data.password }),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('API response error:', errorText) // Debugging line
+        throw new Error(errorText)
+      }
+
+      const result = await response.json()
+      console.log('API response:', result) // Debugging line
+
+      toast({
+        title: 'Success',
+        description: 'Password reset successfully',
+        variant: 'default',
+      })
+      router.push('/sign-in')
+    } catch (error) {
+      console.error('Error:', error) // Debugging line
+      toast({
+        title: 'Error',
+        description: (error as Error).message,
+        variant: 'destructive',
+      })
+    }
+  }
+
   return (
-    <div className='mb-24'>
-      <SessionProvider session={session}>
-        <h1 className='h1-bold py-4'>Reset Password</h1>
-        <Card className='max-w-2xl'>
-          <CardContent className='p-4 flex justify-between flex-wrap'>
-            <p className='text-sm py-2'>
-              If you want to change the password associated with your{' '}
-              {site.name}
-              &apos;s account, you may do so below. Be sure to click the Save
-              Changes button when you are done.
-            </p>
-            <ProfileForm />
-          </CardContent>
-        </Card>
-      </SessionProvider>
-    </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div>
+          <h1 className='text-2xl font-bold bg-orange-400 py-2 text-center rounded-xl mb-5'>
+            Reset Password
+          </h1>
+        </div>
+        <div className='space-y-6'>
+          <FormField
+            control={form.control}
+            name='password'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>New Password</FormLabel>
+                <FormControl>
+                  <Input
+                    type='password'
+                    placeholder='Enter new password'
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='confirmPassword'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <Input
+                    type='password'
+                    placeholder='Confirm new password'
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type='submit' className='w-full'>
+            Reset Password
+          </Button>
+        </div>
+      </form>
+    </Form>
   )
 }

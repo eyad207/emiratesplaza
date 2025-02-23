@@ -107,7 +107,7 @@ const TestEmailButton = ({ email }: { email: string }) => {
 
   const handleCodeSubmit = () => {
     if (code === generatedCode) {
-      router.push('/reset-password')
+      router.push(`/reset-password?email=${currentEmail}`)
     } else {
       toast({
         title: 'Error',
