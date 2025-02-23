@@ -12,7 +12,8 @@ const publicPages = [
   '/cart/(.*)',
   '/product/(.*)',
   '/page/(.*)',
-  '/forgot-password', // Ensure this line is present
+  '/forgot-password',
+  '/reset-password', // Add this line
   // (/secret requires auth)
 ]
 const intlMiddleware = createMiddleware(routing)
