@@ -19,19 +19,26 @@ import { useState } from 'react'
 export default function AddToCart({
   item,
   minimal = false,
+  selectedSize,
 }: {
   item: OrderItem
   minimal?: boolean
+  selectedSize: string
 }) {
   const router = useRouter()
   const { toast } = useToast()
 
   const { addItem } = useCartStore()
 
-  //PROMPT: add quantity state
   const [quantity, setQuantity] = useState(1)
 
   const t = useTranslations()
+
+  const getCountInStockForSelectedSize = () => {
+    const colorObj = item.colors.find((c) => c.color === item.color)
+    const sizeObj = colorObj?.sizes.find((s) => s.size === selectedSize)
+    return sizeObj ? sizeObj.countInStock : 0
+  }
 
   return minimal ? (
     <Button
@@ -73,7 +80,7 @@ export default function AddToCart({
           </SelectValue>
         </SelectTrigger>
         <SelectContent position='popper'>
-          {Array.from({ length: item.colors[0].sizes[0].countInStock }).map(
+          {Array.from({ length: getCountInStockForSelectedSize() }).map(
             (_, i) => (
               <SelectItem key={i + 1} value={`${i + 1}`}>
                 {i + 1}

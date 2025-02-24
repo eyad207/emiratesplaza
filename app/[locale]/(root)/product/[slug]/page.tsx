@@ -161,6 +161,7 @@ export default async function ProductDetails(props: {
                         color: selectedColor,
                         colors: product.colors,
                       }}
+                      selectedSize={selectedSize}
                     />
                   </div>
                 )}
