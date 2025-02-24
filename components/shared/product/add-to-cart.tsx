@@ -23,7 +23,7 @@ export default function AddToCart({
 }: {
   item: OrderItem
   minimal?: boolean
-  selectedSize: string
+  selectedSize?: string
 }) {
   const router = useRouter()
   const { toast } = useToast()

@@ -90,6 +90,7 @@ const ProductCard = ({
           image: product.images[0],
           colors: product.colors,
         }}
+        selectedSize={product.colors[0]?.sizes[0]?.size}
       />
     </div>
   )
