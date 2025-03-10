@@ -567,3 +567,30 @@ async function getTopSalesCategories(date: DateRange, limit = 5) {
 
   return result
 }
+
+// GET ORDERS BY USER ID
+export async function getOrdersByUserId({
+  limit,
+  page,
+  userId,
+}: {
+  limit?: number
+  page: number
+  userId: string
+}) {
+  const {
+    common: { pageSize },
+  } = await getSetting()
+  limit = limit || pageSize
+  await connectToDatabase()
+  const skipAmount = (Number(page) - 1) * limit
+  const orders = await Order.find({ user: userId })
+    .sort({ createdAt: 'desc' })
+    .skip(skipAmount)
+    .limit(limit)
+  const ordersCount = await Order.countDocuments({ user: userId })
+  return {
+    data: JSON.parse(JSON.stringify(orders)) as IOrder[],
+    totalPages: Math.ceil(ordersCount / limit),
+  }
+}

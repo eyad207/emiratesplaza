@@ -10,28 +10,30 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { getMyOrders } from '@/lib/actions/order.actions'
+import { getOrdersByUserId } from '@/lib/actions/order.actions'
 import { IOrder } from '@/lib/db/models/order.model'
 import { formatDateTime, formatId } from '@/lib/utils'
-import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import ProductPrice from '@/components/shared/product/product-price'
 
-const PAGE_TITLE = 'Your Orders'
+const PAGE_TITLE = 'User Orders'
 export const metadata: Metadata = {
   title: PAGE_TITLE,
 }
-export default async function OrdersPage(props: {
-  searchParams: Promise<{ page: string }>
+
+export default async function UserOrdersPage(props: {
+  params: { id: string }
+  searchParams: { page: string }
 }) {
-  const searchParams = await props.searchParams
-  const page = Number(searchParams.page) || 1
-  const orders = await getMyOrders({
+  const { id } = props.params
+  const page = Number(props.searchParams.page) || 1
+  const orders = await getOrdersByUserId({
     page,
+    userId: id,
   })
   return (
     <div>
       <div className='flex gap-2'>
-        <Link href='/account'>Your Account</Link>
+        <Link href='/admin/users'>Users</Link>
         <span>›</span>
         <span>{PAGE_TITLE}</span>
       </div>
@@ -52,7 +54,7 @@ export default async function OrdersPage(props: {
             {orders.data.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className=''>
-                  You have no orders.
+                  No orders found for this user.
                 </TableCell>
               </TableRow>
             )}
@@ -81,7 +83,7 @@ export default async function OrdersPage(props: {
                 </TableCell>
                 <TableCell>
                   <Link href={`/account/orders/${order._id}`}>
-                    <span className='px-3 border rounded-full bg-blue-600 hover:bg-blue-700 text-white ease-in-out duration-300 height-32 flex items-center justify-center'>
+                    <span className='px-3 border rounded-full bg-yellow-300 hover:bg-yellow-500 text-black ease-in-out duration-300 height-32 flex items-center justify-center'>
                       Details
                     </span>
                   </Link>
@@ -94,7 +96,6 @@ export default async function OrdersPage(props: {
           <Pagination page={page} totalPages={orders.totalPages} />
         )}
       </div>
-      <BrowsingHistoryList className='mt-16' />
     </div>
   )
 }

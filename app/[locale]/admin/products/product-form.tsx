@@ -308,6 +308,102 @@ const ProductForm = ({
         </div>
 
         <div>
+          <FormLabel className='text-lg mr-10 '>Colors and Sizes</FormLabel>
+          {colorFields.map((colorField, colorIndex) => (
+            <div key={colorField.id} className='mb-4'>
+              <div className='flex items-center gap-2'>
+                <FormField
+                  control={form.control}
+                  name={`colors.${colorIndex}.color`}
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel>Color</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Enter color' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  className='mt-8'
+                  type='button'
+                  variant='destructive'
+                  onClick={() => removeColor(colorIndex)}
+                >
+                  Remove Color
+                </Button>
+              </div>
+              <div className='ml-2'>
+                {sizeFields.map((sizeField, sizeIndex) => (
+                  <div key={sizeField.id} className='flex items-center gap-2'>
+                    <FormField
+                      control={form.control}
+                      name={`colors.${colorIndex}.sizes.${sizeIndex}.size`}
+                      render={({ field }) => (
+                        <FormItem className='w-full'>
+                          <FormLabel>Size</FormLabel>
+                          <FormControl>
+                            <Input placeholder='Enter size' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`colors.${colorIndex}.sizes.${sizeIndex}.countInStock`}
+                      render={({ field }) => (
+                        <FormItem className='w-full'>
+                          <FormLabel>Count In Stock</FormLabel>
+                          <FormControl>
+                            <Input
+                              type='number'
+                              placeholder='Enter count in stock'
+                              {...field}
+                              onChange={(e) => {
+                                const value = parseInt(e.target.value, 10)
+                                if (value >= 0) {
+                                  field.onChange(e)
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      className='mt-8'
+                      type='button'
+                      variant='destructive'
+                      onClick={() => removeSize(sizeIndex)}
+                    >
+                      Remove Size
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  className='mt-3'
+                  type='button'
+                  onClick={() => appendSize({ size: '', countInStock: 0 })}
+                >
+                  Add Size
+                </Button>
+              </div>
+            </div>
+          ))}
+          <Button
+            type='button'
+            onClick={() =>
+              appendColor({ color: '', sizes: [{ size: '', countInStock: 0 }] })
+            }
+          >
+            Add Color
+          </Button>
+        </div>
+
+        <div>
           <FormField
             control={form.control}
             name='description'
@@ -347,93 +443,6 @@ const ProductForm = ({
               </FormItem>
             )}
           />
-        </div>
-
-        <div>
-          <FormLabel>Colors and Sizes</FormLabel>
-          {colorFields.map((colorField, colorIndex) => (
-            <div key={colorField.id} className='mb-4'>
-              <div className='flex items-center gap-2'>
-                <FormField
-                  control={form.control}
-                  name={`colors.${colorIndex}.color`}
-                  render={({ field }) => (
-                    <FormItem className='w-full'>
-                      <FormLabel>Color</FormLabel>
-                      <FormControl>
-                        <Input placeholder='Enter color' {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type='button'
-                  variant='destructive'
-                  onClick={() => removeColor(colorIndex)}
-                >
-                  Remove Color
-                </Button>
-              </div>
-              <div className='ml-4'>
-                {sizeFields.map((sizeField, sizeIndex) => (
-                  <div key={sizeField.id} className='flex items-center gap-2'>
-                    <FormField
-                      control={form.control}
-                      name={`colors.${colorIndex}.sizes.${sizeIndex}.size`}
-                      render={({ field }) => (
-                        <FormItem className='w-full'>
-                          <FormLabel>Size</FormLabel>
-                          <FormControl>
-                            <Input placeholder='Enter size' {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`colors.${colorIndex}.sizes.${sizeIndex}.countInStock`}
-                      render={({ field }) => (
-                        <FormItem className='w-full'>
-                          <FormLabel>Count In Stock</FormLabel>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              placeholder='Enter count in stock'
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type='button'
-                      variant='destructive'
-                      onClick={() => removeSize(sizeIndex)}
-                    >
-                      Remove Size
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  type='button'
-                  onClick={() => appendSize({ size: '', countInStock: 0 })}
-                >
-                  Add Size
-                </Button>
-              </div>
-            </div>
-          ))}
-          <Button
-            type='button'
-            onClick={() =>
-              appendColor({ color: '', sizes: [{ size: '', countInStock: 0 }] })
-            }
-          >
-            Add Color
-          </Button>
         </div>
 
         <div>

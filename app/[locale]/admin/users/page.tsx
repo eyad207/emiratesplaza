@@ -57,6 +57,9 @@ export default async function AdminUser(props: {
                   <Button asChild variant='outline' size='sm'>
                     <Link href={`/admin/users/${user._id}`}>Edit</Link>
                   </Button>
+                  <Button asChild variant='outline' size='sm'>
+                    <Link href={`/admin/users/${user._id}/orders`}>Orders</Link>
+                  </Button>
                   <DeleteDialog id={user._id} action={deleteUser} />
                 </TableCell>
               </TableRow>
