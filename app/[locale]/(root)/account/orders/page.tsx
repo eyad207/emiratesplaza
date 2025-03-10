@@ -81,7 +81,7 @@ export default async function OrdersPage(props: {
                 </TableCell>
                 <TableCell>
                   <Link href={`/account/orders/${order._id}`}>
-                    <span className='px-3 border rounded-full bg-blue-600 hover:bg-blue-700 text-white ease-in-out duration-300 height-32 flex items-center justify-center'>
+                    <span className='px-3 border rounded-full bg-yellow-400 hover:bg-yellow-500 text-black ease-in-out duration-300 height-32 flex items-center justify-center'>
                       Details
                     </span>
                   </Link>
