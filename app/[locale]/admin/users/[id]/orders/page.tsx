@@ -20,12 +20,17 @@ export const metadata: Metadata = {
   title: PAGE_TITLE,
 }
 
-export default async function UserOrdersPage(props: {
-  params: { id: string }
-  searchParams: { page: string }
-}) {
-  const { id } = props.params
-  const page = Number(props.searchParams.page) || 1
+interface PageProps {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function UserOrdersPage({
+  params,
+  searchParams,
+}: PageProps) {
+  const { id } = await params
+  const page = Number((await searchParams)?.page) || 1
   const orders = await getOrdersByUserId({
     page,
     userId: id,
