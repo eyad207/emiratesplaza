@@ -81,6 +81,10 @@ export async function updateUserName(user: IUserName) {
     const session = await auth()
     const currentUser = await User.findById(session?.user?.id)
     if (!currentUser) throw new Error('User not found')
+
+    const existingUser = await User.findOne({ name: user.name })
+    if (existingUser) throw new Error('Name already exists')
+
     currentUser.name = user.name
     const updatedUser = await currentUser.save()
     return {
@@ -176,7 +180,7 @@ export async function getAllUsers({
 
   const skipAmount = (Number(page) - 1) * limit
   const users = await User.find()
-    .sort({ createdAt: 'desc' })
+    .sort({ role: 1, createdAt: 'desc' }) // Sort by role (Admin first), then by creation date
     .skip(skipAmount)
     .limit(limit)
   const usersCount = await User.countDocuments()

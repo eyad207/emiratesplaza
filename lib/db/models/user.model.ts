@@ -10,7 +10,7 @@ export interface IUser extends Document, IUserInput {
 const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     role: { type: String, required: true, default: 'User' },
     password: { type: String },
     image: { type: String },
