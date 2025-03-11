@@ -87,7 +87,7 @@ export default async function UserOrdersPage({
                     : 'No'}
                 </TableCell>
                 <TableCell>
-                  <Link href={`/account/orders/${order._id}`}>
+                  <Link href={`/admin/orders/${order._id}`}>
                     <span className='px-3 border rounded-full bg-yellow-300 hover:bg-yellow-500 text-black ease-in-out duration-300 height-32 flex items-center justify-center'>
                       Details
                     </span>
