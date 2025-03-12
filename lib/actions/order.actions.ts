@@ -14,6 +14,7 @@ import Product from '../db/models/product.model'
 import User from '../db/models/user.model'
 import mongoose from 'mongoose'
 import { getSetting } from './setting.actions'
+import { sendEmail } from '@/lib/email'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -131,7 +132,14 @@ export async function deliverOrder(orderId: string) {
     order.isDelivered = !order.isDelivered
     order.deliveredAt = order.isDelivered ? new Date() : undefined
     await order.save()
-    if (order.user?.email) await sendAskReviewOrderItems({ order })
+    if (order.user?.email) {
+      await sendAskReviewOrderItems({ order })
+      await sendEmail({
+        to: order.user.email,
+        subject: 'Order Delivery Status Updated',
+        text: `Your order with ID ${order._id} has been ${order.isDelivered ? 'delivered' : 'marked as not delivered'}.`,
+      })
+    }
     revalidatePath(`/account/orders/${orderId}`)
     return {
       success: true,
@@ -153,6 +161,13 @@ export async function shipOrder(orderId: string) {
     order.isShipped = !order.isShipped
     order.shippedAt = order.isShipped ? new Date() : undefined
     await order.save()
+    if (order.user?.email) {
+      await sendEmail({
+        to: order.user.email,
+        subject: 'Order Shipping Status Updated',
+        text: `Your order with ID ${order._id} has been ${order.isShipped ? 'shipped' : 'marked as not shipped'}.`,
+      })
+    }
     revalidatePath(`/account/orders/${orderId}`)
     return {
       success: true,
