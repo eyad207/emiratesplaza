@@ -13,7 +13,7 @@ export async function sendEmail({
 }) {
   try {
     await resend.emails.send({
-      from: process.env.SENDER_EMAIL!,
+      from: `${process.env.SENDER_NAME} <${process.env.SENDER_EMAIL}>`,
       to,
       subject,
       text: `${text}
