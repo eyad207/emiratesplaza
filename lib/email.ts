@@ -16,7 +16,10 @@ export async function sendEmail({
       from: process.env.SENDER_EMAIL!,
       to,
       subject,
-      text,
+      text: `${text}
+
+---
+This is an automated message from EmiratesPlaza. Please do not reply to this email.`,
     })
   } catch (error) {
     console.error('Error sending email:', error)

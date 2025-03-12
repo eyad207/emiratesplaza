@@ -137,7 +137,14 @@ export async function deliverOrder(orderId: string) {
       await sendEmail({
         to: order.user.email,
         subject: 'Order Delivery Status Updated',
-        text: `Your order with ID ${order._id} has been ${order.isDelivered ? 'delivered' : 'marked as not delivered'}.`,
+        text: `Dear ${order.user.name},
+
+We are pleased to inform you that your order with ID ${order._id} has been ${order.isDelivered ? 'delivered' : 'marked as not delivered'}.
+
+Thank you for shopping with us!
+
+Best regards,
+EmiratesPlaza Support Team`,
       })
     }
     revalidatePath(`/account/orders/${orderId}`)
@@ -165,7 +172,14 @@ export async function shipOrder(orderId: string) {
       await sendEmail({
         to: order.user.email,
         subject: 'Order Shipping Status Updated',
-        text: `Your order with ID ${order._id} has been ${order.isShipped ? 'shipped' : 'marked as not shipped'}.`,
+        text: `Dear ${order.user.name},
+
+We are pleased to inform you that your order with ID ${order._id} has been ${order.isShipped ? 'shipped' : 'marked as not shipped'}.
+
+Thank you for shopping with us!
+
+Best regards,
+EmiratesPlaza Support Team`,
       })
     }
     revalidatePath(`/account/orders/${orderId}`)
