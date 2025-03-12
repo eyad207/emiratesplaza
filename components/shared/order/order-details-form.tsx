@@ -241,6 +241,7 @@ export default function OrderDetailsForm({
             )}
             {isAdmin && isPaid && (
               <Button
+                className='ml-4 mr-4'
                 onClick={handleShippingStatusChange}
                 disabled={isPending}
                 variant={isShipped ? 'outline' : 'default'}
