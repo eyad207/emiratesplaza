@@ -37,57 +37,62 @@ export default async function OrdersPage(props: {
     page: Number(page),
     orderId,
   })
+
   return (
     <div className='space-y-2'>
       <h1 className='h1-bold'>Orders</h1>
       <FilterInput defaultValue={orderId} />
       <div className='overflow-x-auto'>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Id</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Buyer</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Paid</TableHead>
-              <TableHead>Delivered</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orders.data.map((order: IOrderList) => (
-              <TableRow key={order._id}>
-                <TableCell>{order._id}</TableCell>
-                <TableCell>
-                  {formatDateTime(order.createdAt!).dateTime}
-                </TableCell>
-                <TableCell>
-                  {order.user ? order.user.name : 'Deleted User'}
-                </TableCell>
-                <TableCell>
-                  {' '}
-                  <ProductPrice price={order.totalPrice} plain />
-                </TableCell>
-                <TableCell>
-                  {order.isPaid && order.paidAt
-                    ? formatDateTime(order.paidAt).dateTime
-                    : 'No'}
-                </TableCell>
-                <TableCell>
-                  {order.isDelivered && order.deliveredAt
-                    ? formatDateTime(order.deliveredAt).dateTime
-                    : 'No'}
-                </TableCell>
-                <TableCell className='flex gap-1'>
-                  <Button asChild variant='outline' size='sm'>
-                    <Link href={`/admin/orders/${order._id}`}>Details</Link>
-                  </Button>
-                  <DeleteDialog id={order._id} action={deleteOrder} />
-                </TableCell>
+        {orders.data.length === 0 ? (
+          <p>No orders found</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Id</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Buyer</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead>Paid</TableHead>
+                <TableHead>Delivered</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {orders.data.map((order: IOrderList) => (
+                <TableRow key={order._id}>
+                  <TableCell>{order._id}</TableCell>
+                  <TableCell>
+                    {formatDateTime(order.createdAt!).dateTime}
+                  </TableCell>
+                  <TableCell>
+                    {order.user ? order.user.name : 'Deleted User'}
+                  </TableCell>
+                  <TableCell>
+                    {' '}
+                    <ProductPrice price={order.totalPrice} plain />
+                  </TableCell>
+                  <TableCell>
+                    {order.isPaid && order.paidAt
+                      ? formatDateTime(order.paidAt).dateTime
+                      : 'No'}
+                  </TableCell>
+                  <TableCell>
+                    {order.isDelivered && order.deliveredAt
+                      ? formatDateTime(order.deliveredAt).dateTime
+                      : 'No'}
+                  </TableCell>
+                  <TableCell className='flex gap-1'>
+                    <Button asChild variant='outline' size='sm'>
+                      <Link href={`/admin/orders/${order._id}`}>Details</Link>
+                    </Button>
+                    <DeleteDialog id={order._id} action={deleteOrder} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
         {orders.totalPages > 1 && (
           <Pagination page={page} totalPages={orders.totalPages!} />
         )}

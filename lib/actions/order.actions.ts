@@ -196,7 +196,8 @@ export async function getAllOrders({
   limit = limit || pageSize
   await connectToDatabase()
   const skipAmount = (Number(page) - 1) * limit
-  const filter = orderId ? { _id: orderId } : {}
+  const filter =
+    orderId && mongoose.Types.ObjectId.isValid(orderId) ? { _id: orderId } : {}
   const orders = await Order.find(filter)
     .populate('user', 'name')
     .sort({ createdAt: 'desc' })

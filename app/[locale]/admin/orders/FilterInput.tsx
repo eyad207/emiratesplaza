@@ -3,6 +3,7 @@
 import { Input } from '@/components/ui/input'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 
 export default function FilterInput({
   defaultValue,
@@ -25,11 +26,23 @@ export default function FilterInput({
     router.push(`?${params.toString()}`)
   }
 
+  const handleReset = () => {
+    setValue('')
+    const params = new URLSearchParams(searchParams?.toString() || '')
+    params.delete('orderId')
+    router.push(`?${params.toString()}`)
+  }
+
   return (
-    <Input
-      placeholder='Filter by Order ID'
-      value={value}
-      onChange={handleChange}
-    />
+    <div className='flex gap-2'>
+      <Input
+        placeholder='Filter by Order ID'
+        value={value}
+        onChange={handleChange}
+      />
+      <Button variant='outline' onClick={handleReset}>
+        Reset
+      </Button>
+    </div>
   )
 }
