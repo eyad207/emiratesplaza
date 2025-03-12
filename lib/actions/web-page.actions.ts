@@ -57,9 +57,10 @@ export async function deleteWebPage(id: string) {
 }
 
 // GET ALL
-export async function getAllWebPages() {
+export async function getAllWebPages({ name }: { name?: string } = {}) {
   await connectToDatabase()
-  const webPages = await WebPage.find()
+  const filter = name ? { title: { $regex: name, $options: 'i' } } : {}
+  const webPages = await WebPage.find(filter).sort({ createdAt: 'desc' })
   return JSON.parse(JSON.stringify(webPages)) as IWebPage[]
 }
 export async function getWebPageById(webPageId: string) {

@@ -14,13 +14,19 @@ import { formatId } from '@/lib/utils'
 import { Metadata } from 'next'
 import { deleteWebPage, getAllWebPages } from '@/lib/actions/web-page.actions'
 import { IWebPage } from '@/lib/db/models/web-page.model'
+import FilterInput from './FilterInput'
 
 export const metadata: Metadata = {
   title: 'Admin Web Pages',
 }
 
-export default async function WebPageAdminPage() {
-  const webPages = await getAllWebPages()
+interface PageProps {
+  searchParams: Promise<{ name?: string }>
+}
+
+export default async function WebPageAdminPage({ searchParams }: PageProps) {
+  const { name = '' } = await searchParams
+  const webPages = await getAllWebPages({ name })
   return (
     <div className='space-y-2'>
       <div className='flex-between'>
@@ -29,6 +35,7 @@ export default async function WebPageAdminPage() {
           <Link href='/admin/web-pages/create'>Create WebPage</Link>
         </Button>
       </div>
+      <FilterInput defaultValue={name} />
       <div>
         <Table>
           <TableHeader>
@@ -41,6 +48,13 @@ export default async function WebPageAdminPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {webPages.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className=''>
+                  No web pages found.
+                </TableCell>
+              </TableRow>
+            )}
             {webPages.map((webPage: IWebPage) => (
               <TableRow key={webPage._id}>
                 <TableCell>{formatId(webPage._id)}</TableCell>
