@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/table'
 import { deleteUser, getAllUsers } from '@/lib/actions/user.actions'
 import { IUser } from '@/lib/db/models/user.model'
-import { formatId } from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Admin Users',
@@ -49,7 +48,7 @@ export default async function AdminUser(props: {
           <TableBody>
             {users?.data.map((user: IUser) => (
               <TableRow key={user._id}>
-                <TableCell>{formatId(user._id)}</TableCell>
+                <TableCell>{user._id}</TableCell>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.role}</TableCell>

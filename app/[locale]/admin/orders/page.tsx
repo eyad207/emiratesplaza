@@ -14,7 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { deleteOrder, getAllOrders } from '@/lib/actions/order.actions'
-import { formatDateTime, formatId } from '@/lib/utils'
+import { formatDateTime } from '@/lib/utils'
 import { IOrderList } from '@/types'
 import ProductPrice from '@/components/shared/product/product-price'
 
@@ -54,7 +54,7 @@ export default async function OrdersPage(props: {
           <TableBody>
             {orders.data.map((order: IOrderList) => (
               <TableRow key={order._id}>
-                <TableCell>{formatId(order._id)}</TableCell>
+                <TableCell>{order._id}</TableCell>
                 <TableCell>
                   {formatDateTime(order.createdAt!).dateTime}
                 </TableCell>
