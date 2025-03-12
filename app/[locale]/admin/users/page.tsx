@@ -15,26 +15,31 @@ import {
 } from '@/components/ui/table'
 import { deleteUser, getAllUsers } from '@/lib/actions/user.actions'
 import { IUser } from '@/lib/db/models/user.model'
+import FilterInput from './FilterInput'
 
+const PAGE_TITLE = 'Users'
 export const metadata: Metadata = {
-  title: 'Admin Users',
+  title: PAGE_TITLE,
 }
 
-export default async function AdminUser(props: {
-  searchParams: Promise<{ page: string }>
-}) {
-  const searchParams = await props.searchParams
+interface PageProps {
+  searchParams: Promise<{ page?: string; name?: string }>
+}
+
+export default async function UsersPage({ searchParams }: PageProps) {
+  const { page = '1', name = '' } = await searchParams
   const session = await auth()
   if (session?.user.role !== 'Admin')
     throw new Error('Admin permission required')
-  const page = Number(searchParams.page) || 1
   const users = await getAllUsers({
-    page,
+    page: Number(page),
+    name,
   })
   return (
-    <div className='space-y-2'>
-      <h1 className='h1-bold'>Users</h1>
-      <div>
+    <div>
+      <h1 className='h1-bold pt-4'>{PAGE_TITLE}</h1>
+      <FilterInput defaultValue={name} />
+      <div className='overflow-x-auto'>
         <Table>
           <TableHeader>
             <TableRow>
@@ -46,7 +51,14 @@ export default async function AdminUser(props: {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users?.data.map((user: IUser) => (
+            {users.data.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className=''>
+                  No users found.
+                </TableCell>
+              </TableRow>
+            )}
+            {users.data.map((user: IUser) => (
               <TableRow key={user._id}>
                 <TableCell>{user._id}</TableCell>
                 <TableCell>{user.name}</TableCell>
@@ -65,8 +77,8 @@ export default async function AdminUser(props: {
             ))}
           </TableBody>
         </Table>
-        {users?.totalPages > 1 && (
-          <Pagination page={page} totalPages={users?.totalPages} />
+        {users.totalPages > 1 && (
+          <Pagination page={page} totalPages={users.totalPages} />
         )}
       </div>
     </div>

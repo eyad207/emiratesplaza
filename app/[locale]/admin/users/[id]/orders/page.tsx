@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/table'
 import { getOrdersByUserId } from '@/lib/actions/order.actions'
 import { IOrder } from '@/lib/db/models/order.model'
-import { formatDateTime, formatId } from '@/lib/utils'
+import { formatDateTime } from '@/lib/utils'
 import ProductPrice from '@/components/shared/product/product-price'
+import FilterInput from './FilterInput'
 
 const PAGE_TITLE = 'User Orders'
 export const metadata: Metadata = {
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 
 interface PageProps {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; orderId?: string }>
 }
 
 export default async function UserOrdersPage({
@@ -30,10 +31,11 @@ export default async function UserOrdersPage({
   searchParams,
 }: PageProps) {
   const { id } = await params
-  const page = Number((await searchParams)?.page) || 1
+  const { page = '1', orderId = '' } = await searchParams
   const orders = await getOrdersByUserId({
-    page,
+    page: Number(page),
     userId: id,
+    orderId,
   })
   return (
     <div>
@@ -43,6 +45,7 @@ export default async function UserOrdersPage({
         <span>{PAGE_TITLE}</span>
       </div>
       <h1 className='h1-bold pt-4'>{PAGE_TITLE}</h1>
+      <FilterInput defaultValue={orderId} />
       <div className='overflow-x-auto'>
         <Table>
           <TableHeader>
@@ -66,9 +69,7 @@ export default async function UserOrdersPage({
             {orders.data.map((order: IOrder) => (
               <TableRow key={order._id}>
                 <TableCell>
-                  <Link href={`/account/orders/${order._id}`}>
-                    {formatId(order._id)}
-                  </Link>
+                  <Link href={`/account/orders/${order._id}`}>{order._id}</Link>
                 </TableCell>
                 <TableCell>
                   {formatDateTime(order.createdAt!).dateTime}

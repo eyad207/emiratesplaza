@@ -577,10 +577,12 @@ export async function getOrdersByUserId({
   limit,
   page,
   userId,
+  orderId,
 }: {
   limit?: number
   page: number
   userId: string
+  orderId?: string
 }) {
   const {
     common: { pageSize },
@@ -588,11 +590,17 @@ export async function getOrdersByUserId({
   limit = limit || pageSize
   await connectToDatabase()
   const skipAmount = (Number(page) - 1) * limit
-  const orders = await Order.find({ user: userId })
+  const filter = {
+    user: userId,
+    ...(orderId && mongoose.Types.ObjectId.isValid(orderId)
+      ? { _id: orderId }
+      : {}),
+  }
+  const orders = await Order.find(filter)
     .sort({ createdAt: 'desc' })
     .skip(skipAmount)
     .limit(limit)
-  const ordersCount = await Order.countDocuments({ user: userId })
+  const ordersCount = await Order.countDocuments(filter)
   return {
     data: JSON.parse(JSON.stringify(orders)) as IOrder[],
     totalPages: Math.ceil(ordersCount / limit),

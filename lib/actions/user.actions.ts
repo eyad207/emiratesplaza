@@ -168,22 +168,24 @@ export const SignOut = async () => {
 export async function getAllUsers({
   limit,
   page,
+  name,
 }: {
   limit?: number
   page: number
+  name?: string
 }) {
   const {
     common: { pageSize },
   } = await getSetting()
   limit = limit || pageSize
   await connectToDatabase()
-
   const skipAmount = (Number(page) - 1) * limit
-  const users = await User.find()
-    .sort({ role: 1, createdAt: 'desc' }) // Sort by role (Admin first), then by creation date
+  const filter = name ? { name: { $regex: name, $options: 'i' } } : {}
+  const users = await User.find(filter)
+    .sort({ createdAt: 'desc' })
     .skip(skipAmount)
     .limit(limit)
-  const usersCount = await User.countDocuments()
+  const usersCount = await User.countDocuments(filter)
   return {
     data: JSON.parse(JSON.stringify(users)) as IUser[],
     totalPages: Math.ceil(usersCount / limit),
