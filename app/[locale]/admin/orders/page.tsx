@@ -17,16 +17,17 @@ import { deleteOrder, getAllOrders } from '@/lib/actions/order.actions'
 import { formatDateTime } from '@/lib/utils'
 import { IOrderList } from '@/types'
 import ProductPrice from '@/components/shared/product/product-price'
+import FilterInput from './FilterInput'
 
 export const metadata: Metadata = {
   title: 'Admin Orders',
 }
 export default async function OrdersPage(props: {
-  searchParams: Promise<{ page: string }>
+  searchParams: Promise<{ page: string; orderId: string }>
 }) {
   const searchParams = await props.searchParams
 
-  const { page = '1' } = searchParams
+  const { page = '1', orderId = '' } = searchParams
 
   const session = await auth()
   if (session?.user.role !== 'Admin')
@@ -34,10 +35,12 @@ export default async function OrdersPage(props: {
 
   const orders = await getAllOrders({
     page: Number(page),
+    orderId,
   })
   return (
     <div className='space-y-2'>
       <h1 className='h1-bold'>Orders</h1>
+      <FilterInput defaultValue={orderId} />
       <div className='overflow-x-auto'>
         <Table>
           <TableHeader>
