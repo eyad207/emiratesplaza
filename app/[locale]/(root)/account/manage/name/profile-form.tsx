@@ -71,6 +71,7 @@ export const ProfileForm = () => {
                     placeholder='Name'
                     {...field}
                     className='input-field'
+                    value={field.value ?? ''} // Ensure the input always has a defined value
                   />
                 </FormControl>
                 <FormMessage />
