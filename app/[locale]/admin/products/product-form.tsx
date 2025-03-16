@@ -248,18 +248,27 @@ const ProductForm = ({
             render={() => (
               <FormItem className='w-full'>
                 <FormLabel>Images</FormLabel>
+                <FormDescription>
+                  The first image will be used as the main product image and for
+                  category display.
+                </FormDescription>
                 <Card>
                   <CardContent className='space-y-2 mt-2 min-h-48'>
-                    <div className='flex justify-start items-center space-x-2'>
+                    <div className='flex flex-wrap justify-start items-center space-x-2'>
                       {images.map((image: string, index: number) => (
-                        <div key={index} className='relative'>
+                        <div key={index} className='relative mb-2'>
                           <Image
                             src={image}
                             alt='product image'
-                            className='w-20 h-20 object-cover object-center rounded-sm'
+                            className={`w-20 h-20 object-cover object-center rounded-sm ${index === 0 ? 'border-2 border-primary' : ''}`}
                             width={100}
                             height={100}
                           />
+                          {index === 0 && (
+                            <span className='absolute bottom-0 left-0 bg-primary text-white text-xs px-1 rounded-sm'>
+                              Main
+                            </span>
+                          )}
                           <button
                             type='button'
                             onClick={() => {
@@ -272,13 +281,36 @@ const ProductForm = ({
                           >
                             X
                           </button>
+                          {index > 0 && (
+                            <button
+                              type='button'
+                              onClick={() => {
+                                const updatedImages = [...images]
+                                ;[updatedImages[0], updatedImages[index]] = [
+                                  updatedImages[index],
+                                  updatedImages[0],
+                                ]
+                                form.setValue('images', updatedImages)
+                              }}
+                              className='absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-1 w-4 h-4 flex items-center justify-center'
+                              title='Make this the main image'
+                            >
+                              ↑
+                            </button>
+                          )}
                         </div>
                       ))}
                       <FormControl>
                         <UploadButton
                           endpoint='imageUploader'
                           onClientUploadComplete={(res: { url: string }[]) => {
-                            form.setValue('images', [...images, res[0].url])
+                            // If this is the first image, just add it
+                            // Otherwise, add it after the first image to maintain main image position
+                            if (images.length === 0) {
+                              form.setValue('images', [res[0].url])
+                            } else {
+                              form.setValue('images', [...images, res[0].url])
+                            }
                           }}
                           onUploadError={(error: Error) => {
                             toast({
@@ -291,7 +323,6 @@ const ProductForm = ({
                     </div>
                   </CardContent>
                 </Card>
-
                 <FormMessage />
               </FormItem>
             )}

@@ -4,6 +4,7 @@ import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
 import { revalidatePath } from 'next/cache'
 import { formatError } from '../utils'
+import { toSlug } from '../utils' // Add this import for toSlug
 import { ProductInputSchema, ProductUpdateSchema } from '../validator'
 import { IProductInput } from '@/types'
 import { z } from 'zod'
@@ -127,6 +128,40 @@ export async function getAllCategories() {
   )
   return categories
 }
+
+// New function to get categories with representative images
+export async function getCategoriesWithImages(limit = 4) {
+  await connectToDatabase()
+  const categories = await Product.find({ isPublished: true }).distinct(
+    'category'
+  )
+
+  const categoriesWithImages = await Promise.all(
+    categories.slice(0, limit).map(async (category) => {
+      // Find one product from this category that has images
+      const product = await Product.findOne(
+        {
+          category,
+          isPublished: true,
+          images: { $exists: true, $not: { $size: 0 } },
+        },
+        { images: 1 }
+      ).sort({ createdAt: -1 })
+
+      return {
+        name: category,
+        // Use the first image if available, otherwise fall back to a default
+        image:
+          product && product.images && product.images.length > 0
+            ? product.images[0]
+            : `/images/${toSlug(category)}.jpg`,
+      }
+    })
+  )
+
+  return categoriesWithImages
+}
+
 export async function getProductsForCard({
   tag,
   limit = 4,

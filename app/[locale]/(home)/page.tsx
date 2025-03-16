@@ -7,10 +7,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import {
   getProductsForCard,
   getProductsByTag,
-  getAllCategories,
+  getCategoriesWithImages, // Use the new function
 } from '@/lib/actions/product.actions'
 import { getSetting } from '@/lib/actions/setting.actions'
-import { toSlug } from '@/lib/utils'
 import { getTranslations } from 'next-intl/server'
 
 export default async function HomePage() {
@@ -19,7 +18,9 @@ export default async function HomePage() {
   const todaysDeals = await getProductsByTag({ tag: 'todays-deal' })
   const bestSellingProducts = await getProductsByTag({ tag: 'best-seller' })
 
-  const categories = (await getAllCategories()).slice(0, 4)
+  // Use the new function to get categories with their images
+  const categoriesWithImages = await getCategoriesWithImages(4)
+
   const newArrivals = await getProductsForCard({
     tag: 'new-arrival',
   })
@@ -36,10 +37,10 @@ export default async function HomePage() {
         text: t('See More'),
         href: '/search',
       },
-      items: categories.map((category) => ({
-        name: category,
-        image: `/images/${toSlug(category)}.jpg`,
-        href: `/search?category=${category}`,
+      items: categoriesWithImages.map((category) => ({
+        name: category.name,
+        image: category.image, // Use the image from our new function
+        href: `/search?category=${category.name}`,
         className: 'transition-transform duration-300 hover:scale-105', // Add hover animation
       })),
     },
