@@ -11,7 +11,7 @@ export default function BrowsingHistoryList({}: { className?: string }) {
   return (
     products.length !== 0 && (
       <div className='bg-background'>
-        <Card>
+        <Card className='w-full'>
           <CardContent>
             <ProductList
               title={t("Related to items that you've viewed")}
@@ -19,7 +19,7 @@ export default function BrowsingHistoryList({}: { className?: string }) {
             />
           </CardContent>
         </Card>
-        <Card>
+        <Card className='mt-4'>
           <CardContent>
             <ProductList
               title={t('Your browsing history')}

@@ -99,9 +99,9 @@ export default async function HomePage() {
       </div>
 
       <div className='md:p-4 md:space-y-4 bg-border'>
-        <Card>
-          <CardContent>
-            <BrowsingHistoryList />
+        <Card className=''>
+          <CardContent className='w-full p-4 items-center gap-3'>
+            <BrowsingHistoryList className='' />
           </CardContent>
         </Card>
       </div>

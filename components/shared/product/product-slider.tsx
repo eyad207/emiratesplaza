@@ -55,17 +55,16 @@ export default function ProductSlider({
         )}
       </div>
 
-      <div className='relative px-6'>
-        <div className='overflow-hidden' ref={emblaRef}>
+      <div className='relative px-6 overflow-hidden'>
+        <div className='overflow-hidden scrollbar-hide' ref={emblaRef}>
           <div className='flex gap-4 pl-4 pr-20'>
             {products.map((product) => (
               <div
                 key={product._id.toString()}
-                className='w-[280px] sm:w-[320px] md:w-[350px] flex-shrink-0 flex-grow-0 h-[500px]'
+                className='w-[280px] sm:w-[320px] md:w-[350px] flex-shrink-0 flex-grow-0'
                 style={{
                   minWidth: '280px',
                   maxWidth: '350px',
-                  overflow: 'hidden',
                 }}
               >
                 <ProductCard
