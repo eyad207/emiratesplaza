@@ -99,7 +99,11 @@ export default async function HomePage() {
       </div>
 
       <div className='md:p-4 md:space-y-4 bg-border'>
-        <BrowsingHistoryList />
+        <Card>
+          <CardContent>
+            <BrowsingHistoryList />
+          </CardContent>
+        </Card>
       </div>
     </>
   )

@@ -86,7 +86,7 @@ const ProductCard = ({
   )
 
   const AddButton = () => (
-    <div className='w-full text-center transform transition-all duration-300 hover:scale-105'>
+    <div className='w-full text-center transform transition-all duration-300 hover:scale-105 pb-1'>
       <AddToCart
         minimal
         item={{
@@ -124,7 +124,7 @@ const ProductCard = ({
   ) : (
     <Card
       className={cn(
-        'flex flex-col group card-professional h-full border-2 border-border/50 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 dark:hover:border-primary/60',
+        'flex flex-col group card-professional h-full border-2 border-border/50 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 dark:hover:border-primary/60 overflow-hidden',
         className
       )}
     >
@@ -133,10 +133,10 @@ const ProductCard = ({
       </CardHeader>
       {!hideDetails && (
         <>
-          <CardContent className='p-3 flex-1 text-center'>
+          <CardContent className='p-3 flex-1 text-center overflow-y-auto'>
             <ProductDetails />
           </CardContent>
-          <CardFooter className='p-3 flex-shrink-0 mt-auto'>
+          <CardFooter className='p-3 pt-2 pb-3 flex-shrink-0 mt-auto border-t border-border/10 dark:border-zinc-800'>
             {!hideAddToCart && <AddButton />}
           </CardFooter>
         </>

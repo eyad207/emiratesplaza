@@ -62,7 +62,11 @@ export default function ProductSlider({
               <div
                 key={product._id.toString()}
                 className='w-[280px] sm:w-[320px] md:w-[350px] flex-shrink-0 flex-grow-0 h-[500px]'
-                style={{ minWidth: '280px', maxWidth: '350px' }}
+                style={{
+                  minWidth: '280px',
+                  maxWidth: '350px',
+                  overflow: 'hidden',
+                }}
               >
                 <ProductCard
                   product={product}
