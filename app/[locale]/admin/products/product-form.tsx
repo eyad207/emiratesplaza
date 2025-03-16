@@ -128,15 +128,6 @@ const ProductForm = ({
     name: 'colors',
   })
 
-  const {
-    fields: sizeFields,
-    append: appendSize,
-    remove: removeSize,
-  } = useFieldArray({
-    control: form.control,
-    name: 'colors.0.sizes', // Assuming sizes are nested under the first color
-  })
-
   return (
     <Form {...form}>
       <form
@@ -335,58 +326,77 @@ const ProductForm = ({
                 </Button>
               </div>
               <div className='ml-2'>
-                {sizeFields.map((sizeField, sizeIndex) => (
-                  <div key={sizeField.id} className='flex items-center gap-2'>
-                    <FormField
-                      control={form.control}
-                      name={`colors.${colorIndex}.sizes.${sizeIndex}.size`}
-                      render={({ field }) => (
-                        <FormItem className='w-full'>
-                          <FormLabel>Size</FormLabel>
-                          <FormControl>
-                            <Input placeholder='Enter size' {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`colors.${colorIndex}.sizes.${sizeIndex}.countInStock`}
-                      render={({ field }) => (
-                        <FormItem className='w-full'>
-                          <FormLabel>Count In Stock</FormLabel>
-                          <FormControl>
-                            <Input
-                              type='number'
-                              placeholder='Enter count in stock'
-                              {...field}
-                              onChange={(e) => {
-                                const value = parseInt(e.target.value, 10)
-                                if (value >= 0) {
-                                  field.onChange(e)
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      className='mt-8'
-                      type='button'
-                      variant='destructive'
-                      onClick={() => removeSize(sizeIndex)}
-                    >
-                      Remove Size
-                    </Button>
-                  </div>
-                ))}
+                {/* Access sizes directly from the current color */}
+                {(form.watch(`colors.${colorIndex}.sizes`) || []).map(
+                  (size, sizeIndex) => (
+                    <div key={sizeIndex} className='flex items-center gap-2'>
+                      <FormField
+                        control={form.control}
+                        name={`colors.${colorIndex}.sizes.${sizeIndex}.size`}
+                        render={({ field }) => (
+                          <FormItem className='w-full'>
+                            <FormLabel>Size</FormLabel>
+                            <FormControl>
+                              <Input placeholder='Enter size' {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`colors.${colorIndex}.sizes.${sizeIndex}.countInStock`}
+                        render={({ field }) => (
+                          <FormItem className='w-full'>
+                            <FormLabel>Count In Stock</FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                placeholder='Enter count in stock'
+                                {...field}
+                                onChange={(e) => {
+                                  const value = parseInt(e.target.value, 10)
+                                  if (value >= 0) {
+                                    field.onChange(value)
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        className='mt-8'
+                        type='button'
+                        variant='destructive'
+                        onClick={() => {
+                          const currentSizes = [
+                            ...(form.getValues(`colors.${colorIndex}.sizes`) ||
+                              []),
+                          ]
+                          currentSizes.splice(sizeIndex, 1)
+                          form.setValue(
+                            `colors.${colorIndex}.sizes`,
+                            currentSizes
+                          )
+                        }}
+                      >
+                        Remove Size
+                      </Button>
+                    </div>
+                  )
+                )}
                 <Button
                   className='mt-3'
                   type='button'
-                  onClick={() => appendSize({ size: '', countInStock: 0 })}
+                  onClick={() => {
+                    const currentSizes = [
+                      ...(form.getValues(`colors.${colorIndex}.sizes`) || []),
+                    ]
+                    currentSizes.push({ size: '', countInStock: 0 })
+                    form.setValue(`colors.${colorIndex}.sizes`, currentSizes)
+                  }}
                 >
                   Add Size
                 </Button>
