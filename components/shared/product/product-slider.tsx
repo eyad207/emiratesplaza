@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { IProduct } from '@/lib/db/models/product.model'
 import Link from 'next/link'
 import useEmblaCarousel from 'embla-carousel-react'
-import Autoplay from 'embla-carousel-autoplay'
+// Removed Autoplay import as it's no longer needed
 import ProductCard from './product-card'
 
 export default function ProductSlider({
@@ -28,8 +28,15 @@ export default function ProductSlider({
       align: 'start',
       containScroll: 'trimSnaps',
       dragFree: true,
-    },
-    [Autoplay({ delay: 10000, stopOnInteraction: false })]
+      slidesToScroll: 4, // Scroll 4 slides at a time
+      breakpoints: {
+        // Responsive breakpoints
+        '(max-width: 1200px)': { slidesToScroll: 3 },
+        '(max-width: 768px)': { slidesToScroll: 2 },
+        '(max-width: 640px)': { slidesToScroll: 1 },
+      },
+    }
+    // Removed the Autoplay plugin to disable auto-scrolling
   )
 
   const scrollPrev = React.useCallback(() => {
@@ -57,15 +64,12 @@ export default function ProductSlider({
 
       <div className='relative px-6 overflow-hidden'>
         <div className='overflow-hidden scrollbar-hide' ref={emblaRef}>
-          <div className='flex gap-4 pl-4 pr-20'>
+          <div className='flex gap-2 pl-1 pr-8'>
             {products.map((product) => (
               <div
                 key={product._id.toString()}
-                className='w-[280px] sm:w-[320px] md:w-[350px] flex-shrink-0 flex-grow-0'
-                style={{
-                  minWidth: '280px',
-                  maxWidth: '350px',
-                }}
+                className='w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 px-2'
+                style={{ minWidth: 'calc(100% / 4)' }}
               >
                 <ProductCard
                   product={product}
