@@ -116,7 +116,7 @@ const ProductCard = ({
       )}
     </div>
   ) : (
-    <Card className='flex flex-col group card-professional h-full m-4 border-2 border-border/50 hover:border-primary/40 dark:bg-card/95 dark:hover:bg-card'>
+    <Card className='flex flex-col group card-professional h-full m-4 border-2 border-border/50 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 dark:hover:border-primary/60'>
       <CardHeader className='p-3'>
         <ProductImage />
       </CardHeader>

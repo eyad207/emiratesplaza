@@ -22,7 +22,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
       {cards.map((card) => (
         <Card
           key={card.title}
-          className='rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:bg-card/95 dark:hover:bg-card'
+          className='rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700'
         >
           <CardContent className='p-6 flex-1'>
             <h3 className='text-lg font-bold mb-5 border-b pb-3 text-foreground dark:text-foreground/90'>
@@ -35,7 +35,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
                   href={item.href}
                   className={cn('flex flex-col group', item.className)}
                 >
-                  <div className='bg-secondary/40 dark:bg-secondary/10 rounded-lg p-3 flex items-center justify-center mb-2 overflow-hidden relative border border-border/50 hover:border-primary/50 transition-colors duration-300'>
+                  <div className='bg-secondary/40 dark:bg-zinc-800 rounded-lg p-3 flex items-center justify-center mb-2 overflow-hidden relative border border-border/50 dark:border-zinc-700 hover:border-primary/50 dark:hover:border-primary/60 transition-colors duration-300'>
                     <div className='absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500'></div>
                     <div className='transform transition-transform duration-500 ease-out group-hover:translate-y-[-5px] relative z-10'>
                       <Image
