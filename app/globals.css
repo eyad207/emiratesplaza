@@ -35,6 +35,10 @@ body {
     --chart-5: 27 87% 67%;
     --color-dark-blue: #1a237e;
     --color-dark-blue-darker: #0c1b68;
+    --color-header: 226 83% 30%;        /* #1a237e - deep blue for light mode */
+    --color-header-darker: 231 79% 23%; /* #0c1b68 - darker blue for light mode */
+    --color-footer: 226 83% 30%;        /* #1a237e - matches header */
+    --color-footer-darker: 231 79% 23%; /* #0c1b68 - matches header darker */
   }
 
   .dark {
@@ -62,6 +66,10 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --color-header: 240 6% 10%;      /* zinc-900 for dark mode */
+    --color-header-darker: 240 5% 14%; /* zinc-800 for dark mode */
+    --color-footer: 240 6% 10%;      /* zinc-900 for dark mode */
+    --color-footer-darker: 240 5% 14%; /* zinc-800 for dark mode */
   }
 }
 
@@ -175,6 +183,30 @@ body {
   
   .scrollbar-hide::-webkit-scrollbar {
     display: none;  /* Chrome, Safari, Opera */
+  }
+
+  .bg-header {
+    @apply bg-[hsl(var(--color-header))];
+  }
+  
+  .bg-header-darker {
+    @apply bg-[hsl(var(--color-header-darker))];
+  }
+  
+  .bg-footer {
+    @apply bg-[hsl(var(--color-footer))];
+  }
+  
+  .bg-footer-darker {
+    @apply bg-[hsl(var(--color-footer-darker))];
+  }
+  
+  .border-header-darker {
+    @apply border-[hsl(var(--color-header-darker))];
+  }
+  
+  .border-footer-darker {
+    @apply border-[hsl(var(--color-footer-darker))];
   }
 }
 

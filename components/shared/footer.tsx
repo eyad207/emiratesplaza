@@ -24,17 +24,17 @@ export default function Footer() {
   const locale = useLocale()
   const t = useTranslations()
   return (
-    <footer className='bg-dark-blue text-white underline-link mt-10'>
+    <footer className='bg-footer text-white underline-link mt-10'>
       <div className='w-full'>
         <Button
           variant='ghost'
-          className='bg-dark-blue-darker w-full rounded-none '
+          className='bg-footer-darker w-full rounded-none'
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <ChevronUp className='mr-2 h-4 w-4' />
           {t('Footer.Back to top')}
         </Button>
-        <div className='border-t border-dark-blue-darker'>
+        <div className='border-t border-footer-darker'>
           <div className='max-w-7xl mx-auto py-8 px-4 flex flex-col items-center space-y-4'>
             <div className='flex items-center space-x-4 flex-wrap md:flex-nowrap'>
               <Image

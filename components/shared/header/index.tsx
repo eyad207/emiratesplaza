@@ -20,7 +20,7 @@ export default async function Header() {
   const { site } = await getSetting()
   const t = await getTranslations()
   return (
-    <header className='bg-dark-blue text-white'>
+    <header className='bg-header text-white'>
       <div className='px-2'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center'>
@@ -47,7 +47,7 @@ export default async function Header() {
           <Search />
         </div>
       </div>
-      <div className='flex items-center justify-center px-3 mb-[1px] bg-dark-blue-darker'>
+      <div className='flex items-center justify-center px-3 mb-[1px] bg-header-darker'>
         <Sidebar categories={categories} />
         <div className='flex items-center flex-wrap gap-3 overflow-hidden max-h-[42px]'>
           {data.headerMenus.map((menu) => (
