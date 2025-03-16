@@ -54,9 +54,6 @@ export default function Footer() {
                   router.push(pathname, { locale: value })
                 }}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('Footer.Select a language')} />
-                </SelectTrigger>
                 <SelectContent>
                   {locales.map((lang, index) => (
                     <SelectItem key={index} value={lang.code}>
