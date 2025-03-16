@@ -46,7 +46,7 @@ export default function AccountPage() {
           </Link>
         </Card>
       </div>
-      <BrowsingHistoryList className='mt-16' />
+      <BrowsingHistoryList className='mt-13' />
     </div>
   )
 }

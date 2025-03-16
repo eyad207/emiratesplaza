@@ -10,7 +10,7 @@ export default function BrowsingHistoryList({}: { className?: string }) {
   const t = useTranslations('Home')
   return (
     products.length !== 0 && (
-      <div className='bg-background'>
+      <div className='bg-background mt-10'>
         <Card className='w-full'>
           <CardContent>
             <ProductList
