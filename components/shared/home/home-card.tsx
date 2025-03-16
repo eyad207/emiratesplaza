@@ -58,7 +58,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
             <CardFooter className='border-t pt-3 pb-4 px-6'>
               <Link
                 href={card.link.href}
-                className='text-sm font-semibold text-primary hover:text-primary-foreground dark:text-primary-foreground/90 dark:hover:text-primary transition-colors duration-300 flex items-center group hover-arrow-animation'
+                className='text-sm font-semibold text-primary hover:text-emerald-500 dark:text-emerald-300 dark:hover:text-primary transition-colors duration-300 flex items-center group hover-arrow-animation'
               >
                 {card.link.text}
                 <svg
