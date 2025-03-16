@@ -35,7 +35,6 @@ export default function BrowsingHistoryList({
 function ProductList({
   title,
   type = 'history',
-  hideDetails = false,
   excludeId = '',
 }: {
   title: string
@@ -58,9 +57,5 @@ function ProductList({
     fetchProducts()
   }, [excludeId, products, type])
 
-  return (
-    data.length > 0 && (
-      <ProductSlider title={title} products={data} hideDetails={hideDetails} />
-    )
-  )
+  return data.length > 0 && <ProductSlider title={title} products={data} />
 }

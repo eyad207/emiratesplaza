@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { IProduct } from '@/lib/db/models/product.model'
 
 import Rating from './rating'
-import { formatNumber, generateId, round2 } from '@/lib/utils'
+import { formatNumber, generateId, round2, cn } from '@/lib/utils'
 import ProductPrice from './product-price'
 import ImageHover from './image-hover'
 import AddToCart from './add-to-cart'
@@ -16,11 +16,13 @@ const ProductCard = ({
   hideBorder = false,
   hideDetails = false,
   hideAddToCart = false,
+  className,
 }: {
   product: IProduct
   hideDetails?: boolean
   hideBorder?: boolean
   hideAddToCart?: boolean
+  className?: string
 }) => {
   const ProductImage = () => (
     <Link
@@ -50,7 +52,7 @@ const ProductCard = ({
   )
 
   const ProductDetails = () => (
-    <div className='flex-1 space-y-2'>
+    <div className='flex-1 space-y-2 flex flex-col'>
       <p className='font-bold text-foreground dark:text-foreground/90'>
         {product.brand}
       </p>
@@ -72,12 +74,14 @@ const ProductCard = ({
         </span>
       </div>
 
-      <ProductPrice
-        isDeal={product.tags.includes('todays-deal')}
-        price={product.price}
-        listPrice={product.listPrice}
-        forListing
-      />
+      <div className='mt-auto pt-2'>
+        <ProductPrice
+          isDeal={product.tags.includes('todays-deal')}
+          price={product.price}
+          listPrice={product.listPrice}
+          forListing
+        />
+      </div>
     </div>
   )
 
@@ -104,7 +108,9 @@ const ProductCard = ({
   )
 
   return hideBorder ? (
-    <div className='flex flex-col group card-professional h-full m-4'>
+    <div
+      className={cn('flex flex-col group card-professional h-full', className)}
+    >
       <ProductImage />
       {!hideDetails && (
         <>
@@ -116,8 +122,13 @@ const ProductCard = ({
       )}
     </div>
   ) : (
-    <Card className='flex flex-col group card-professional h-full m-4 border-2 border-border/50 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 dark:hover:border-primary/60'>
-      <CardHeader className='p-3'>
+    <Card
+      className={cn(
+        'flex flex-col group card-professional h-full border-2 border-border/50 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 dark:hover:border-primary/60',
+        className
+      )}
+    >
+      <CardHeader className='p-3 flex-shrink-0'>
         <ProductImage />
       </CardHeader>
       {!hideDetails && (
@@ -125,7 +136,7 @@ const ProductCard = ({
           <CardContent className='p-3 flex-1 text-center'>
             <ProductDetails />
           </CardContent>
-          <CardFooter className='p-3'>
+          <CardFooter className='p-3 flex-shrink-0 mt-auto'>
             {!hideAddToCart && <AddButton />}
           </CardFooter>
         </>
