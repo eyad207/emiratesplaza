@@ -42,7 +42,7 @@ export default function AddToCart({
 
   return minimal ? (
     <Button
-      className='rounded-full w-auto'
+      className='rounded-full w-auto font-semibold shadow-sm hover:shadow-md transition-all border-2 border-primary/80 dark:border-primary/60 dark:hover:border-primary'
       onClick={() => {
         try {
           addItem(item, 1)
@@ -50,6 +50,7 @@ export default function AddToCart({
             description: t('Product.Added to Cart'),
             action: (
               <Button
+                className='dark:border dark:border-border/70 dark:hover:border-primary/70'
                 onClick={() => {
                   router.push('/cart')
                 }}

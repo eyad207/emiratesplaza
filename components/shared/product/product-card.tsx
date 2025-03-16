@@ -23,8 +23,11 @@ const ProductCard = ({
   hideAddToCart?: boolean
 }) => {
   const ProductImage = () => (
-    <Link href={`/product/${product.slug}`}>
-      <div className='relative h-52'>
+    <Link
+      href={`/product/${product.slug}`}
+      className='overflow-hidden rounded-lg block'
+    >
+      <div className='relative h-52 transform transition-transform duration-700 ease-out hover:scale-105'>
         {product.images.length > 1 ? (
           <ImageHover
             src={product.images[0]}
@@ -38,19 +41,22 @@ const ProductCard = ({
               alt={product.name}
               fill
               sizes='80vw'
-              className='object-contain'
+              className='object-contain drop-shadow-md'
             />
           </div>
         )}
       </div>
     </Link>
   )
+
   const ProductDetails = () => (
     <div className='flex-1 space-y-2'>
-      <p className='font-bold'>{product.brand}</p>
+      <p className='font-bold text-foreground dark:text-foreground/90'>
+        {product.brand}
+      </p>
       <Link
         href={`/product/${product.slug}`}
-        className='overflow-hidden text-ellipsis'
+        className='overflow-hidden text-ellipsis font-medium hover:text-primary transition-colors duration-300 dark:text-foreground/80 dark:hover:text-primary'
         style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -61,7 +67,9 @@ const ProductCard = ({
       </Link>
       <div className='flex gap-2 justify-center'>
         <Rating rating={product.avgRating} />
-        <span>({formatNumber(product.numReviews)})</span>
+        <span className='font-medium'>
+          ({formatNumber(product.numReviews)})
+        </span>
       </div>
 
       <ProductPrice
@@ -74,7 +82,7 @@ const ProductCard = ({
   )
 
   const AddButton = () => (
-    <div className='w-full text-center'>
+    <div className='w-full text-center transform transition-all duration-300 hover:scale-105'>
       <AddToCart
         minimal
         item={{
@@ -96,7 +104,7 @@ const ProductCard = ({
   )
 
   return hideBorder ? (
-    <div className='flex flex-col transition-transform transform hover:scale-105 shadow-md h-full m-4'>
+    <div className='flex flex-col group card-professional h-full m-4'>
       <ProductImage />
       {!hideDetails && (
         <>
@@ -108,13 +116,13 @@ const ProductCard = ({
       )}
     </div>
   ) : (
-    <Card className='flex flex-col transition-transform transform hover:scale-105 shadow-md h-full m-4'>
+    <Card className='flex flex-col group card-professional h-full m-4 border-2 border-border/50 hover:border-primary/40 dark:bg-card/95 dark:hover:bg-card'>
       <CardHeader className='p-3'>
         <ProductImage />
       </CardHeader>
       {!hideDetails && (
         <>
-          <CardContent className='p-3 flex-1  text-center'>
+          <CardContent className='p-3 flex-1 text-center'>
             <ProductDetails />
           </CardContent>
           <CardFooter className='p-3'>
