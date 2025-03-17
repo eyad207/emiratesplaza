@@ -6,8 +6,8 @@ export default async function AccountLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className=' flex-1 p-4'>
-      <div className='max-w-5xl mx-auto space-y-4'>{children}</div>
+    <div className='bg-muted/30 min-h-[calc(100vh-var(--header-height))] w-full py-6 sm:py-8 md:py-10'>
+      <div className='container max-w-5xl mx-auto px-4 sm:px-6'>{children}</div>
     </div>
   )
 }

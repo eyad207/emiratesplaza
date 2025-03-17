@@ -39,6 +39,7 @@ body {
     --color-header-darker: 231 79% 23%; /* #0c1b68 - darker blue for light mode */
     --color-footer: 226 83% 30%;        /* #1a237e - matches header */
     --color-footer-darker: 231 79% 23%; /* #0c1b68 - matches header darker */
+    --header-height: 144px; /* Approximate total header height */
   }
 
   .dark {
