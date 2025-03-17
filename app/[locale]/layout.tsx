@@ -8,6 +8,7 @@ import { routing } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { cookies } from 'next/headers'
+import CartSidebar from '@/components/shared/cart-sidebar'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -65,6 +66,7 @@ export default async function AppLayout({
           <ClientProviders setting={{ ...setting, currency }}>
             {children}
           </ClientProviders>
+          <CartSidebar />
         </NextIntlClientProvider>
       </body>
     </html>

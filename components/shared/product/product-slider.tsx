@@ -48,7 +48,7 @@ export default function ProductSlider({
   }, [emblaApi])
 
   return (
-    <div className='my-3 sm:my-5 md:my-8 dark:bg-zinc-900/50'>
+    <div className='sm:my-5 md:my-8 dark:bg-zinc-900/50'>
       <div className='flex justify-between items-center mb-4'>
         <h2 className='text-xl font-bold'>{title}</h2>
         {href && (

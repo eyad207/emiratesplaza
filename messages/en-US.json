@@ -131,7 +131,12 @@
     "Proceed to Checkout": "Proceed to Checkout",
     "Delete": "Delete",
     "Update": "Update",
-    "Checkout": "Checkout"
+    "Checkout": "Checkout",
+    "Product": "Product",
+    "item": "item",
+    "Total": "Total",
+    "Order Summary": "Order Summary",
+    "Continue shopping": "Continue shopping"
   },
   "Search": {
     "for": "for",

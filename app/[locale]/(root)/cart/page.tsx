@@ -1,8 +1,23 @@
 'use client'
-import BrowsingHistoryList from '@/components/shared/browsing-history-list'
-import ProductPrice from '@/components/shared/product/product-price'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+
+import EmptyCart from '@/components/shared/cart/empty-cart'
+import { buttonVariants } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import useCartStore from '@/hooks/use-cart-store'
+import { formatCurrency } from '@/lib/utils'
+import { TrashIcon } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { Separator } from '@/components/ui/separator'
 import {
   Select,
   SelectContent,
@@ -10,219 +25,195 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import useCartStore from '@/hooks/use-cart-store'
-import useSettingStore from '@/hooks/use-setting-store'
-import { useTranslations } from 'next-intl'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import React from 'react'
-import { OrderItem } from '@/types'
 
-export default function CartPage() {
+export default function Cart() {
   const {
-    cart: { items, itemsPrice },
-    updateItem,
+    cart: { items, itemsPrice, taxPrice, shippingPrice, totalPrice },
     removeItem,
+    updateItem,
   } = useCartStore()
-  const router = useRouter()
-  const {
-    setting: {
-      site,
-      common: { freeShippingMinPrice },
-    },
-  } = useSettingStore()
 
   const t = useTranslations()
 
-  const getSizesForColor = (item: OrderItem, color: string) => {
-    const colorObj = item.colors.find((c) => c.color === color)
-    return colorObj ? colorObj.sizes : []
-  }
-
-  const getCountInStockForSelectedVariant = (item: OrderItem) => {
-    if (!item.color || !item.size) return 0
-    const sizes = getSizesForColor(item, item.color)
-    const sizeObj = sizes.find((s) => s.size === item.size)
-    return sizeObj ? sizeObj.countInStock : 0
+  if (items.length === 0) {
+    return <EmptyCart />
   }
 
   return (
-    <div>
-      <div className='grid grid-cols-1 md:grid-cols-4  md:gap-4'>
-        {items.length === 0 ? (
-          <Card className='col-span-4 rounded-none'>
-            <CardHeader className='text-3xl  '>
-              {t('Cart.Your Shopping Cart is empty')}
+    <div className='container py-6 md:py-8 lg:py-10'>
+      <div className='mb-6'>
+        <h1 className='text-2xl sm:text-3xl font-bold mb-2'>
+          {t('Cart.Shopping Cart')}
+        </h1>
+        <p className='text-muted-foreground'>
+          {items.length} {items.length === 1 ? 'item' : 'items'} in your cart
+        </p>
+      </div>
+
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        {/* Cart Items */}
+        <div className='lg:col-span-2'>
+          <Card className='shadow-sm'>
+            <CardHeader className='py-4 px-6 border-b'>
+              <CardTitle className='text-lg'>{t('Cart.Items')}</CardTitle>
             </CardHeader>
-            <CardContent>
-              {t.rich('Cart.Continue shopping on', {
-                name: site.name,
-                home: (chunks) => <Link href='/'>{chunks}</Link>,
-              })}
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            <div className='col-span-3'>
-              <Card className='rounded-none'>
-                <CardHeader className='text-3xl pb-0'>
-                  {t('Cart.Shopping Cart')}
-                </CardHeader>
-                <CardContent className='p-4'>
-                  <div className='flex justify-end border-b mb-4'>
-                    {t('Cart.Price')}
-                  </div>
-
-                  {items.map((item) => (
-                    <div
-                      key={item.clientId}
-                      className='flex flex-col md:flex-row justify-between py-4 border-b gap-4'
-                    >
-                      <Link href={`/product/${item.slug}`}>
-                        <div className='relative w-40 h-40'>
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fill
-                            sizes='20vw'
-                            style={{
-                              objectFit: 'contain',
-                            }}
-                          />
-                        </div>
-                      </Link>
-
-                      <div className='flex-1 space-y-4'>
-                        <Link
-                          href={`/product/${item.slug}`}
-                          className='text-lg hover:no-underline  '
-                        >
-                          {item.name}
-                        </Link>
-                        <div>
-                          <p className='text-sm'>
-                            <span className='font-bold'>
-                              {' '}
-                              {t('Cart.Color')}:{' '}
-                            </span>{' '}
-                            {item.color}
-                          </p>
-                          <p className='text-sm'>
-                            <span className='font-bold'>
-                              {' '}
-                              {t('Cart.Size')}:{' '}
-                            </span>{' '}
-                            {item.size}
-                          </p>
-                        </div>
-                        <div className='flex gap-2 items-center'>
+            <CardContent className='p-0'>
+              <div className='overflow-x-auto'>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className='w-[100px]'></TableHead>
+                      <TableHead>{t('Cart.Product')}</TableHead>
+                      <TableHead className='text-right'>
+                        {t('Cart.Price')}
+                      </TableHead>
+                      <TableHead>{t('Cart.Quantity')}</TableHead>
+                      <TableHead className='text-right'>
+                        {t('Cart.Total')}
+                      </TableHead>
+                      <TableHead className='w-[50px]'></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {items.map((item) => (
+                      <TableRow
+                        key={item.clientId}
+                        className='hover:bg-muted/30 transition-colors'
+                      >
+                        <TableCell className='p-2'>
+                          <Link
+                            href={`/product/${item.slug}`}
+                            className='block w-[80px] h-[80px] relative overflow-hidden rounded-md border'
+                          >
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              sizes='80px'
+                              className='object-contain'
+                            />
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          <Link
+                            href={`/product/${item.slug}`}
+                            className='font-medium hover:text-primary transition-colors hover:underline'
+                          >
+                            {item.name}
+                          </Link>
+                          <div className='text-sm text-muted-foreground mt-1'>
+                            {item.color && (
+                              <span className='mr-2'>
+                                {t('Cart.Color')}: {item.color}
+                              </span>
+                            )}
+                            {item.size && (
+                              <span>
+                                {t('Cart.Size')}: {item.size}
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className='text-right font-medium'>
+                          {formatCurrency(item.price)}
+                        </TableCell>
+                        <TableCell>
                           <Select
                             value={item.quantity.toString()}
-                            onValueChange={(value) =>
+                            onValueChange={(value) => {
                               updateItem(item, Number(value))
-                            }
+                            }}
                           >
-                            <SelectTrigger className='w-auto'>
-                              <SelectValue>
-                                {t('Cart.Quantity')}: {item.quantity}
-                              </SelectValue>
+                            <SelectTrigger className='w-20'>
+                              <SelectValue />
                             </SelectTrigger>
-                            <SelectContent position='popper'>
-                              {Array.from({
-                                length: getCountInStockForSelectedVariant(item),
-                              }).map((_, i) => (
-                                <SelectItem key={i + 1} value={`${i + 1}`}>
+                            <SelectContent>
+                              {Array.from({ length: 10 }).map((_, i) => (
+                                <SelectItem
+                                  key={i + 1}
+                                  value={(i + 1).toString()}
+                                >
                                   {i + 1}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          <Button
-                            variant={'outline'}
+                        </TableCell>
+                        <TableCell className='text-right font-medium'>
+                          {formatCurrency(item.price * item.quantity)}
+                        </TableCell>
+                        <TableCell>
+                          <button
                             onClick={() => removeItem(item)}
+                            className='text-muted-foreground hover:text-destructive transition-colors'
+                            aria-label='Remove item'
                           >
-                            {t('Cart.Delete')}
-                          </Button>
-                        </div>
-                      </div>
-                      <div>
-                        <p className='text-right'>
-                          {item.quantity > 1 && (
-                            <>
-                              {item.quantity} x
-                              <ProductPrice price={item.price} plain />
-                              <br />
-                            </>
-                          )}
+                            <TrashIcon className='w-4 h-4' />
+                          </button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-                          <span className='font-bold text-lg'>
-                            <ProductPrice
-                              price={item.price * item.quantity}
-                              plain
-                            />
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+        {/* Summary */}
+        <div>
+          <Card className='shadow-sm sticky top-24'>
+            <CardHeader className='py-4 px-6 border-b'>
+              <CardTitle className='text-lg'>
+                {t('Cart.Order Summary')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className='p-6 space-y-4'>
+              <div className='space-y-2'>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>
+                    {t('Cart.Subtotal')} ({items.length}{' '}
+                    {items.length === 1 ? t('Cart.item') : t('Cart.items')})
+                  </span>
+                  <span>{formatCurrency(itemsPrice)}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>
+                    {t('Cart.Shipping')}
+                  </span>
+                  <span>{formatCurrency(shippingPrice ?? 0)}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>{t('Cart.Tax')}</span>
+                  <span>{formatCurrency(taxPrice ?? 0)}</span>
+                </div>
+              </div>
 
-                  <div className='flex justify-end text-lg my-2'>
-                    {t('Cart.Subtotal')} (
-                    {items.reduce((acc, item) => acc + item.quantity, 0)}{' '}
-                    {t('Cart.Items')}):{' '}
-                    <span className='font-bold ml-1'>
-                      <ProductPrice price={itemsPrice} plain />
-                    </span>{' '}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            <div>
-              <Card className='rounded-none'>
-                <CardContent className='py-4 space-y-4'>
-                  {itemsPrice < freeShippingMinPrice ? (
-                    <div className='flex-1'>
-                      {t('Cart.Add')}{' '}
-                      <span className='text-green-700'>
-                        <ProductPrice
-                          price={freeShippingMinPrice - itemsPrice}
-                          plain
-                        />
-                      </span>{' '}
-                      {t(
-                        'Cart.of eligible items to your order to qualify for FREE Shipping'
-                      )}
-                    </div>
-                  ) : (
-                    <div className='flex-1'>
-                      <span className='text-green-700'>
-                        {t('Cart.Your order qualifies for FREE Shipping')}
-                      </span>{' '}
-                      {t('Cart.Choose this option at checkout')}
-                    </div>
-                  )}
-                  <div className='text-lg'>
-                    {t('Cart.Subtotal')} (
-                    {items.reduce((acc, item) => acc + item.quantity, 0)}{' '}
-                    {t('Cart.items')}):{' '}
-                    <span className='font-bold'>
-                      <ProductPrice price={itemsPrice} plain />
-                    </span>{' '}
-                  </div>
-                  <Button
-                    onClick={() => router.push('/checkout')}
-                    className='rounded-full w-full'
-                  >
-                    {t('Cart.Proceed to Checkout')}
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </>
-        )}
+              <Separator />
+
+              <div className='flex justify-between text-lg font-bold'>
+                <span>{t('Cart.Total')}</span>
+                <span>{formatCurrency(totalPrice)}</span>
+              </div>
+
+              <div className='pt-4'>
+                <Link
+                  href='/checkout'
+                  className={buttonVariants({ size: 'lg' }) + ' w-full'}
+                >
+                  {t('Cart.Checkout')}
+                </Link>
+              </div>
+
+              <div className='pt-2 text-center'>
+                <Link href='/' className='text-primary text-sm hover:underline'>
+                  {t('Cart.Continue shopping')}
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-      <BrowsingHistoryList className='mt-10' />
     </div>
   )
 }
