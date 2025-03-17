@@ -1,4 +1,5 @@
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import RecentOrdersList from '@/components/shared/account/recent-orders-list'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   PackageCheckIcon,
@@ -12,6 +13,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { Separator } from '@/components/ui/separator'
 import { auth } from '@/auth'
+import { getRecentOrders } from '@/lib/actions/order.actions'
 
 const PAGE_TITLE = 'Your Account'
 export const metadata: Metadata = {
@@ -21,6 +23,11 @@ export const metadata: Metadata = {
 export default async function AccountPage() {
   const session = await auth()
   const userName = session?.user?.name || 'there'
+
+  // Fetch recent orders if user is logged in
+  const recentOrders = session?.user?.id
+    ? await getRecentOrders(session.user.id)
+    : []
 
   const accountCards = [
     {
@@ -97,19 +104,9 @@ export default async function AccountPage() {
             Quick access to your latest purchases
           </p>
         </div>
-        <Card>
-          <CardContent className='p-6'>
-            <div className='text-center py-6'>
-              <p>You have no recent orders</p>
-              <Link
-                href='/search'
-                className='text-primary hover:underline mt-2 block'
-              >
-                Continue shopping
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+
+        {/* Use our new component to display recent orders */}
+        <RecentOrdersList orders={recentOrders} />
       </div>
 
       <Separator className='my-8' />

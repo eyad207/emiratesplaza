@@ -635,3 +635,18 @@ export async function getOrdersByUserId({
     totalPages: Math.ceil(ordersCount / limit),
   }
 }
+
+export async function getRecentOrders(userId: string) {
+  try {
+    await connectToDatabase()
+    const orders = await Order.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean()
+
+    return JSON.parse(JSON.stringify(orders))
+  } catch (error) {
+    console.error('Error fetching recent orders:', error)
+    return []
+  }
+}

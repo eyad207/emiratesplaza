@@ -17,6 +17,7 @@ import {
   UserSignUpSchema,
   WebPageInputSchema,
 } from '@/lib/validator'
+import { IOrder } from '@/lib/db/models/order.model'
 import { z } from 'zod'
 
 export type IReviewInput = z.infer<typeof ReviewInputSchema>
@@ -28,6 +29,9 @@ export type IReviewDetails = IReviewInput & {
   }
 }
 export type IProductInput = z.infer<typeof ProductInputSchema>
+
+// Re-export IOrder from the model
+export type { IOrder }
 
 export type Data = {
   settings: ISettingInput[]
