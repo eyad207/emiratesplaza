@@ -187,7 +187,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
         {processedCards.map((card) => (
           <Card
             key={card.title}
-            className='rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700'
+            className='rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:border-zinc-700 dark:hover:border-primary/60 dark:bg-zinc-900 dark:hover:bg-zinc-900'
           >
             <CardContent className='p-4 sm:p-5 md:p-7 flex-1'>
               <h3 className='text-lg sm:text-xl font-bold mb-4 sm:mb-6 border-b pb-3 sm:pb-4 text-foreground dark:text-foreground/90'>
@@ -290,7 +290,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
           {processedCards.map((card, index) => (
             <Card
               key={card.title}
-              className={`card-item rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 w-[85vw] max-w-[350px] sm:w-[340px] flex-shrink-0 snap-center`}
+              className={`card-item rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:border-zinc-700 dark:hover:border-primary/60 dark:bg-zinc-900 dark:hover:bg-zinc-900 w-[85vw] max-w-[350px] sm:w-[340px] flex-shrink-0 snap-center`}
               data-index={index}
             >
               {/* ...existing card content... */}
