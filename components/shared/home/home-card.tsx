@@ -24,47 +24,67 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [currentCardIndex, setCurrentCardIndex] = useState(0)
   const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Check if we're on mobile or desktop
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024) // Consider lg breakpoint (1024px) as desktop
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Calculate total number of cards
   const totalCards = cards.length
 
-  // Handle manual navigation with precise single-card scroll
+  // Handle manual navigation with precise single-card scroll (mobile only)
   const scrollPrev = () => {
-    if (scrollContainerRef.current) {
-      const newIndex = Math.max(0, currentCardIndex - 1)
-      setCurrentCardIndex(newIndex)
+    if (!scrollContainerRef.current || !isMobile) return
 
-      // Calculate the exact position to scroll to
-      const cardElements =
-        scrollContainerRef.current.querySelectorAll('.card-item')
-      if (cardElements[newIndex]) {
-        scrollContainerRef.current.scrollLeft =
-          cardElements[newIndex].getBoundingClientRect().left +
-          scrollContainerRef.current.scrollLeft -
-          scrollContainerRef.current.getBoundingClientRect().left
-      }
+    const newIndex = Math.max(0, currentCardIndex - 1)
+    setCurrentCardIndex(newIndex)
+
+    // Calculate the exact position to scroll to
+    const cardElements =
+      scrollContainerRef.current.querySelectorAll('.card-item')
+    if (cardElements[newIndex]) {
+      scrollContainerRef.current.scrollLeft =
+        cardElements[newIndex].getBoundingClientRect().left +
+        scrollContainerRef.current.scrollLeft -
+        scrollContainerRef.current.getBoundingClientRect().left
     }
   }
 
   const scrollNext = () => {
-    if (scrollContainerRef.current) {
-      const newIndex = Math.min(totalCards - 1, currentCardIndex + 1)
-      setCurrentCardIndex(newIndex)
+    if (!scrollContainerRef.current || !isMobile) return
 
-      // Calculate the exact position to scroll to
-      const cardElements =
-        scrollContainerRef.current.querySelectorAll('.card-item')
-      if (cardElements[newIndex]) {
-        scrollContainerRef.current.scrollLeft =
-          cardElements[newIndex].getBoundingClientRect().left +
-          scrollContainerRef.current.scrollLeft -
-          scrollContainerRef.current.getBoundingClientRect().left
-      }
+    const newIndex = Math.min(totalCards - 1, currentCardIndex + 1)
+    setCurrentCardIndex(newIndex)
+
+    // Calculate the exact position to scroll to
+    const cardElements =
+      scrollContainerRef.current.querySelectorAll('.card-item')
+    if (cardElements[newIndex]) {
+      scrollContainerRef.current.scrollLeft =
+        cardElements[newIndex].getBoundingClientRect().left +
+        scrollContainerRef.current.scrollLeft -
+        scrollContainerRef.current.getBoundingClientRect().left
     }
   }
 
-  // Auto-scroll functionality - modified for single-card scroll
+  // Auto-scroll functionality - only for mobile
   useEffect(() => {
+    if (!isMobile) {
+      // Make sure to clear any autoScroll if we switch to desktop
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current)
+      }
+      return
+    }
+
     const startAutoScroll = () => {
       autoScrollIntervalRef.current = setInterval(() => {
         if (scrollContainerRef.current) {
@@ -95,10 +115,12 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
         clearInterval(autoScrollIntervalRef.current)
       }
     }
-  }, [currentCardIndex, totalCards])
+  }, [currentCardIndex, totalCards, isMobile])
 
-  // Handle manual scroll
+  // Handle manual scroll - only for mobile
   const handleManualScroll = () => {
+    if (!isMobile) return
+
     if (autoScrollIntervalRef.current) {
       clearInterval(autoScrollIntervalRef.current)
     }
@@ -157,9 +179,82 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
     return { ...card, items: limitedItems }
   })
 
+  // Render different layouts for mobile and desktop
+  if (!isMobile) {
+    // Desktop layout - grid with 90% width
+    return (
+      <div className='w-[90%] mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4'>
+        {processedCards.map((card) => (
+          <Card
+            key={card.title}
+            className='rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700'
+          >
+            <CardContent className='p-3 sm:p-4 md:p-6 flex-1'>
+              <h3 className='text-base sm:text-lg font-bold mb-3 sm:mb-5 border-b pb-2 sm:pb-3 text-foreground dark:text-foreground/90'>
+                {card.title}
+              </h3>
+
+              <div className='grid grid-cols-2 gap-3 sm:gap-4'>
+                {card.items.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn('flex flex-col group', item.className)}
+                  >
+                    <div className='bg-secondary/40 dark:bg-zinc-800 rounded-lg p-2 sm:p-3 flex items-center justify-center mb-1 sm:mb-2 overflow-hidden relative border border-border/50 dark:border-zinc-700 hover:border-primary/50 dark:hover:border-primary/60 transition-colors duration-300'>
+                      <div className='absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500'></div>
+                      <div className='transform transition-transform duration-500 ease-out group-hover:translate-y-[-2px] sm:group-hover:translate-y-[-5px] relative z-10'>
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          className='aspect-square object-contain max-w-full h-auto mx-auto group-hover:scale-110 transition-transform duration-700 drop-shadow-sm'
+                          height={80}
+                          width={80}
+                        />
+                      </div>
+                    </div>
+                    <p className='text-center text-xs sm:text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis group-hover:text-primary transition-colors duration-300 dark:font-semibold'>
+                      {item.name}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+
+            {card.link && (
+              <CardFooter className='border-t pt-2 pb-3 px-3 sm:pt-3 sm:pb-4 sm:px-6'>
+                <Link
+                  href={card.link.href}
+                  className='text-xs sm:text-sm font-semibold text-primary hover:text-emerald-500 dark:text-emerald-300 dark:hover:text-primary transition-colors duration-300 flex items-center group hover-arrow-animation'
+                >
+                  {card.link.text}
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    width='16'
+                    height='16'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    className='ml-1 h-3 w-3 sm:h-4 sm:w-4 transform transition-transform duration-300'
+                  >
+                    <path d='m9 18 6-6-6-6' />
+                  </svg>
+                </Link>
+              </CardFooter>
+            )}
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  // Mobile layout - scrollable with navigation and dots
   return (
     <div className='relative'>
-      {/* Navigation buttons */}
+      {/* Navigation buttons - mobile only */}
       <Button
         variant='outline'
         size='icon'
@@ -178,7 +273,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
         <ChevronRightIcon className='h-3 w-3 sm:h-4 sm:w-4' />
       </Button>
 
-      {/* Card container with scroll snapping */}
+      {/* Card container with scroll snapping - mobile only */}
       <div
         className='overflow-x-auto pb-4 scrollbar-hide px-6 scroll-smooth snap-x snap-mandatory'
         ref={scrollContainerRef}
@@ -195,7 +290,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
           {processedCards.map((card, index) => (
             <Card
               key={card.title}
-              className={`card-item rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 w-[85vw] max-w-[350px] sm:w-[340px] md:w-[320px] flex-shrink-0 snap-center`}
+              className={`card-item rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 w-[85vw] max-w-[350px] sm:w-[340px] flex-shrink-0 snap-center`}
               data-index={index}
             >
               {/* ...existing card content... */}
@@ -260,7 +355,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
         </div>
       </div>
 
-      {/* Optional: Add pagination indicators */}
+      {/* Pagination indicators - mobile only */}
       <div className='flex justify-center mt-4 gap-2'>
         {Array.from({ length: totalCards }).map((_, index) => (
           <button
@@ -284,6 +379,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
                 })
               }
             }}
+            aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
