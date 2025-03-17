@@ -1,5 +1,13 @@
 'use client'
-import { BadgeDollarSign, Barcode, CreditCard, Users } from 'lucide-react'
+import {
+  BadgeDollarSign,
+  Barcode,
+  CreditCard,
+  Users,
+  TrendingUp,
+  ArrowUp,
+  ArrowDown,
+} from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import Link from 'next/link'
@@ -9,6 +17,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card'
 import {
   Table,
@@ -18,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 import { calculatePastDate, formatDateTime, formatNumber } from '@/lib/utils'
 
 import SalesCategoryPieChart from './sales-category-pie-chart'
@@ -31,6 +41,8 @@ import { IOrderList } from '@/types'
 import ProductPrice from '@/components/shared/product/product-price'
 import { Skeleton } from '@/components/ui/skeleton'
 import TableChart from './table-chart'
+import { cn } from '@/lib/utils'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function OverviewReport() {
   const t = useTranslations('Admin')
@@ -41,9 +53,8 @@ export default function OverviewReport() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<{ [key: string]: any }>()
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isPending, startTransition] = useTransition()
+
   useEffect(() => {
     if (date) {
       startTransition(async () => {
@@ -52,202 +63,376 @@ export default function OverviewReport() {
     }
   }, [date])
 
-  if (!data)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const calculatePercentageChange = (data: any) => {
+    if (!data || !data.monthlySales || data.monthlySales.length < 2)
+      return { value: 0, isPositive: true }
+
+    const currentMonth = data.monthlySales[0].value
+    const previousMonth = data.monthlySales[1].value
+
+    if (previousMonth === 0) return { value: 100, isPositive: true }
+
+    const percentChange = ((currentMonth - previousMonth) / previousMonth) * 100
+    return {
+      value: Math.abs(Math.round(percentChange)),
+      isPositive: percentChange >= 0,
+    }
+  }
+
+  if (!data || isPending)
     return (
-      <div className='space-y-4'>
-        <div>
-          <h1 className='h1-bold'>Dashboard</h1>
-        </div>
-        {/* First Row */}
-        <div className='flex gap-4'>
-          {[...Array(4)].map((_, index) => (
-            <Skeleton key={index} className='h-36 w-full' />
-          ))}
+      <div className='space-y-6 opacity-70 transition-opacity duration-300'>
+        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+          <Skeleton className='h-10 w-52' />
+          <Skeleton className='h-10 w-32' />
         </div>
 
-        {/* Second Row */}
-        <div>
-          <Skeleton className='h-[30rem] w-full' />
+        {/* Card Grid Skeletons */}
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5'>
+          {Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <Card key={i} className='overflow-hidden'>
+                <CardHeader className='pb-2'>
+                  <Skeleton className='h-5 w-24' />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className='h-8 w-32 mb-2' />
+                  <Skeleton className='h-4 w-16' />
+                </CardContent>
+              </Card>
+            ))}
         </div>
 
-        {/* Third Row */}
-        <div className='flex gap-4'>
-          {[...Array(2)].map((_, index) => (
-            <Skeleton key={index} className='h-60 w-full' />
-          ))}
-        </div>
+        {/* Main Chart Skeleton */}
+        <Card className='overflow-hidden'>
+          <CardHeader>
+            <Skeleton className='h-6 w-40' />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className='h-[320px] w-full' />
+          </CardContent>
+        </Card>
 
-        {/* Fourth Row */}
-        <div className='flex gap-4'>
-          {[...Array(2)].map((_, index) => (
-            <Skeleton key={index} className='h-60 w-full' />
-          ))}
+        {/* Secondary Charts Skeletons */}
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
+          {Array(2)
+            .fill(0)
+            .map((_, i) => (
+              <Card key={i} className='overflow-hidden'>
+                <CardHeader>
+                  <Skeleton className='h-6 w-40' />
+                  <Skeleton className='h-4 w-28' />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className='h-[220px] w-full' />
+                </CardContent>
+              </Card>
+            ))}
         </div>
       </div>
     )
+
+  const percentChange = calculatePercentageChange(data)
+
   return (
-    <div>
-      <div className='flex items-center justify-between mb-2'>
-        <h1 className='h1-bold'>{t('Dashboard')}</h1>
+    <div className='space-y-6 transition-opacity duration-300'>
+      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+        <div>
+          <h1 className='text-3xl font-bold tracking-tight'>
+            {t('Dashboard')}
+          </h1>
+          <p className='text-muted-foreground mt-1'>
+            Analytics and reporting for your business
+          </p>
+        </div>
         <CalendarDateRangePicker defaultDate={date} setDate={setDate} />
       </div>
-      <div className='space-y-4'>
-        <div className='grid gap-4  grid-cols-2 lg:grid-cols-4'>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                {t('Total Revenue')}
-              </CardTitle>
-              <BadgeDollarSign />
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='text-2xl font-bold'>
-                <ProductPrice price={data.totalSales} plain />
-              </div>
-              <div>
-                <Link className='text-xs' href='/admin/orders'>
-                  {t('View revenue')}
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                {t('Sales')}
-              </CardTitle>
-              <CreditCard />
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='text-2xl font-bold'>
-                {formatNumber(data.ordersCount)}
-              </div>
-              <div>
-                <Link className='text-xs' href='/admin/orders'>
-                  {t('View orders')}
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                {t('Customers')}
-              </CardTitle>
-              <Users />
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='text-2xl font-bold'>{data.usersCount}</div>
-              <div>
-                <Link className='text-xs' href='/admin/users'>
-                  {t('View customers')}
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                {t('Products')}
-              </CardTitle>
-              <Barcode />
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='text-2xl font-bold'>{data.productsCount}</div>
-              <div>
-                <Link className='text-xs' href='/admin/products'>
-                  {t('View products')}
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('Sales Overview')}</CardTitle>
-            </CardHeader>
-            <CardContent>
+
+      {/* Stats Cards */}
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5'>
+        <Card className='overflow-hidden transition-all hover:border-primary/40 hover:shadow-md'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
+              {t('Total Revenue')}
+            </CardTitle>
+            <div className='h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center'>
+              <BadgeDollarSign className='h-5 w-5 text-primary' />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold mb-1'>
+              <ProductPrice price={data.totalSales} plain />
+            </div>
+            <div className='flex items-center text-xs'>
+              {percentChange.isPositive ? (
+                <div className='flex items-center text-emerald-500'>
+                  <ArrowUp className='mr-1 h-3 w-3' />
+                  <span>{percentChange.value}% from last month</span>
+                </div>
+              ) : (
+                <div className='flex items-center text-rose-500'>
+                  <ArrowDown className='mr-1 h-3 w-3' />
+                  <span>{percentChange.value}% from last month</span>
+                </div>
+              )}
+            </div>
+            <div className='mt-3'>
+              <Link
+                href='/admin/orders'
+                className='text-xs text-primary hover:underline inline-flex items-center'
+              >
+                {t('View revenue')}
+                <TrendingUp className='ml-1 h-3 w-3' />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className='overflow-hidden transition-all hover:border-primary/40 hover:shadow-md'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>{t('Sales')}</CardTitle>
+            <div className='h-8 w-8 rounded-md bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center'>
+              <CreditCard className='h-5 w-5 text-blue-700 dark:text-blue-400' />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold mb-1'>
+              {formatNumber(data.ordersCount)}
+            </div>
+            <div className='flex items-center text-xs text-muted-foreground'>
+              <span>Total completed orders</span>
+            </div>
+            <div className='mt-3'>
+              <Link
+                href='/admin/orders'
+                className='text-xs text-primary hover:underline inline-flex items-center'
+              >
+                {t('View orders')}
+                <TrendingUp className='ml-1 h-3 w-3' />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className='overflow-hidden transition-all hover:border-primary/40 hover:shadow-md'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
+              {t('Customers')}
+            </CardTitle>
+            <div className='h-8 w-8 rounded-md bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center'>
+              <Users className='h-5 w-5 text-violet-700 dark:text-violet-400' />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold mb-1'>{data.usersCount}</div>
+            <div className='flex items-center text-xs text-muted-foreground'>
+              <span>Active user accounts</span>
+            </div>
+            <div className='mt-3'>
+              <Link
+                href='/admin/users'
+                className='text-xs text-primary hover:underline inline-flex items-center'
+              >
+                {t('View customers')}
+                <TrendingUp className='ml-1 h-3 w-3' />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className='overflow-hidden transition-all hover:border-primary/40 hover:shadow-md'>
+          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+            <CardTitle className='text-sm font-medium'>
+              {t('Products')}
+            </CardTitle>
+            <div className='h-8 w-8 rounded-md bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center'>
+              <Barcode className='h-5 w-5 text-amber-700 dark:text-amber-400' />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold mb-1'>{data.productsCount}</div>
+            <div className='flex items-center text-xs text-muted-foreground'>
+              <span>Active inventory items</span>
+            </div>
+            <div className='mt-3'>
+              <Link
+                href='/admin/products'
+                className='text-xs text-primary hover:underline inline-flex items-center'
+              >
+                {t('View products')}
+                <TrendingUp className='ml-1 h-3 w-3' />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Sales Overview Chart */}
+      <div>
+        <Card className='overflow-hidden'>
+          <CardHeader className='border-b bg-muted/40 py-4'>
+            <CardTitle>{t('Sales Overview')}</CardTitle>
+            <CardDescription>
+              {formatDateTime(date!.from!).dateOnly} to{' '}
+              {formatDateTime(date!.to!).dateOnly}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='p-0 sm:p-6'>
+            <div className='h-[350px] w-full pt-4'>
               <SalesAreaChart data={data.salesChartData} />
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        <div className='grid gap-4 md:grid-cols-2'>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('How much you’re earning')}</CardTitle>
-              <CardDescription>
-                {t('Estimated')} · {t('Last 6 months')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TableChart data={data.monthlySales} labelType='month' />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('Product Performance')}</CardTitle>
-              <CardDescription>
-                {formatDateTime(date!.from!).dateOnly} to{' '}
-                {formatDateTime(date!.to!).dateOnly}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TableChart data={data.topSalesProducts} labelType='product' />
-            </CardContent>
-          </Card>
-        </div>
+      {/* Second Row - Earnings & Product Performance */}
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
+        <Card className='overflow-hidden'>
+          <CardHeader className='border-b bg-muted/40 py-4'>
+            <CardTitle>{t('Monthly Revenue')}</CardTitle>
+            <CardDescription>
+              {t('Last 6 months earnings breakdown')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='p-6'>
+            <TableChart data={data.monthlySales} labelType='month' />
+          </CardContent>
+        </Card>
 
-        <div className='grid gap-4 md:grid-cols-2'>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('Best-Selling Categories')}</CardTitle>
-            </CardHeader>
-            <CardContent>
+        <Card className='overflow-hidden'>
+          <CardHeader className='border-b bg-muted/40 py-4'>
+            <CardTitle>{t('Product Performance')}</CardTitle>
+            <CardDescription>
+              Top selling products in selected period
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='p-6'>
+            <TableChart data={data.topSalesProducts} labelType='product' />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Third Row - Categories & Orders */}
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
+        <Card className='overflow-hidden'>
+          <CardHeader className='border-b bg-muted/40 py-4'>
+            <CardTitle>{t('Best-Selling Categories')}</CardTitle>
+            <CardDescription>
+              {formatDateTime(date!.from!).dateOnly} to{' '}
+              {formatDateTime(date!.to!).dateOnly}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='p-0'>
+            <div className='h-[350px]'>
               <SalesCategoryPieChart data={data.topSalesCategories} />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('Recent Sales')}</CardTitle>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className='overflow-hidden'>
+          <Tabs defaultValue='orders'>
+            <CardHeader className='border-b bg-muted/40 py-4'>
+              <div className='flex items-center justify-between'>
+                <CardTitle>{t('Recent Activity')}</CardTitle>
+                <TabsList>
+                  <TabsTrigger value='orders'>Orders</TabsTrigger>
+                  <TabsTrigger value='customers'>Customers</TabsTrigger>
+                </TabsList>
+              </div>
             </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('Buyer')}</TableHead>
-                    <TableHead>{t('Date')}</TableHead>
-                    <TableHead>{t('Total')}</TableHead>
-                    <TableHead>{t('Actions')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.latestOrders.map((order: IOrderList) => (
-                    <TableRow key={order._id}>
-                      <TableCell>
-                        {order.user ? order.user.name : t('Deleted User')}
-                      </TableCell>
 
-                      <TableCell>
-                        {formatDateTime(order.createdAt).dateOnly}
-                      </TableCell>
-                      <TableCell>
-                        <ProductPrice price={order.totalPrice} plain />
-                      </TableCell>
-
-                      <TableCell>
-                        <Link href={`/admin/orders/${order._id}`}>
-                          <span className='px-2'>{t('Details')}</span>
-                        </Link>
-                      </TableCell>
+            <TabsContent value='orders' className='m-0 p-0'>
+              <div className='max-h-[350px] overflow-auto'>
+                <Table>
+                  <TableHeader className='sticky top-0 bg-background z-10'>
+                    <TableRow>
+                      <TableHead className='w-[100px]'>
+                        {t('Order ID')}
+                      </TableHead>
+                      <TableHead>{t('Customer')}</TableHead>
+                      <TableHead>{t('Date')}</TableHead>
+                      <TableHead>{t('Total')}</TableHead>
+                      <TableHead>{t('Status')}</TableHead>
+                      <TableHead className='text-right'>
+                        {t('Actions')}
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </div>
+                  </TableHeader>
+                  <TableBody>
+                    {data.latestOrders.map((order: IOrderList) => (
+                      <TableRow key={order._id} className='hover:bg-muted/60'>
+                        <TableCell className='font-mono text-xs'>
+                          {order._id.substring(order._id.length - 6)}
+                        </TableCell>
+                        <TableCell className='font-medium'>
+                          {order.user ? order.user.name : t('Deleted User')}
+                        </TableCell>
+                        <TableCell className='text-muted-foreground'>
+                          {formatDateTime(order.createdAt).dateOnly}
+                        </TableCell>
+                        <TableCell>
+                          <ProductPrice price={order.totalPrice} plain />
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={cn(
+                              'text-xs',
+                              order.isDelivered
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                                : order.isShipped
+                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300'
+                                  : order.isPaid
+                                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-300'
+                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
+                            )}
+                          >
+                            {order.isDelivered
+                              ? 'Delivered'
+                              : order.isShipped
+                                ? 'Shipped'
+                                : order.isPaid
+                                  ? 'Processing'
+                                  : 'Pending'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className='text-right'>
+                          <Link
+                            href={`/admin/orders/${order._id}`}
+                            className='text-xs font-medium text-primary hover:underline'
+                          >
+                            {t('View')}
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <CardFooter className='border-t p-3'>
+                <Link
+                  href='/admin/orders'
+                  className='text-xs text-muted-foreground hover:text-primary transition-colors'
+                >
+                  View all orders
+                </Link>
+              </CardFooter>
+            </TabsContent>
+
+            <TabsContent value='customers' className='m-0'>
+              <div className='text-center py-12 text-muted-foreground'>
+                <p className='mb-2'>Customer activity will be shown here</p>
+                <Link
+                  href='/admin/users'
+                  className='text-primary text-sm hover:underline'
+                >
+                  View all customers
+                </Link>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </Card>
       </div>
     </div>
   )

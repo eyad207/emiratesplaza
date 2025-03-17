@@ -215,6 +215,34 @@ body {
     @apply relative py-2 px-1 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary 
            after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center;
   }
+
+  .mobile-nav-link {
+    @apply block px-4 py-2 rounded-md text-base font-medium transition-colors duration-200;
+  }
+
+  .mobile-nav-link-active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .mobile-nav-link-inactive {
+    @apply text-muted-foreground hover:bg-muted hover:text-foreground;
+  }
+
+  .mobile-nav-container {
+    @apply absolute top-full left-0 w-full bg-background shadow-md transition-all duration-300;
+  }
+
+  .mobile-nav-container-hidden {
+    @apply hidden;
+  }
+
+  .mobile-nav-container-visible {
+    @apply block;
+  }
+
+  .nav-button {
+    @apply block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 bg-primary text-primary-foreground hover:bg-primary/80;
+  }
 }
 
 @layer base {

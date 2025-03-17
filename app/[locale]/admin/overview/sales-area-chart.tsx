@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import ProductPrice from '@/components/shared/product/product-price'
@@ -18,6 +17,12 @@ import {
   YAxis,
 } from 'recharts'
 
+// Define types for chart data
+interface SalesData {
+  date: string
+  totalSales: number
+}
+
 interface CustomTooltipProps extends TooltipProps<number, string> {
   active?: boolean
   payload?: { value: number }[]
@@ -31,10 +36,12 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
 }) => {
   if (active && payload && payload.length) {
     return (
-      <Card>
-        <CardContent className='p-2'>
-          <p>{label && formatDateTime(new Date(label)).dateOnly}</p>
-          <p className='text-primary text-xl'>
+      <Card className='shadow-lg border-primary/20'>
+        <CardContent className='p-3 space-y-1'>
+          <p className='text-sm font-medium'>
+            {label && formatDateTime(new Date(label)).dateOnly}
+          </p>
+          <p className='text-primary text-xl font-bold'>
             <ProductPrice price={payload[0].value} plain />
           </p>
         </CardContent>
@@ -44,38 +51,84 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
   return null
 }
 
-const CustomXAxisTick: React.FC<any> = ({ x, y, payload }) => {
-  return (
-    <text x={x} y={y + 10} textAnchor='left' fill='#666' className='text-xs'>
-      {formatDateTime(new Date(payload.value)).dateOnly}
-      {/* {`${payload.value.split('/')[1]}/${payload.value.split('/')[2]}`} */}
-    </text>
-  )
-}
-const STROKE_COLORS: { [key: string]: { [key: string]: string } } = {
-  Red: { light: '#980404', dark: '#ff3333' },
-  Green: { light: '#015001', dark: '#06dc06' },
-  Gold: { light: '#ac9103', dark: '#f1d541' },
-}
-
-export default function SalesAreaChart({ data }: { data: any[] }) {
+export default function SalesAreaChart({ data }: { data: SalesData[] }) {
   const { theme } = useTheme()
-  const { cssColors, color } = useColorStore(theme)
+  const { cssColors } = useColorStore(theme)
+
+  const gradientId = 'colorGradient'
+
+  // Add empty data points for smoother curves if data has gaps
+  const processedData = React.useMemo(() => {
+    if (!data || data.length < 2) return data
+
+    // Sort data by date
+    const sortedData = [...data].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    )
+
+    return sortedData
+  }, [data])
 
   return (
-    <ResponsiveContainer width='100%' height={400}>
-      <AreaChart data={data}>
-        <CartesianGrid horizontal={true} vertical={false} stroke='' />
-        <XAxis dataKey='date' tick={<CustomXAxisTick />} interval={3} />
-        <YAxis fontSize={12} tickFormatter={(value: number) => `$${value}`} />
-        <Tooltip content={<CustomTooltip />} />
+    <ResponsiveContainer width='100%' height='100%'>
+      <AreaChart
+        data={processedData}
+        margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
+      >
+        <defs>
+          <linearGradient id={gradientId} x1='0' y1='0' x2='0' y2='1'>
+            <stop
+              offset='5%'
+              stopColor={`hsl(${cssColors['--primary']})`}
+              stopOpacity={0.6}
+            />
+            <stop
+              offset='95%'
+              stopColor={`hsl(${cssColors['--primary']})`}
+              stopOpacity={0}
+            />
+          </linearGradient>
+        </defs>
+        <CartesianGrid
+          strokeDasharray='3 3'
+          vertical={false}
+          stroke='currentColor'
+          strokeOpacity={0.1}
+        />
+        <XAxis
+          dataKey='date'
+          tickMargin={10}
+          axisLine={{ stroke: 'currentColor', strokeOpacity: 0.2 }}
+          tickLine={{ stroke: 'currentColor', strokeOpacity: 0.2 }}
+          tickSize={4}
+          tickCount={7}
+        />
+        <YAxis
+          fontSize={12}
+          tickFormatter={(value: number) => `$${value}`}
+          axisLine={{ stroke: 'currentColor', strokeOpacity: 0.2 }}
+          tickLine={{ stroke: 'currentColor', strokeOpacity: 0.2 }}
+          stroke='currentColor'
+          strokeOpacity={0.4}
+        />
+        <Tooltip
+          content={<CustomTooltip />}
+          cursor={{
+            stroke: 'currentColor',
+            strokeOpacity: 0.2,
+            strokeWidth: 1,
+          }}
+          wrapperStyle={{ outline: 'none' }}
+        />
         <Area
           type='monotone'
           dataKey='totalSales'
-          stroke={STROKE_COLORS[color.name][theme || 'light']}
+          stroke={`hsl(${cssColors['--primary']})`}
           strokeWidth={2}
-          fill={`hsl(${cssColors['--primary']})`}
-          fillOpacity={0.8}
+          fillOpacity={1}
+          fill={`url(#${gradientId})`}
+          animationDuration={1000}
+          animationEasing='ease-out'
         />
       </AreaChart>
     </ResponsiveContainer>

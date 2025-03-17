@@ -193,6 +193,11 @@
     "Back To Home": "Back To Home"
   },
   "Admin": {
+    "Customer": "Customer",
+    "View": "View",
+    "Recent Activity": "Recent Activity",
+    "Order ID": "Order ID",
+    "Last 6 months earnings breakdown": "Last 6 months earnings breakdown",
     "Deleted User": "Deleted User",
     "Overview": "Overview",
     "Products": "Products",
@@ -203,6 +208,7 @@
     "Settings": "Settings",
     "Dashboard": "Dashboard",
     "Total Revenue": "Total Revenue",
+    "Monthly Revenue": "Monthly Revenue",
     "View revenue": "View revenue",
     "Sales": "Sales",
     "View orders": "View orders",
