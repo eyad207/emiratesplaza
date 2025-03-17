@@ -119,9 +119,9 @@ export default async function SearchPage(props: {
   })
   const t = await getTranslations()
   return (
-    <div>
-      <div className='my-2 bg-card md:border-b  flex-between flex-col md:flex-row '>
-        <div className='flex items-center'>
+    <div className='dark:bg-zinc-900 dark:text-white'>
+      <div className='my-2 bg-card md:border-b  flex-between flex-col md:flex-row dark:bg-zinc-900 dark:text-white'>
+        <div className='flex items-center dark:bg-zinc-900 dark:text-white'>
           {data.totalProducts === 0
             ? t('Search.No')
             : `${data.from}-${data.to} ${t('Search.of')} ${
@@ -162,7 +162,7 @@ export default async function SearchPage(props: {
           />
         </div>
       </div>
-      <div className='bg-card grid md:grid-cols-5 md:gap-4'>
+      <div className='bg-card grid md:grid-cols-5 md:gap-4 dark:bg-zinc-900 dark:text-white'>
         <CollapsibleOnMobile title={t('Search.Filters')}>
           <div className='space-y-4'>
             <div>
