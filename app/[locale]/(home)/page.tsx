@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import {
   getProductsForCard,
   getProductsByTag,
-  getCategoriesWithImages, // Use the new function
+  getCategoriesWithImages,
 } from '@/lib/actions/product.actions'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { getTranslations } from 'next-intl/server'
@@ -39,9 +39,9 @@ export default async function HomePage() {
       },
       items: categoriesWithImages.map((category) => ({
         name: category.name,
-        image: category.image, // Use the image from our new function
+        image: category.image,
         href: `/search?category=${category.name}`,
-        className: 'transition-transform duration-300 hover:scale-105', // Add hover animation
+        className: 'transition-transform duration-300 hover:scale-105',
       })),
     },
     {
@@ -80,17 +80,19 @@ export default async function HomePage() {
   ]
 
   return (
-    <>
+    <div className='pb-4 sm:pb-6'>
       <HomeCarousel items={carousels} />
-      <div className='md:p-4 md:space-y-4 bg-border'>
-        <HomeCard cards={cards} />
+      <div className='px-2 sm:px-3 md:p-4 space-y-3 md:space-y-4 bg-border'>
+        <div className='pt-3 sm:pt-4'>
+          <HomeCard cards={cards} />
+        </div>
         <Card className='w-full'>
-          <CardContent className='p-4 items-center gap-3'>
+          <CardContent className='p-2 sm:p-3 md:p-4 items-center gap-3'>
             <ProductSlider title={t("Today's Deals")} products={todaysDeals} />
           </CardContent>
         </Card>
         <Card className='w-full'>
-          <CardContent className='p-4 items-center gap-3'>
+          <CardContent className='p-2 sm:p-3 md:p-4 items-center gap-3'>
             <ProductSlider
               title={t('Best Selling Products')}
               products={bestSellingProducts}
@@ -99,13 +101,9 @@ export default async function HomePage() {
         </Card>
       </div>
 
-      <div className='md:p-4 md:space-y-4 bg-border'>
-        <Card className=''>
-          <CardContent className='w-full p-4 items-center gap-3'>
-            <BrowsingHistoryList className='' />
-          </CardContent>
-        </Card>
+      <div className='px-2 sm:px-3 md:p-4 mt-3 sm:mt-4 bg-border'>
+        <BrowsingHistoryList />
       </div>
-    </>
+    </div>
   )
 }

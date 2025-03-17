@@ -8,24 +8,26 @@ import { Card, CardContent } from '../ui/card'
 export default function BrowsingHistoryList({}: { className?: string }) {
   const { products } = useBrowsingHistory()
   const t = useTranslations('Home')
+
   return (
     products.length !== 0 && (
-      <div className='bg-background mt-10'>
+      <div className='bg-background mt-3 sm:mt-5 md:mt-10'>
         <Card className='w-full'>
-          <CardContent>
-            <ProductList
-              title={t("Related to items that you've viewed")}
-              type='related'
-            />
-          </CardContent>
-        </Card>
-        <Card className='mt-4'>
-          <CardContent>
-            <ProductList
-              title={t('Your browsing history')}
-              hideDetails
-              type='history'
-            />
+          <CardContent className='p-3 sm:p-4 md:p-6'>
+            <div className='space-y-6 md:space-y-10'>
+              <ProductList
+                title={t("Related to items that you've viewed")}
+                type='related'
+              />
+
+              <div className='border-t border-border/50 dark:border-zinc-700 pt-4 mt-4'>
+                <ProductList
+                  title={t('Your browsing history')}
+                  hideDetails
+                  type='history'
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -37,6 +39,7 @@ function ProductList({
   title,
   type = 'history',
   excludeId = '',
+  hideDetails = false,
 }: {
   title: string
   type: 'history' | 'related'
@@ -58,5 +61,9 @@ function ProductList({
     fetchProducts()
   }, [excludeId, products, type])
 
-  return data.length > 0 && <ProductSlider title={title} products={data} />
+  return (
+    data.length > 0 && (
+      <ProductSlider title={title} products={data} hideDetails={hideDetails} />
+    )
+  )
 }

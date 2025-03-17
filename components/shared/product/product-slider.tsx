@@ -48,7 +48,7 @@ export default function ProductSlider({
   }, [emblaApi])
 
   return (
-    <div className='my-8 dark:bg-zinc-900/50'>
+    <div className='my-3 sm:my-5 md:my-8 dark:bg-zinc-900/50'>
       <div className='flex justify-between items-center mb-4'>
         <h2 className='text-xl font-bold'>{title}</h2>
         {href && (
@@ -62,14 +62,13 @@ export default function ProductSlider({
         )}
       </div>
 
-      <div className='relative px-6 overflow-hidden'>
+      <div className='relative px-2 sm:px-6 overflow-hidden'>
         <div className='overflow-hidden scrollbar-hide' ref={emblaRef}>
           <div className='flex gap-2 pl-1 pr-8'>
             {products.map((product) => (
               <div
                 key={product._id.toString()}
-                className='w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 px-2'
-                style={{ minWidth: 'calc(100% / 4)' }}
+                className='w-[85vw] max-w-[320px] sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 px-1 sm:px-2'
               >
                 <ProductCard
                   product={product}
