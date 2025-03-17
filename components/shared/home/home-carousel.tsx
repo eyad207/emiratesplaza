@@ -43,7 +43,8 @@ export function HomeCarousel({ items }: { items: ICarousel[] }) {
                   className='object-cover'
                   priority
                 />
-                <div className='absolute w-2/3 sm:w-1/2 md:w-2/5 lg:w-1/3 left-2 sm:left-6 md:left-10 top-1/2 transform -translate-y-1/2'>
+                {/* Updated width to 35% on all screen sizes including mobile */}
+                <div className='absolute w-[35%] left-2 sm:left-6 md:left-10 top-1/2 transform -translate-y-1/2'>
                   <h2
                     className={cn(
                       'text-lg sm:text-2xl md:text-4xl lg:text-6xl font-bold mb-2 md:mb-4 text-primary drop-shadow-md'
