@@ -101,7 +101,7 @@ export default async function HomePage() {
         </Card>
       </div>
 
-      <div className='px-2 sm:px-3 md:p-4 mt-3 sm:mt-4 bg-border'>
+      <div className='px-2 sm:px-3 md:p-4 bg-border'>
         <BrowsingHistoryList />
       </div>
     </div>
