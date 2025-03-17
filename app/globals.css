@@ -91,7 +91,7 @@ body {
     @apply text-sky-700  hover:text-orange-700 hover:underline;
   }
   .header-button {
-    @apply cursor-pointer p-1 border border-transparent hover:border-white rounded-[2px];
+    @apply cursor-pointer p-1.5 border border-transparent hover:border-white/30 hover:bg-white/10 rounded-md transition-all duration-200;
   }
   .item-button {
     @apply p-3 hover:bg-muted hover:no-underline;
@@ -207,6 +207,12 @@ body {
   
   .border-footer-darker {
     @apply border-[hsl(var(--color-footer-darker))];
+  }
+
+  /* Enhanced professional navigation */
+  .nav-link {
+    @apply relative py-2 px-1 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary 
+           after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center;
   }
 }
 

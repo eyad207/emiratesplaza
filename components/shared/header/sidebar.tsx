@@ -28,9 +28,9 @@ export default async function Sidebar({
   const t = await getTranslations()
   return (
     <Drawer direction={getDirection(locale) === 'rtl' ? 'right' : 'left'}>
-      <DrawerTrigger className='header-button flex items-center !p-2  '>
-        <MenuIcon className='h-5 w-5 mr-1' />
-        {t('Header.All')}
+      <DrawerTrigger className='flex items-center gap-2 py-2 px-4 hover:bg-white/10 transition-colors duration-200 rounded-md'>
+        <MenuIcon className='h-4 w-4' />
+        <span className='text-sm font-medium'>{t('Header.All')}</span>
       </DrawerTrigger>
       <DrawerContent className='w-[350px] mt-0 top-0'>
         <div className='flex flex-col h-full'>

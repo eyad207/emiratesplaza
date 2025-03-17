@@ -31,7 +31,14 @@
     "Help": "Help",
     "Site Menu": "Site Menu",
     "Subtotal": "Subtotal",
-    "Go to cart": "Go to cart"
+    "Go to cart": "Go to cart",
+    "Menu": "Menu",
+    "Account & Settings": "Account & Settings",
+    "Your Account": "Your Account",
+    "Preferences": "Preferences",
+    "Help & Support": "Help & Support",
+    "Contact Us": "Contact Us",
+    "Search": "Search"
   },
   "Home": {
     "Categories to explore": "Categories to explore",
@@ -198,7 +205,7 @@
     "View customers": "View customers",
     "View products": "View products",
     "Sales Overview": "Sales Overview",
-    "How much you’re earning": "How much you’re earning",
+    "How much you're earning": "How much you're earning",
     "Estimated": "Estimated",
     "Last 6 months": "Last 6 months",
     "Product Performance": "Product performance",
