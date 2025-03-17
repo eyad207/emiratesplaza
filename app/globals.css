@@ -35,10 +35,10 @@ body {
     --chart-5: 27 87% 67%;
     --color-dark-blue: #1a237e;
     --color-dark-blue-darker: #0c1b68;
-    --color-header: 226 83% 30%;        /* #1a237e - deep blue for light mode */
-    --color-header-darker: 231 79% 23%; /* #0c1b68 - darker blue for light mode */
-    --color-footer: 226 83% 30%;        /* #1a237e - matches header */
-    --color-footer-darker: 231 79% 23%; /* #0c1b68 - matches header darker */
+    --color-header: 240 6% 10%;      /* zinc-900 for dark mode */
+    --color-header-darker: 240 5% 14%; /* zinc-800 for dark mode */
+    --color-footer: 240 6% 10%;      /* zinc-900 for dark mode */
+    --color-footer-darker: 240 5% 14%; /* zinc-800 for dark mode */
     --header-height: 144px; /* Approximate total header height */
   }
 
