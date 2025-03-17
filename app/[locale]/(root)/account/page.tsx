@@ -1,14 +1,7 @@
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import RecentOrdersList from '@/components/shared/account/recent-orders-list'
 import { Card, CardContent } from '@/components/ui/card'
-import {
-  PackageCheckIcon,
-  ShieldCheckIcon,
-  CreditCardIcon,
-  HeartIcon,
-  MapPinIcon,
-  SettingsIcon,
-} from 'lucide-react'
+import { PackageCheckIcon, ShieldCheckIcon } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Separator } from '@/components/ui/separator'
@@ -42,30 +35,6 @@ export default async function AccountPage() {
       icon: <ShieldCheckIcon className='w-8 h-8 text-primary' />,
       href: '/account/manage',
     },
-    {
-      title: 'Payment options',
-      description: 'Manage payment methods and settings',
-      icon: <CreditCardIcon className='w-8 h-8 text-primary' />,
-      href: '/account/payments',
-    },
-    {
-      title: 'Addresses',
-      description: 'Edit addresses for orders and gifts',
-      icon: <MapPinIcon className='w-8 h-8 text-primary' />,
-      href: '/account/addresses',
-    },
-    {
-      title: 'Wish Lists',
-      description: 'Track your favorite products',
-      icon: <HeartIcon className='w-8 h-8 text-primary' />,
-      href: '/account/wishlist',
-    },
-    {
-      title: 'Account Settings',
-      description: 'Manage preferences and notifications',
-      icon: <SettingsIcon className='w-8 h-8 text-primary' />,
-      href: '/account/settings',
-    },
   ]
 
   return (
@@ -82,7 +51,7 @@ export default async function AccountPage() {
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6'>
         {accountCards.map((card, index) => (
           <Link href={card.href} key={index} className='block h-full'>
-            <Card className='h-full hover:shadow-md transition-all duration-300 hover:border-primary/50 bg-card'>
+            <Card className='h-full hover:shadow-lg transition-transform duration-300 transform hover:scale-105 bg-card'>
               <CardContent className='p-5 md:p-6 flex gap-4 h-full'>
                 <div className='shrink-0'>{card.icon}</div>
                 <div className='space-y-1.5'>
