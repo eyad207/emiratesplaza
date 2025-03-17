@@ -13,47 +13,53 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EllipsisVerticalIcon } from 'lucide-react'
+import { EllipsisVerticalIcon, TagIcon } from 'lucide-react'
 
 export default async function Header() {
   const categories = await getAllCategories()
   const { site } = await getSetting()
   const t = await getTranslations()
+
+  // Popular links to show on mobile
+  const mobileLinks = data.headerMenus.filter((menu) =>
+    ["Today's Deal", 'New Arrivals', 'Best Sellers'].includes(menu.name)
+  )
+
   return (
     <header className='bg-header text-white shadow-md w-full'>
       <div className='w-full px-3 sm:px-6 lg:px-8'>
-        {/* Main header row */}
-        <div className='flex items-center justify-between py-3'>
-          <div className='flex items-center'>
-            {/* Logo and site name */}
+        {/* Main header row - Restructured for mobile */}
+        <div className='flex items-center justify-between py-2 sm:py-3'>
+          {/* Left section with logo */}
+          <div className='flex items-center shrink-0'>
             <Link
               href='/'
-              className='flex items-center header-button font-bold text-lg xs:text-xl sm:text-2xl transition-colors duration-200'
+              className='flex items-center gap-2 rounded-md hover:bg-white/10 transition-all duration-200 px-1.5 py-1'
             >
               <Image
                 src={site.logo}
-                width={36}
-                height={36}
+                width={32}
+                height={32}
                 alt={`${site.name} logo`}
-                className='mr-2'
+                className='h-8 w-8 sm:h-9 sm:w-9'
                 priority
               />
-              <span className='hidden xs:inline'>{site.name}</span>
+              <span className='hidden xs:inline font-bold text-lg xs:text-xl'>
+                {site.name}
+              </span>
             </Link>
           </div>
 
-          {/* Search bar - visible on larger screens */}
-          <div className='hidden nav:block flex-1 max-w-2xl mx-6'>
-            <Search />
+          {/* Center section with search - conditionally styled for different screen sizes */}
+          <div className='flex-1 px-2 max-w-xl mx-auto'>
+            {/* Search is always visible but styled differently based on screen size */}
+            <Search compact={true} />
           </div>
 
           {/* Menu with user controls */}
-          <Menu />
-        </div>
-
-        {/* Mobile/tablet search - hidden on larger screens */}
-        <div className='nav:hidden block py-2'>
-          <Search />
+          <div className='flex-shrink-0'>
+            <Menu />
+          </div>
         </div>
 
         {/* Navigation bar */}
@@ -76,24 +82,45 @@ export default async function Header() {
             ))}
           </div>
 
+          {/* Mobile popular links - Visible on smaller screens */}
+          <div className='nav:hidden flex items-center overflow-x-auto scrollbar-hide gap-3 px-2'>
+            {mobileLinks.map((menu) => (
+              <Link
+                href={menu.href}
+                key={menu.href}
+                className='flex items-center whitespace-nowrap text-xs py-1 px-2 hover:bg-white/10 rounded-md transition-colors'
+              >
+                <TagIcon className='h-3 w-3 mr-1' />
+                {t('Header.' + menu.name)}
+              </Link>
+            ))}
+          </div>
+
           {/* Mobile/tablet menu dropdown */}
           <div className='nav:hidden flex items-center'>
             <DropdownMenu>
-              <DropdownMenuTrigger className='header-button !p-1.5 rounded-md'>
+              <DropdownMenuTrigger className='rounded-md hover:bg-white/10 transition-colors p-1.5'>
                 <EllipsisVerticalIcon className='h-5 w-5' />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='min-w-[180px] z-50'>
-                {data.headerMenus.map((menu) => (
-                  <DropdownMenuItem
-                    key={menu.href}
-                    asChild
-                    className='cursor-pointer'
-                  >
-                    <Link href={menu.href} className='w-full'>
-                      {t('Header.' + menu.name)}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
+              <DropdownMenuContent
+                align='end'
+                className='min-w-[200px] z-50 rounded-md'
+              >
+                {data.headerMenus
+                  .filter(
+                    (menu) => !mobileLinks.some((m) => m.name === menu.name)
+                  )
+                  .map((menu) => (
+                    <DropdownMenuItem
+                      key={menu.href}
+                      asChild
+                      className='cursor-pointer focus:bg-primary/10'
+                    >
+                      <Link href={menu.href} className='w-full py-1.5'>
+                        {t('Header.' + menu.name)}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
