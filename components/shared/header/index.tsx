@@ -27,8 +27,8 @@ export default async function Header() {
 
   return (
     <header className='bg-header text-white shadow-md w-full'>
+      {/* Main header row */}
       <div className='w-full px-3 sm:px-6 lg:px-8'>
-        {/* Main header row - Restructured for mobile */}
         <div className='flex items-center justify-between py-2 sm:py-3'>
           {/* Left section with logo */}
           <div className='flex items-center shrink-0'>
@@ -61,9 +61,11 @@ export default async function Header() {
             <Menu />
           </div>
         </div>
+      </div>
 
-        {/* Navigation bar */}
-        <div className='flex items-center justify-between py-2 bg-header-darker border-t border-white/10'>
+      {/* Navigation bar - Full width */}
+      <div className='w-full bg-header-darker border-t border-white/10'>
+        <div className='flex items-center justify-between py-2 px-3 sm:px-6 lg:px-8 max-w-[2000px] mx-auto'>
           {/* Sidebar trigger (categories) */}
           <div className='flex-shrink-0'>
             <Sidebar categories={categories} />
