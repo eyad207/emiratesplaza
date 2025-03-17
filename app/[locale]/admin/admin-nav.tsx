@@ -32,17 +32,15 @@ const links = [
     href: '/admin/settings',
   },
 ]
-export function AdminNav({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLElement>) {
+
+export function AdminNav({ ...props }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname() || ''
   const t = useTranslations('Admin')
   return (
     <nav
       className={cn(
-        'flex items-center flex-wrap overflow-hidden gap-2 md:gap-4',
-        className
+        'flex items-center justify-around flex-wrap gap-2 md:gap-4',
+        props.className
       )}
       {...props}
     >
@@ -51,8 +49,10 @@ export function AdminNav({
           key={item.href}
           href={item.href}
           className={cn(
-            '',
-            pathname.includes(item.href) ? '' : 'text-muted-foreground'
+            'px-2.5 py-2 rounded-md text-xs font-medium transition-colors duration-200',
+            pathname.includes(item.href)
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
           )}
         >
           {t(item.title)}
