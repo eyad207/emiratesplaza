@@ -31,7 +31,6 @@ export default function ResetPasswordPage() {
     confirmPassword: string
   }) => {
     try {
-      console.log('Form data:', data) // Debugging line
       const response = await fetch('/api/reset-password', {
         method: 'POST',
         headers: {
@@ -42,21 +41,17 @@ export default function ResetPasswordPage() {
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('API response error:', errorText) // Debugging line
         throw new Error(errorText)
       }
 
       const result = await response.json()
-      console.log('API response:', result) // Debugging line
-
       toast({
         title: 'Success',
-        description: 'Password reset successfully',
+        description: result.message,
         variant: 'default',
       })
       router.push('/sign-in')
     } catch (error) {
-      console.error('Error:', error) // Debugging line
       toast({
         title: 'Error',
         description: (error as Error).message,
@@ -108,9 +103,7 @@ export default function ResetPasswordPage() {
               </FormItem>
             )}
           />
-          <Button type='submit' className='w-full'>
-            Reset Password
-          </Button>
+          <Button type='submit'>Reset Password</Button>
         </div>
       </form>
     </Form>

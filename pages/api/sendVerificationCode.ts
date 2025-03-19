@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Resend } from 'resend'
-import { EmailTemplate } from '@/emails/test-email'
+import { EmailTemplate } from '@/emails/email-form'
 import React from 'react'
 import { SENDER_EMAIL, SENDER_NAME } from '@/lib/constants'
 
