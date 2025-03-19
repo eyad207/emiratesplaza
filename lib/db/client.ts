@@ -12,6 +12,8 @@ const options = {
     strict: true,
     deprecationErrors: true,
   },
+  // Ensure useBigInt64 is not enabled
+  useBigInt64: false,
 }
 
 let client: MongoClient
