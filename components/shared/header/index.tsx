@@ -7,13 +7,13 @@ import data from '@/lib/data'
 import Sidebar from './sidebar'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { getTranslations } from 'next-intl/server'
+import { EllipsisVerticalIcon, TagIcon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EllipsisVerticalIcon, TagIcon } from 'lucide-react'
 
 export default async function Header() {
   const categories = await getAllCategories()
@@ -57,7 +57,12 @@ export default async function Header() {
           </div>
 
           {/* Menu with user controls */}
-          <div className='flex-shrink-0'>
+          <div className='flex-shrink-0 hidden nav:flex'>
+            <Menu />
+          </div>
+
+          {/* Mobile menu button */}
+          <div className='nav:hidden flex items-center'>
             <Menu />
           </div>
         </div>
