@@ -95,7 +95,7 @@ export default async function Header() {
               <Link
                 href={menu.href}
                 key={menu.href}
-                className='flex items-center whitespace-nowrap text-xs py-1 px-2 hover:bg-white/10 rounded-md transition-colors'
+                className='flex items-center whitespace-nowrap text-xs py-1 px-2 hover:bg-primary/10 rounded-md transition-colors'
               >
                 <TagIcon className='h-3 w-3 mr-1' />
                 {t('Header.' + menu.name)}

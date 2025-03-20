@@ -35,7 +35,7 @@ export default async function Sidebar({
       <DrawerContent className='w-[350px] mt-0 top-0'>
         <div className='flex flex-col h-full'>
           {/* User Sign In Section */}
-          <div className='dark bg-gray-800 text-foreground flex items-center justify-between  '>
+          <div className='dark bg-gray-800 text-foreground flex items-center justify-between'>
             <DrawerHeader>
               <DrawerTitle className='flex items-center'>
                 <UserCircle className='h-6 w-6 mr-2' />
@@ -79,7 +79,7 @@ export default async function Sidebar({
                 <DrawerClose asChild key={category}>
                   <Link
                     href={`/search?category=${category}`}
-                    className={`flex items-center justify-between item-button`}
+                    className='flex items-center justify-between py-2 px-4 hover:bg-primary/10 transition-colors rounded-md'
                   >
                     <span>{category}</span>
                     <ChevronRight className='h-4 w-4' />
@@ -90,33 +90,42 @@ export default async function Sidebar({
           </div>
 
           {/* Setting and Help */}
-          <div className='border-t flex flex-col '>
+          <div className='border-t flex flex-col'>
             <div className='p-4'>
               <h2 className='text-lg font-semibold'>
                 {t('Header.Help & Settings')}
               </h2>
             </div>
             <DrawerClose asChild>
-              <Link href='/account' className='item-button'>
+              <Link
+                href='/account'
+                className='py-2 px-4 hover:bg-primary/10 transition-colors rounded-md'
+              >
                 {t('Header.Your account')}
               </Link>
-            </DrawerClose>{' '}
+            </DrawerClose>
             <DrawerClose asChild>
-              <Link href='/page/customer-service' className='item-button'>
+              <Link
+                href='/page/customer-service'
+                className='py-2 px-4 hover:bg-primary/10 transition-colors rounded-md'
+              >
                 {t('Header.Customer Service')}
               </Link>
             </DrawerClose>
             {session ? (
               <form action={SignOut} className='w-full'>
                 <Button
-                  className='w-full justify-start item-button text-base'
+                  className='w-full justify-start py-2 px-4 hover:bg-primary/10 transition-colors rounded-md'
                   variant='ghost'
                 >
                   {t('Header.Sign out')}
                 </Button>
               </form>
             ) : (
-              <Link href='/sign-in' className='item-button'>
+              <Link
+                href='/sign-in'
+                className='py-2 px-4 hover:bg-primary/10 transition-colors rounded-md'
+              >
                 {t('Header.Sign in')}
               </Link>
             )}

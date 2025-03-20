@@ -21,7 +21,7 @@ export default async function UserButton() {
   return (
     <div className='flex gap-2 items-center'>
       <DropdownMenu>
-        <DropdownMenuTrigger className='header-button' asChild>
+        <DropdownMenuTrigger className='header-button hidden nav:flex' asChild>
           <div className='flex items-center'>
             <div className='flex flex-col text-xs text-left'>
               <span>
@@ -30,11 +30,15 @@ export default async function UserButton() {
               </span>
               <span className='font-bold'>{t('Header.Account & Orders')}</span>
             </div>
-            <ChevronDownIcon />
+            <ChevronDownIcon className='transition-transform duration-200' />
           </div>
         </DropdownMenuTrigger>
         {session ? (
-          <DropdownMenuContent className='w-56' align='end' forceMount>
+          <DropdownMenuContent
+            className='w-56 bg-white text-black shadow-lg rounded-md animate-fadeIn'
+            align='end'
+            forceMount
+          >
             <DropdownMenuLabel className='font-normal'>
               <div className='flex flex-col space-y-1'>
                 <p className='text-sm font-medium leading-none'>
@@ -47,15 +51,21 @@ export default async function UserButton() {
             </DropdownMenuLabel>
             <DropdownMenuGroup>
               <Link className='w-full' href='/account'>
-                <DropdownMenuItem>{t('Header.Your account')}</DropdownMenuItem>
+                <DropdownMenuItem className='hover:bg-primary/10 transition-colors'>
+                  {t('Header.Your account')}
+                </DropdownMenuItem>
               </Link>
               <Link className='w-full' href='/account/orders'>
-                <DropdownMenuItem>{t('Header.Your orders')}</DropdownMenuItem>
+                <DropdownMenuItem className='hover:bg-primary/10 transition-colors'>
+                  {t('Header.Your orders')}
+                </DropdownMenuItem>
               </Link>
 
               {session.user.role === 'Admin' && (
                 <Link className='w-full' href='/admin/overview'>
-                  <DropdownMenuItem>{t('Header.Admin')}</DropdownMenuItem>
+                  <DropdownMenuItem className='hover:bg-primary/10 transition-colors'>
+                    {t('Header.Admin')}
+                  </DropdownMenuItem>
                 </Link>
               )}
             </DropdownMenuGroup>
@@ -71,9 +81,13 @@ export default async function UserButton() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         ) : (
-          <DropdownMenuContent className='w-56' align='end' forceMount>
+          <DropdownMenuContent
+            className='w-56 bg-white text-black shadow-lg rounded-md animate-fadeIn'
+            align='end'
+            forceMount
+          >
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem className='hover:bg-primary/10 transition-colors'>
                 <Link
                   className={cn(buttonVariants(), 'w-full')}
                   href='/sign-in'
@@ -91,6 +105,50 @@ export default async function UserButton() {
           </DropdownMenuContent>
         )}
       </DropdownMenu>
+
+      {/* Mobile Links */}
+      <div className='nav:hidden flex flex-col text-xs space-y-2 mt-4'>
+        <h3 className='text-sm font-semibold uppercase tracking-wider text-white/70'>
+          {t('Header.Your Account')}
+        </h3>
+        <Link
+          href='/account'
+          className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
+        >
+          {t('Header.Your account')}
+        </Link>
+        <Link
+          href='/account/orders'
+          className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
+        >
+          {t('Header.Your orders')}
+        </Link>
+        {session?.user.role === 'Admin' && (
+          <Link
+            href='/admin/overview'
+            className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
+          >
+            {t('Header.Admin')}
+          </Link>
+        )}
+        {session ? (
+          <form action={SignOut} className='w-full'>
+            <Button
+              className='w-full py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
+              variant='ghost'
+            >
+              {t('Header.Sign out')}
+            </Button>
+          </form>
+        ) : (
+          <Link
+            href='/sign-in'
+            className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
+          >
+            {t('Header.Sign in')}
+          </Link>
+        )}
+      </div>
     </div>
   )
 }
