@@ -3,7 +3,7 @@ import { HomeCard } from '@/components/shared/home/home-card'
 import { HomeCarousel } from '@/components/shared/home/home-carousel'
 import ProductSlider from '@/components/shared/product/product-slider'
 import { Card, CardContent } from '@/components/ui/card'
-
+import React from 'react'
 import {
   getProductsForCard,
   getProductsByTag,
@@ -11,6 +11,7 @@ import {
 } from '@/lib/actions/product.actions'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { getTranslations } from 'next-intl/server'
+import InfiniteProductList from '@/components/shared/infinite-product-list' // Import the new component
 
 export default async function HomePage() {
   const t = await getTranslations('Home')
@@ -103,6 +104,11 @@ export default async function HomePage() {
 
       <div className='px-2 sm:px-3 md:p-4 bg-border'>
         <BrowsingHistoryList />
+      </div>
+
+      <div className='px-2 sm:px-3 md:p-4 bg-border'>
+        <h2 className='font-bold text-lg'>All Products</h2>
+        <InfiniteProductList />
       </div>
     </div>
   )
