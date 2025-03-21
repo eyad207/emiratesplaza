@@ -50,9 +50,6 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
             <div className='mt-6 flex flex-col gap-5 flex-1'>
               {/* User Account Section */}
               <div className='space-y-4'>
-                <h3 className='text-sm font-semibold uppercase tracking-wider text-white/70'>
-                  {t('Header.Your Account')}
-                </h3>
                 <div className='space-y-3'>
                   <UserButton />
                   {!forAdmin && <CartButton />}
