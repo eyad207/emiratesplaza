@@ -90,7 +90,7 @@ const ProductCard = ({
       >
         {product.name}
       </Link>
-      <div className='flex gap-2 justify-center hidden sm:flex'>
+      <div className='flex gap-2 justify-center sm:flex'>
         <Rating rating={product.avgRating} />
         <span className='font-medium'>
           ({formatNumber(product.numReviews)})
