@@ -49,7 +49,7 @@ const InfiniteProductList = () => {
     <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
       {allProducts.map((product, index) => (
         <div
-          key={product._id}
+          key={`${product._id}-${index}`} // Ensure unique keys
           ref={index === allProducts.length - 1 ? lastProductElementRef : null}
           className='transition-transform duration-300 hover:scale-105'
         >
