@@ -39,7 +39,7 @@ const ProductCard = ({
         className={cn(
           'relative transform transition-transform duration-700 ease-out hover:scale-105',
           {
-            'h-40': isInInfiniteList,
+            'h-60': isInInfiniteList,
             'h-52': !isInInfiniteList,
           }
         )}

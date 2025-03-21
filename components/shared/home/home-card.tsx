@@ -293,7 +293,6 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
               className={`card-item rounded-lg shadow-md hover:shadow-xl transition-all duration-500 flex flex-col border-2 border-border/30 hover:border-primary/40 dark:border-zinc-700 dark:hover:border-primary/60 dark:bg-zinc-900 dark:hover:bg-zinc-900 w-[85vw] max-w-[350px] sm:w-[340px] flex-shrink-0 snap-center`}
               data-index={index}
             >
-              {/* ...existing card content... */}
               <CardContent className='p-3 sm:p-4 md:p-6 flex-1'>
                 <h3 className='text-base sm:text-lg font-bold mb-3 sm:mb-5 border-b pb-2 sm:pb-3 text-foreground dark:text-foreground/90'>
                   {card.title}
