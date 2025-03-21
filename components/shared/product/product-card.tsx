@@ -17,19 +17,33 @@ const ProductCard = ({
   hideDetails = false,
   hideAddToCart = false,
   className,
+  hideAddToCartButton = false, // New prop to conditionally hide add to cart button
+  hideBrandOnMobile = false, // New prop to conditionally hide brand name on mobile
+  isInInfiniteList = false, // New prop to conditionally style for infinite list
 }: {
   product: IProduct
   hideDetails?: boolean
   hideBorder?: boolean
   hideAddToCart?: boolean
   className?: string
+  hideAddToCartButton?: boolean // New prop to conditionally hide add to cart button
+  hideBrandOnMobile?: boolean // New prop to conditionally hide brand name on mobile
+  isInInfiniteList?: boolean // New prop to conditionally style for infinite list
 }) => {
   const ProductImage = () => (
     <Link
       href={`/product/${product.slug}`}
       className='overflow-hidden rounded-lg block'
     >
-      <div className='relative h-52 transform transition-transform duration-700 ease-out hover:scale-105'>
+      <div
+        className={cn(
+          'relative transform transition-transform duration-700 ease-out hover:scale-105',
+          {
+            'h-40': isInInfiniteList,
+            'h-52': !isInInfiniteList,
+          }
+        )}
+      >
         {product.images.length > 1 ? (
           <ImageHover
             src={product.images[0]}
@@ -37,7 +51,12 @@ const ProductCard = ({
             alt={product.name}
           />
         ) : (
-          <div className='relative h-52'>
+          <div
+            className={cn('relative', {
+              'h-40': isInInfiniteList,
+              'h-52': !isInInfiniteList,
+            })}
+          >
             <Image
               src={product.images[0]}
               alt={product.name}
@@ -53,7 +72,11 @@ const ProductCard = ({
 
   const ProductDetails = () => (
     <div className='flex-1 space-y-2 flex flex-col'>
-      <p className='font-bold text-foreground dark:text-foreground/90'>
+      <p
+        className={cn('font-bold text-foreground dark:text-foreground/90', {
+          'hidden sm:block': hideBrandOnMobile,
+        })}
+      >
         {product.brand}
       </p>
       <Link
@@ -67,7 +90,7 @@ const ProductCard = ({
       >
         {product.name}
       </Link>
-      <div className='flex gap-2 justify-center'>
+      <div className='flex gap-2 justify-center hidden sm:flex'>
         <Rating rating={product.avgRating} />
         <span className='font-medium'>
           ({formatNumber(product.numReviews)})
@@ -109,7 +132,10 @@ const ProductCard = ({
 
   return hideBorder ? (
     <div
-      className={cn('flex flex-col group card-professional h-full', className)}
+      className={cn('flex flex-col group card-professional h-full', className, {
+        'hover:bg-gray-100 dark:hover:bg-gray-800': isInInfiniteList,
+        'hover:border-primary': isInInfiniteList,
+      })}
     >
       <ProductImage />
       {!hideDetails && (
@@ -117,7 +143,7 @@ const ProductCard = ({
           <div className='p-3 flex-1 text-center'>
             <ProductDetails />
           </div>
-          {!hideAddToCart && <AddButton />}
+          {!hideAddToCart && !hideAddToCartButton && <AddButton />}
         </>
       )}
     </div>
@@ -125,7 +151,11 @@ const ProductCard = ({
     <Card
       className={cn(
         'flex flex-col group card-professional h-full border-2 border-border/50 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 dark:hover:border-primary/60 overflow-hidden',
-        className
+        className,
+        {
+          'hover:bg-gray-100 dark:hover:bg-gray-800': isInInfiniteList,
+          'hover:border-primary': isInInfiniteList,
+        }
       )}
     >
       <CardHeader className='p-3 flex-shrink-0'>
@@ -137,7 +167,7 @@ const ProductCard = ({
             <ProductDetails />
           </CardContent>
           <CardFooter className='p-3 pt-2 pb-3 flex-shrink-0 mt-auto border-t border-border/10 dark:border-zinc-800'>
-            {!hideAddToCart && <AddButton />}
+            {!hideAddToCart && !hideAddToCartButton && <AddButton />}
           </CardFooter>
         </>
       )}

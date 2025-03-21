@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { IProduct } from '@/lib/db/models/product.model'
 import Link from 'next/link'
 import useEmblaCarousel from 'embla-carousel-react'
-// Removed Autoplay import as it's no longer needed
 import ProductCard from './product-card'
 
 export default function ProductSlider({
@@ -22,22 +21,19 @@ export default function ProductSlider({
   linkText?: string
   hideDetails?: boolean
 }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      loop: true,
-      align: 'start',
-      containScroll: 'trimSnaps',
-      dragFree: true,
-      slidesToScroll: 4, // Scroll 4 slides at a time
-      breakpoints: {
-        // Responsive breakpoints
-        '(max-width: 1200px)': { slidesToScroll: 3 },
-        '(max-width: 768px)': { slidesToScroll: 2 },
-        '(max-width: 640px)': { slidesToScroll: 1 },
-      },
-    }
-    // Removed the Autoplay plugin to disable auto-scrolling
-  )
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'start',
+    containScroll: 'trimSnaps',
+    dragFree: false, // Disable dragFree to ensure one product scroll at a time
+    slidesToScroll: 1, // Scroll 1 slide at a time
+    breakpoints: {
+      // Responsive breakpoints
+      '(max-width: 1200px)': { slidesToScroll: 1 },
+      '(max-width: 768px)': { slidesToScroll: 1 },
+      '(max-width: 640px)': { slidesToScroll: 1 },
+    },
+  })
 
   const scrollPrev = React.useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev()
@@ -68,7 +64,7 @@ export default function ProductSlider({
             {products.map((product) => (
               <div
                 key={product._id.toString()}
-                className='w-[85vw] max-w-[320px] sm:w-1/2 md:w-1/3 lg:w-1/4 flex-shrink-0 px-1 sm:px-2'
+                className='w-[75vw] max-w-[280px] sm:w-[45vw] md:w-[30vw] lg:w-[22vw] flex-shrink-0 px-1 sm:px-2'
               >
                 <ProductCard
                   product={product}

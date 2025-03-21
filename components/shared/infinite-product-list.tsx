@@ -46,14 +46,19 @@ const InfiniteProductList = () => {
   }, [page])
 
   return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
+    <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
       {allProducts.map((product, index) => (
         <div
           key={`${product._id}-${index}`} // Ensure unique keys
           ref={index === allProducts.length - 1 ? lastProductElementRef : null}
           className='transition-transform duration-300 hover:scale-105'
         >
-          <ProductCard product={product} />
+          <ProductCard
+            product={product}
+            hideAddToCartButton={true}
+            hideBrandOnMobile={true}
+            isInInfiniteList={true} // Apply new styling for infinite list
+          />
         </div>
       ))}
       {isPending && <p>Loading more products...</p>}
