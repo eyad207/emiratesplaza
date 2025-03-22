@@ -31,43 +31,38 @@ const ProductCard = ({
   isInInfiniteList?: boolean // New prop to conditionally style for infinite list
 }) => {
   const ProductImage = () => (
-    <Link
-      href={`/product/${product.slug}`}
-      className='overflow-hidden rounded-lg block'
+    <div
+      className={cn(
+        'relative transform transition-transform duration-700 ease-out hover:scale-105',
+        {
+          'h-60': isInInfiniteList,
+          'h-52': !isInInfiniteList,
+        }
+      )}
     >
-      <div
-        className={cn(
-          'relative transform transition-transform duration-700 ease-out hover:scale-105',
-          {
-            'h-60': isInInfiniteList,
+      {product.images.length > 1 ? (
+        <ImageHover
+          src={product.images[0]}
+          hoverSrc={product.images[1]}
+          alt={product.name}
+        />
+      ) : (
+        <div
+          className={cn('relative', {
+            'h-40': isInInfiniteList,
             'h-52': !isInInfiniteList,
-          }
-        )}
-      >
-        {product.images.length > 1 ? (
-          <ImageHover
+          })}
+        >
+          <Image
             src={product.images[0]}
-            hoverSrc={product.images[1]}
             alt={product.name}
+            fill
+            sizes='80vw'
+            className='object-contain drop-shadow-md'
           />
-        ) : (
-          <div
-            className={cn('relative', {
-              'h-40': isInInfiniteList,
-              'h-52': !isInInfiniteList,
-            })}
-          >
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              sizes='80vw'
-              className='object-contain drop-shadow-md'
-            />
-          </div>
-        )}
-      </div>
-    </Link>
+        </div>
+      )}
+    </div>
   )
 
   const ProductDetails = () => (
@@ -79,8 +74,7 @@ const ProductCard = ({
       >
         {product.brand}
       </p>
-      <Link
-        href={`/product/${product.slug}`}
+      <p
         className='overflow-hidden text-ellipsis font-medium hover:text-primary transition-colors duration-300 dark:text-foreground/80 dark:hover:text-primary'
         style={{
           display: '-webkit-box',
@@ -89,7 +83,7 @@ const ProductCard = ({
         }}
       >
         {product.name}
-      </Link>
+      </p>
       <div className='flex gap-2 justify-center sm:flex'>
         <Rating rating={product.avgRating} />
         <span className='font-medium'>
@@ -131,11 +125,16 @@ const ProductCard = ({
   )
 
   return hideBorder ? (
-    <div
-      className={cn('flex flex-col group card-professional h-full', className, {
-        'hover:bg-gray-100 dark:hover:bg-gray-800': isInInfiniteList,
-        'hover:border-primary': isInInfiniteList,
-      })}
+    <Link
+      href={`/product/${product.slug}`}
+      className={cn(
+        'flex flex-col group card-professional h-full cursor-pointer',
+        className,
+        {
+          'hover:bg-gray-100 dark:hover:bg-gray-800': isInInfiniteList,
+          'hover:border-primary': isInInfiniteList,
+        }
+      )}
     >
       <ProductImage />
       {!hideDetails && (
@@ -146,32 +145,34 @@ const ProductCard = ({
           {!hideAddToCart && !hideAddToCartButton && <AddButton />}
         </>
       )}
-    </div>
+    </Link>
   ) : (
-    <Card
-      className={cn(
-        'flex flex-col group card-professional h-full border-2 border-border/50 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 dark:hover:border-primary/60 overflow-hidden',
-        className,
-        {
-          'hover:bg-gray-100 dark:hover:bg-gray-800': isInInfiniteList,
-          'hover:border-primary': isInInfiniteList,
-        }
-      )}
-    >
-      <CardHeader className='p-3 flex-shrink-0'>
-        <ProductImage />
-      </CardHeader>
-      {!hideDetails && (
-        <>
-          <CardContent className='p-3 flex-1 text-center overflow-y-auto'>
-            <ProductDetails />
-          </CardContent>
-          <CardFooter className='p-3 pt-2 pb-3 flex-shrink-0 mt-auto border-t border-border/10 dark:border-zinc-800'>
-            {!hideAddToCart && !hideAddToCartButton && <AddButton />}
-          </CardFooter>
-        </>
-      )}
-    </Card>
+    <Link href={`/product/${product.slug}`}>
+      <Card
+        className={cn(
+          'flex flex-col group card-professional h-full border-2 border-border/50 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 dark:hover:border-primary/60 overflow-hidden cursor-pointer',
+          className,
+          {
+            'hover:bg-gray-100 dark:hover:bg-gray-800': isInInfiniteList,
+            'hover:border-primary': isInInfiniteList,
+          }
+        )}
+      >
+        <CardHeader className='p-3 flex-shrink-0'>
+          <ProductImage />
+        </CardHeader>
+        {!hideDetails && (
+          <>
+            <CardContent className='p-3 flex-1 text-center overflow-y-auto'>
+              <ProductDetails />
+            </CardContent>
+            <CardFooter className='p-3 pt-2 pb-3 flex-shrink-0 mt-auto border-t border-border/10 dark:border-zinc-800'>
+              {!hideAddToCart && !hideAddToCartButton && <AddButton />}
+            </CardFooter>
+          </>
+        )}
+      </Card>
+    </Link>
   )
 }
 
