@@ -30,7 +30,9 @@ export default async function Sidebar({
     <Drawer direction={getDirection(locale) === 'rtl' ? 'right' : 'left'}>
       <DrawerTrigger className='flex items-center gap-2 py-2 px-4 hover:bg-white/10 transition-colors duration-200 rounded-md'>
         <MenuIcon className='h-4 w-4' />
-        <span className='text-sm font-medium'>{t('Header.All')}</span>
+        <span className='text-sm font-medium'>
+          {t('Header.All Categories')}
+        </span>
       </DrawerTrigger>
       <DrawerContent className='w-[350px] mt-0 top-0'>
         <div className='flex flex-col h-full'>
