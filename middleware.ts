@@ -13,7 +13,8 @@ const publicPages = [
   '/product/(.*)',
   '/page/(.*)',
   '/forgot-password',
-  '/reset-password', // Add this line
+  '/confirm-email', // Corrected spelling
+  '/reset-password',
   // (/secret requires auth)
 ]
 const intlMiddleware = createMiddleware(routing)
@@ -34,9 +35,7 @@ export default auth((req) => {
   } else {
     if (!req.auth) {
       const newUrl = new URL(
-        `/sign-in?callbackUrl=${
-          encodeURIComponent(req.nextUrl.pathname) || '/'
-        }`,
+        `/sign-in?callbackUrl=${encodeURIComponent(req.nextUrl.pathname)}`,
         req.nextUrl.origin
       )
       return Response.redirect(newUrl)

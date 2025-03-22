@@ -186,10 +186,13 @@ export const UserPasswordSchema = z
 
 export const ResetPasswordSchema = z
   .object({
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters long')
+      .regex(/[A-Z]/, 'Password must contain at least one capital letter'),
     confirmPassword: z
       .string()
-      .min(6, 'Confirm Password must be at least 6 characters'),
+      .min(8, 'Confirm Password must be at least 8 characters long'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -226,13 +229,22 @@ export const UserSignInSchema = z.object({
   email: Email,
   password: Password,
 })
-export const UserSignUpSchema = UserSignInSchema.extend({
-  name: UserName,
-  confirmPassword: Password,
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-})
+export const UserSignUpSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.string().email('Invalid email address'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters long')
+      .regex(/[A-Z]/, 'Password must contain at least one capital letter'),
+    confirmPassword: z
+      .string()
+      .min(8, 'Confirm Password must be at least 8 characters long'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
 export const UserNameSchema = z.object({
   name: UserName,
 })

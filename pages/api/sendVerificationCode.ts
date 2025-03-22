@@ -4,7 +4,7 @@ import { EmailTemplate } from '@/emails/email-form'
 import React from 'react'
 import { SENDER_EMAIL, SENDER_NAME } from '@/lib/constants'
 
-const resend = new Resend('re_BDf2kDyp_FSoS9wE1SitHzKqqKqQAfaK9')
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export default async function handler(
   req: NextApiRequest,

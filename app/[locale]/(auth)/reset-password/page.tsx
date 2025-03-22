@@ -61,51 +61,61 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div>
-          <h1 className='text-2xl font-bold bg-orange-400 py-2 text-center rounded-xl mb-5'>
-            Reset Password
-          </h1>
-        </div>
-        <div className='space-y-6'>
-          <FormField
-            control={form.control}
-            name='password'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>New Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type='password'
-                    placeholder='Enter new password'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='confirmPassword'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type='password'
-                    placeholder='Confirm new password'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type='submit'>Reset Password</Button>
-        </div>
-      </form>
-    </Form>
+    <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900'>
+      <div className='w-full max-w-md p-8 bg-white dark:bg-gray-800 rounded shadow-md'>
+        <h1 className='text-3xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100'>
+          Reset Password
+        </h1>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className='space-y-6'>
+              <FormField
+                control={form.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel className='text-gray-700 dark:text-gray-300'>
+                      New Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type='password'
+                        placeholder='Enter new password'
+                        {...field}
+                        className='dark:bg-gray-700 dark:text-gray-100'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='confirmPassword'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel className='text-gray-700 dark:text-gray-300'>
+                      Confirm Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type='password'
+                        placeholder='Confirm new password'
+                        {...field}
+                        className='dark:bg-gray-700 dark:text-gray-100'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type='submit' className='w-full'>
+                Reset Password
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+    </div>
   )
 }

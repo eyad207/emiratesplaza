@@ -1,9 +1,7 @@
 'use client'
-import { redirect, useSearchParams } from 'next/navigation'
-
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import Link from 'next/link'
 import useSettingStore from '@/hooks/use-setting-store'
 import {
   Form,
@@ -15,12 +13,12 @@ import {
 } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { IUserSignUp } from '@/types'
-import { registerUser, signInWithCredentials } from '@/lib/actions/user.actions'
+import { sendVerificationCode } from '@/lib/actions/user.actions'
 import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignUpSchema } from '@/lib/validator'
 import { Separator } from '@/components/ui/separator'
-import { isRedirectError } from 'next/dist/client/components/redirect-error'
+import Link from 'next/link'
 
 const signUpDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -37,12 +35,13 @@ const signUpDefaultValues =
         confirmPassword: '',
       }
 
-export default function CredentialsSignInForm() {
+export default function SignUpForm() {
   const {
     setting: { site },
   } = useSettingStore()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams?.get('callbackUrl') || '/'
+  const router = useRouter()
 
   const form = useForm<IUserSignUp>({
     resolver: zodResolver(UserSignUpSchema),
@@ -53,7 +52,7 @@ export default function CredentialsSignInForm() {
 
   const onSubmit = async (data: IUserSignUp) => {
     try {
-      const res = await registerUser(data)
+      const res = await sendVerificationCode(data.email, data.name)
       if (!res.success) {
         toast({
           title: 'Error',
@@ -62,18 +61,13 @@ export default function CredentialsSignInForm() {
         })
         return
       }
-      await signInWithCredentials({
-        email: data.email,
-        password: data.password,
-      })
-      redirect(callbackUrl)
-    } catch (error) {
-      if (isRedirectError(error)) {
-        throw error
-      }
+      router.push(
+        `/confirm-email?email=${encodeURIComponent(data.email)}&name=${encodeURIComponent(data.name)}&callbackUrl=${encodeURIComponent(callbackUrl)}`
+      )
+    } catch {
       toast({
         title: 'Error',
-        description: 'Invalid email or password',
+        description: 'Failed to send verification code',
         variant: 'destructive',
       })
     }

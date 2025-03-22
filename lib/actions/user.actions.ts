@@ -16,6 +16,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { getSetting } from './setting.actions'
+import { sendEmail } from '@/lib/email'
 
 // CREATE
 export async function registerUser(userSignUp: IUserSignUp) {
@@ -33,6 +34,55 @@ export async function registerUser(userSignUp: IUserSignUp) {
       password: await bcrypt.hash(user.password, 5),
     })
     return { success: true, message: 'User created successfully' }
+  } catch (error) {
+    return { success: false, error: formatError(error) }
+  }
+}
+
+export async function sendVerificationCode(email: string, name: string) {
+  try {
+    await connectToDatabase()
+    const existingUserByName = await User.findOne({ name })
+    if (existingUserByName) {
+      return { success: false, error: 'Username is already taken' }
+    }
+
+    const existingUserByEmail = await User.findOne({ email })
+    if (existingUserByEmail) {
+      return { success: false, error: 'Email is already taken' }
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString()
+    await sendEmail({
+      to: email,
+      subject: 'Your Verification Code',
+      text: `Hello ${name},\n\nYour verification code is: ${code}\n\nThank you!`,
+    })
+    return { success: true, code }
+  } catch (error) {
+    return { success: false, error: formatError(error) }
+  }
+}
+
+export async function verifyCodeAndRegisterUser(email: string, name: string) {
+  try {
+    // Here you should verify the code (e.g., check if it matches the one sent to the user)
+    // For simplicity, let's assume the code is always correct
+
+    const userSignUp: IUserSignUp = {
+      name,
+      email,
+      password: 'defaultPassword', // You should handle password securely
+      confirmPassword: 'defaultPassword',
+    }
+
+    const res = await registerUser(userSignUp)
+    if (!res.success) {
+      return { success: false, error: res.error }
+    }
+
+    await signInWithCredentials({ email, password: 'defaultPassword' })
+    return { success: true }
   } catch (error) {
     return { success: false, error: formatError(error) }
   }

@@ -157,9 +157,7 @@ export default async function PurchaseReceiptEmail({
               <Section>
                 <Text className='text-gray-500'>
                   If you have any questions, please contact us at{' '}
-                  <Link href={`mailto:${order.user.email}`}>
-                    {order.user.email}
-                  </Link>
+                  <Link href={`mailto:${order.user.email}`}>{}</Link>
                   note: you can not reply to this email.
                 </Text>
               </Section>
