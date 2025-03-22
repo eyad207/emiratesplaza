@@ -6,7 +6,7 @@ import { toast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
 
-const TestEmailButton = ({ email }: { email: string }) => {
+const EmailButton = ({ email }: { email: string }) => {
   const [currentEmail, setCurrentEmail] = useState(email)
   const [codeSent, setCodeSent] = useState(false)
   const [code, setCode] = useState('')
@@ -167,4 +167,4 @@ const TestEmailButton = ({ email }: { email: string }) => {
   )
 }
 
-export default TestEmailButton
+export default EmailButton

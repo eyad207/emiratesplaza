@@ -14,7 +14,7 @@ import { toast } from '@/hooks/use-toast'
 import { UserEmailSchema } from '@/lib/validator'
 import { sendResetPasswordEmail } from '@/lib/actions/user.actions'
 import { useRouter } from 'next/navigation'
-import TestEmailButton from '@/components/EmailButton'
+import EmailButton from '@/components/EmailButton'
 ////////
 
 export default function ForgotPasswordPage() {
@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
             )}
           />
           <div>
-            <TestEmailButton email={email} />
+            <EmailButton email={email} />
           </div>
           <div></div>
           <div className='text-sm'>
