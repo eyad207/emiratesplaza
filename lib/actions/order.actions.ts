@@ -74,9 +74,7 @@ export async function updateOrderToPaid(orderId: string) {
     order.isPaid = true
     order.paidAt = new Date()
     await order.save()
-    if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
-      await updateProductStock(order._id)
-    if (order.user.email) await sendPurchaseReceipt({ order })
+    if (order.user?.email) await sendPurchaseReceipt({ order })
     revalidatePath(`/account/orders/${orderId}`)
     return { success: true, message: 'Order paid successfully' }
   } catch (err) {
@@ -95,7 +93,7 @@ const updateProductStock = async (orderId: string) => {
       { _id: orderId },
       { isPaid: true, paidAt: new Date() },
       opts
-    )
+    ).populate('user', 'email') // Ensure user is populated
     if (!order) throw new Error('Order not found')
 
     for (const item of order.items) {

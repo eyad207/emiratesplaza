@@ -107,7 +107,8 @@
     "Rating": "Rating",
     "No reviews yet": "No reviews yet",
     "Submitting": "Submitting...",
-    "Only X left in stock - order soon": "Only {count} left in stock - order soon"
+    "Only X left in stock - order soon": "Only {count} left in stock - order soon",
+    "You can only review products you have purchased": "You can only review products you have purchased"
   },
   "Cart": {
     "Shopping Cart": "Shopping Cart",

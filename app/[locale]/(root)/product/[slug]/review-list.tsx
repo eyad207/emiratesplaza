@@ -53,6 +53,7 @@ import RatingSummary from '@/components/shared/product/rating-summary'
 import { IProduct } from '@/lib/db/models/product.model'
 import { Separator } from '@/components/ui/separator'
 import { IReviewDetails } from '@/types'
+import { getMyOrders } from '@/lib/actions/order.actions'
 
 const reviewFormDefaultValues = {
   title: '',
@@ -148,6 +149,24 @@ export default function ReviewList({
     }
     setOpen(true)
   }
+
+  const [hasPurchased, setHasPurchased] = useState(false)
+  useEffect(() => {
+    const checkPurchase = async () => {
+      if (userId) {
+        const orders = await getMyOrders({ page: 1 })
+        const purchased: boolean = orders.data.some(
+          (order: { items: { product: string }[] }) =>
+            order.items.some(
+              (item: { product: string }) => item.product === product._id
+            )
+        )
+        setHasPurchased(purchased)
+      }
+    }
+    checkPurchase()
+  }, [userId, product._id])
+
   return (
     <div className='space-y-2 dark:bg-zinc-900 dark:text-white'>
       {reviews.length === 0 && <div>{t('No reviews yet')}</div>}
@@ -170,119 +189,128 @@ export default function ReviewList({
               {t('Share your thoughts with other customers')}
             </p>
             {userId ? (
-              <Dialog open={open} onOpenChange={setOpen}>
-                <Button
-                  onClick={handleOpenForm}
-                  variant='outline'
-                  className=' rounded-full w-full'
-                >
-                  {t('Write a customer review')}
-                </Button>
+              hasPurchased ? (
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <Button
+                    onClick={handleOpenForm}
+                    variant='outline'
+                    className=' rounded-full w-full'
+                  >
+                    {t('Write a customer review')}
+                  </Button>
 
-                <DialogContent className='sm:max-w-[425px]'>
-                  <Form {...form}>
-                    <form method='post' onSubmit={form.handleSubmit(onSubmit)}>
-                      <DialogHeader>
-                        <DialogTitle>
-                          {t('Write a customer review')}
-                        </DialogTitle>
-                        <DialogDescription>
-                          {t('Share your thoughts with other customers')}
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className='grid gap-4 py-4'>
-                        <div className='flex flex-col gap-5  '>
-                          <FormField
-                            control={form.control}
-                            name='title'
-                            render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>{t('Title')}</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder={t('Enter title')}
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name='comment'
-                            render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>{t('Comment')}</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder={t('Enter comment')}
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        <div>
-                          <FormField
-                            control={form.control}
-                            name='rating'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>{t('Rating')}</FormLabel>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  value={field.value.toString()}
-                                >
+                  <DialogContent className='sm:max-w-[425px]'>
+                    <Form {...form}>
+                      <form
+                        method='post'
+                        onSubmit={form.handleSubmit(onSubmit)}
+                      >
+                        <DialogHeader>
+                          <DialogTitle>
+                            {t('Write a customer review')}
+                          </DialogTitle>
+                          <DialogDescription>
+                            {t('Share your thoughts with other customers')}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className='grid gap-4 py-4'>
+                          <div className='flex flex-col gap-5  '>
+                            <FormField
+                              control={form.control}
+                              name='title'
+                              render={({ field }) => (
+                                <FormItem className='w-full'>
+                                  <FormLabel>{t('Title')}</FormLabel>
                                   <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue
-                                        placeholder={t('Select a rating')}
-                                      />
-                                    </SelectTrigger>
+                                    <Input
+                                      placeholder={t('Enter title')}
+                                      {...field}
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    {Array.from({ length: 5 }).map(
-                                      (_, index) => (
-                                        <SelectItem
-                                          key={index}
-                                          value={(index + 1).toString()}
-                                        >
-                                          <div className='flex items-center gap-1'>
-                                            {index + 1}{' '}
-                                            <StarIcon className='h-4 w-4' />
-                                          </div>
-                                        </SelectItem>
-                                      )
-                                    )}
-                                  </SelectContent>
-                                </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
 
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                            <FormField
+                              control={form.control}
+                              name='comment'
+                              render={({ field }) => (
+                                <FormItem className='w-full'>
+                                  <FormLabel>{t('Comment')}</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      placeholder={t('Enter comment')}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div>
+                            <FormField
+                              control={form.control}
+                              name='rating'
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('Rating')}</FormLabel>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    value={field.value.toString()}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue
+                                          placeholder={t('Select a rating')}
+                                        />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {Array.from({ length: 5 }).map(
+                                        (_, index) => (
+                                          <SelectItem
+                                            key={index}
+                                            value={(index + 1).toString()}
+                                          >
+                                            <div className='flex items-center gap-1'>
+                                              {index + 1}{' '}
+                                              <StarIcon className='h-4 w-4' />
+                                            </div>
+                                          </SelectItem>
+                                        )
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
                         </div>
-                      </div>
 
-                      <DialogFooter>
-                        <Button
-                          type='submit'
-                          size='lg'
-                          disabled={form.formState.isSubmitting}
-                        >
-                          {form.formState.isSubmitting
-                            ? t('Submitting...')
-                            : t('Submit')}
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </Form>
-                </DialogContent>
-              </Dialog>
+                        <DialogFooter>
+                          <Button
+                            type='submit'
+                            size='lg'
+                            disabled={form.formState.isSubmitting}
+                          >
+                            {form.formState.isSubmitting
+                              ? t('Submitting...')
+                              : t('Submit')}
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              ) : (
+                <div>
+                  {t('You can only review products you have purchased')}
+                </div>
+              )
             ) : (
               <div>
                 {t('Please')}{' '}
