@@ -84,7 +84,11 @@ const ProductCard = ({
       >
         {product.name}
       </p>
-      <div className='flex gap-2 justify-center sm:flex'>
+      <div
+        className={cn('flex gap-2 justify-center', {
+          'hidden sm:flex': isInInfiniteList,
+        })}
+      >
         <Rating rating={product.avgRating} />
         <span className='font-medium'>
           ({formatNumber(product.numReviews)})
@@ -103,7 +107,7 @@ const ProductCard = ({
   )
 
   const AddButton = () => (
-    <div className='w-full text-center transform transition-all duration-300 hover:scale-105 pb-1'>
+    <div className='w-full text-center transform transition-all duration-300 hover:scale-105 pb-1 hidden lg:block'>
       <AddToCart
         minimal
         item={{
