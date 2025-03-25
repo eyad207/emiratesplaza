@@ -17,6 +17,7 @@ import {
 import { formatCurrency } from '@/lib/utils'
 import { IOrder } from '@/lib/db/models/order.model'
 import { getSetting } from '@/lib/actions/setting.actions'
+import { SENDER_EMAIL } from '@/lib/constants'
 
 type OrderInformationProps = {
   order: IOrder
@@ -157,7 +158,7 @@ export default async function PurchaseReceiptEmail({
               <Section>
                 <Text className='text-gray-500'>
                   If you have any questions, please contact us at{' '}
-                  <Link href={`mailto:${order.user.email}`}>{}</Link>
+                  <Link href={`mailto:${SENDER_EMAIL}`}>{SENDER_EMAIL}</Link>{' '}
                   note: you can not reply to this email.
                 </Text>
               </Section>

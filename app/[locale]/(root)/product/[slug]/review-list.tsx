@@ -298,7 +298,7 @@ export default function ReviewList({
                             disabled={form.formState.isSubmitting}
                           >
                             {form.formState.isSubmitting
-                              ? t('Submitting...')
+                              ? t('Submitting')
                               : t('Submit')}
                           </Button>
                         </DialogFooter>

@@ -3,6 +3,7 @@
 import mongoose from 'mongoose'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { Filter } from 'bad-words'
 
 import { auth } from '@/auth'
 
@@ -13,6 +14,8 @@ import { formatError } from '../utils'
 import { ReviewInputSchema } from '../validator'
 import { IReviewDetails } from '@/types'
 import { getSetting } from './setting.actions'
+
+const filter = new Filter()
 
 export async function createUpdateReview({
   data,
@@ -31,6 +34,11 @@ export async function createUpdateReview({
       ...data,
       user: session?.user?.id,
     })
+
+    // Check for profanity
+    if (filter.isProfane(review.title) || filter.isProfane(review.comment)) {
+      throw new Error('Your review contains inappropriate language')
+    }
 
     await connectToDatabase()
     const existReview = await Review.findOne({

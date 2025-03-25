@@ -58,9 +58,9 @@
     "Best Deals on Wrist Watches": "Best Deals on Wrist Watches"
   },
   "Product": {
-    "Added to Cart": "Added to Cart",
-    "Go to Cart": "Go to Cart",
-    "Deleted User": "Deleted User",
+    "AddedToCart": "Added to Cart",
+    "GoToCart": "Go to Cart",
+    "DeletedUser": "Deleted User",
     "Brand": "Brand",
     "Limited time deal": "Limited time deal",
     "Was": "Was",
