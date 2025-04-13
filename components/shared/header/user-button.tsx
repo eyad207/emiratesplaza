@@ -35,7 +35,7 @@ export default async function UserButton() {
         </DropdownMenuTrigger>
         {session ? (
           <DropdownMenuContent
-            className='w-56 bg-white text-black shadow-lg rounded-md animate-fadeIn'
+            className='w-56 bg-white text-black shadow-md rounded-lg p-2'
             align='end'
             forceMount
           >
@@ -82,7 +82,7 @@ export default async function UserButton() {
           </DropdownMenuContent>
         ) : (
           <DropdownMenuContent
-            className='w-56 bg-white text-black shadow-lg rounded-md animate-fadeIn'
+            className='w-56 bg-white text-black shadow-md rounded-lg p-2'
             align='end'
             forceMount
           >

@@ -104,7 +104,7 @@
     "sign in": "sign in",
     "to write a review": "to write a review",
     "See more reviews": "See more reviews",
-    "Loading": "Loading...",
+    "Loading": "Loading ",
     "Rating": "Rating",
     "No reviews yet": "No reviews yet",
     "Submitting": "Submitting...",
@@ -187,7 +187,7 @@
     "Help": "Help"
   },
   "Loading": {
-    "Loading": "Loading..."
+    "Loading": "Loading "
   },
   "Error": {
     "Error": "Error",
