@@ -234,11 +234,43 @@
     "Delivered": "تم التوصيل",
     "Processing": "قيد المعالجة",
     "Recommended for You": "موصى به لك",
+    "NoRecentOrders": "ليس لديك أي طلبات حديثة",
+    "ContinueShopping": "متابعة التسوق",
+    "Details": "التفاصيل",
+    "Order": "طلب",
+    "Quantity": "الكمية: {quantity}",
+    "MoreItems": "و {count} عناصر إضافية",
+    "ViewAllOrders": "عرض جميع الطلبات",
+    "Shipped": "تم الشحن",
+    "NoOrdersYet": "ليس لديك أي طلبات حتى الآن.",
+    "StartShopping": "ابدأ التسوق",
+    "ViewDetails": "عرض التفاصيل",
+    "PaidOn": "تم الدفع في {date}",
+    "AwaitingPayment": "في انتظار الدفع",
+    "RecommendedForYou": "موصى به لك",
+    "PaymentPending": "في انتظار الدفع",
+    "TotalAmount": "المبلغ الإجمالي",
+    "Items": "العناصر",
+    "Paid": "مدفوع",
+    "ExpectedDelivery": "التسليم المتوقع: {date}",
     "Error": {
       "View Details": "عرض التفاصيل"
     },
     "Header": {
       "Your Account": "حسابك"
     }
+  },
+  "Account": {
+    "Orders": "الطلبات",
+    "TrackReturnBuy": "تتبع، إرجاع، أو شراء الأشياء مرة أخرى",
+    "LoginSecurity": "تسجيل الدخول والأمان",
+    "EditLoginNameMobile": "تحرير تسجيل الدخول، الاسم، ورقم الجوال",
+    "YourAccount": "حسابك"
+  },
+  "Dashboard": {
+    "Hello": "مرحباً",
+    "WelcomeMessage": "مرحباً بك في لوحة تحكم حسابك",
+    "RecentOrders": "الطلبات الأخيرة",
+    "QuickAccess": "وصول سريع إلى أحدث مشترياتك"
   }
 }

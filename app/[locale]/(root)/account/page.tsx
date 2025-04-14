@@ -7,16 +7,16 @@ import Link from 'next/link'
 import { Separator } from '@/components/ui/separator'
 import { auth } from '@/auth'
 import { getRecentOrders } from '@/lib/actions/order.actions'
+import { getTranslations } from 'next-intl/server'
 
-const PAGE_TITLE = 'Your Account'
 export const metadata: Metadata = {
-  title: PAGE_TITLE,
+  title: 'Your Account',
 }
 
 export default async function AccountPage() {
   const session = await auth()
   const userName = session?.user?.name || 'there'
-
+  const t = await getTranslations() // Initialize translations
   // Fetch recent orders if user is logged in
   const recentOrders = session?.user?.id
     ? await getRecentOrders(session.user.id)
@@ -24,14 +24,14 @@ export default async function AccountPage() {
 
   const accountCards = [
     {
-      title: 'Orders',
-      description: 'Track, return, or buy things again',
+      title: t('Account.Orders'), // Translate title
+      description: t('Account.TrackReturnBuy'), // Translate description
       icon: <PackageCheckIcon className='w-8 h-8 text-primary' />,
       href: '/account/orders',
     },
     {
-      title: 'Login & security',
-      description: 'Edit login, name, and mobile number',
+      title: t('Account.LoginSecurity'), // Translate title
+      description: t('Account.EditLoginNameMobile'), // Translate description
       icon: <ShieldCheckIcon className='w-8 h-8 text-primary' />,
       href: '/account/manage',
     },
@@ -41,10 +41,10 @@ export default async function AccountPage() {
     <div className='space-y-8'>
       <div>
         <h1 className='text-2xl sm:text-3xl font-bold mb-2'>
-          Hello, {userName}
+          {t('Dashboard.Hello')}, {userName} {/* Translate greeting */}
         </h1>
         <p className='text-muted-foreground'>
-          Welcome to your account dashboard
+          {t('Dashboard.WelcomeMessage')} {/* Translate welcome message */}
         </p>
       </div>
 
@@ -68,9 +68,10 @@ export default async function AccountPage() {
 
       <div className='space-y-4'>
         <div>
-          <h2 className='text-xl font-bold'>Recent Orders</h2>
+          <h2 className='text-xl font-bold'>{t('Dashboard.RecentOrders')}</h2>{' '}
+          {/* Translate section title */}
           <p className='text-muted-foreground text-sm'>
-            Quick access to your latest purchases
+            {t('Dashboard.QuickAccess')} {/* Translate description */}
           </p>
         </div>
 

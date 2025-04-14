@@ -1,7 +1,7 @@
 'use client'
 
 import { formatDateTime } from '@/lib/utils'
-import { IOrder } from '@/types' // This import will now work correctly
+import { IOrder } from '@/types'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,12 +21,12 @@ export default function RecentOrdersList({ orders }: { orders: IOrder[] }) {
       <Card>
         <CardContent className='p-6'>
           <div className='text-center py-6'>
-            <p>You have no recent orders</p>
+            <p>{t('Orders.NoRecentOrders')}</p>
             <Link
               href='/search'
               className='text-primary hover:underline mt-2 block'
             >
-              Continue shopping
+              {t('Orders.ContinueShopping')}
             </Link>
           </div>
         </CardContent>
@@ -63,7 +63,7 @@ export default function RecentOrdersList({ orders }: { orders: IOrder[] }) {
                 {formatDateTime(new Date(order.createdAt)).dateOnly}
               </p>
               <p className='font-medium'>
-                Order #{order._id.substring(order._id.length - 8)}
+                {t('Orders.Order')} #{order._id.substring(order._id.length - 8)}
               </p>
             </div>
             <div className='flex items-center gap-2'>
@@ -85,10 +85,10 @@ export default function RecentOrdersList({ orders }: { orders: IOrder[] }) {
                         : 'processing'
                   )}
                   {order.isDelivered
-                    ? 'Delivered'
+                    ? t('Orders.Delivered')
                     : order.isShipped
-                      ? 'Shipped'
-                      : 'Processing'}
+                      ? t('Orders.Shipped')
+                      : t('Orders.Processing')}
                 </span>
               </Badge>
               <Button
@@ -98,7 +98,7 @@ export default function RecentOrdersList({ orders }: { orders: IOrder[] }) {
                 onClick={() => router.push(`/account/orders/${order._id}`)}
               >
                 <Eye className='h-4 w-4 mr-1' />
-                <span>Details</span>
+                <span>{t('Orders.Details')}</span>
               </Button>
             </div>
           </div>
@@ -111,7 +111,6 @@ export default function RecentOrdersList({ orders }: { orders: IOrder[] }) {
                 </span>
               </div>
 
-              {/* Show first 2 items */}
               <div className='grid gap-3'>
                 {order.items.slice(0, 2).map((item) => (
                   <div key={item.clientId} className='flex items-center gap-3'>
@@ -129,18 +128,16 @@ export default function RecentOrdersList({ orders }: { orders: IOrder[] }) {
                         {item.name}
                       </p>
                       <p className='text-xs text-muted-foreground'>
-                        Qty: {item.quantity}
+                        {t('Orders.Quantity', { quantity: item.quantity })}
                       </p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Show "and X more items" if there are more than 2 items */}
               {order.items.length > 2 && (
                 <p className='text-xs text-muted-foreground text-right'>
-                  and {order.items.length - 2} more{' '}
-                  {order.items.length - 2 === 1 ? 'item' : 'items'}
+                  {t('Orders.MoreItems', { count: order.items.length - 2 })}
                 </p>
               )}
             </div>
@@ -154,7 +151,7 @@ export default function RecentOrdersList({ orders }: { orders: IOrder[] }) {
             variant='outline'
             onClick={() => router.push('/account/orders')}
           >
-            View all orders
+            {t('Orders.ViewAllOrders')}
           </Button>
         </div>
       )}

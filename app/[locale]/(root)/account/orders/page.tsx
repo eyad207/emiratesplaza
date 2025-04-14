@@ -21,15 +21,16 @@ import ProductPrice from '@/components/shared/product/product-price'
 import { buttonVariants } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { getTranslations } from 'next-intl/server'
 
-const PAGE_TITLE = 'Your Orders'
 export const metadata: Metadata = {
-  title: PAGE_TITLE,
+  title: 'Your Orders',
 }
 
 export default async function OrdersPage(props: {
   searchParams: Promise<{ page: string }>
 }) {
+  const t = await getTranslations() // Initialize translations
   const searchParams = await props.searchParams
   const page = Number(searchParams.page) || 1
   const orders = await getMyOrders({
@@ -44,27 +45,27 @@ export default async function OrdersPage(props: {
   ) => {
     if (isDelivered) {
       return {
-        text: 'Delivered',
+        text: t('Orders.Delivered'), // Translate status
         variant:
           'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
       }
     }
     if (isShipped) {
       return {
-        text: 'Shipped',
+        text: t('Orders.Shipped'), // Translate status
         variant:
           'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
       }
     }
     if (isPaid) {
       return {
-        text: 'Processing',
+        text: t('Orders.Processing'), // Translate status
         variant:
           'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300',
       }
     }
     return {
-      text: 'Pending',
+      text: t('Orders.Pending'), // Translate status
       variant:
         'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300',
     }
@@ -78,21 +79,25 @@ export default async function OrdersPage(props: {
           href='/account'
           className='hover:text-foreground transition-colors'
         >
-          Your Account
+          {t('Account.YourAccount')} {/* Translate breadcrumb */}
         </Link>
         <ChevronRight className='h-4 w-4' />
-        <span className='font-medium text-foreground'>{PAGE_TITLE}</span>
+        <span className='font-medium text-foreground'>
+          {t('Orders.YourOrders')}
+        </span>{' '}
+        {/* Translate title */}
       </div>
-
-      <h1 className='text-2xl sm:text-3xl font-bold mb-6'>{PAGE_TITLE}</h1>
-
+      <h1 className='text-2xl sm:text-3xl font-bold mb-6'>
+        {t('Orders.YourOrders')}
+      </h1>{' '}
+      {/* Translate title */}
       {orders.data.length === 0 ? (
         <Card className='p-8 text-center'>
           <div className='mb-4 text-muted-foreground'>
-            You have no orders yet.
+            {t('Orders.NoOrdersYet')} {/* Translate no orders message */}
           </div>
           <Link href='/search' className={buttonVariants()}>
-            Start Shopping
+            {t('Orders.StartShopping')} {/* Translate button */}
           </Link>
         </Card>
       ) : (
@@ -102,11 +107,16 @@ export default async function OrdersPage(props: {
             <Table>
               <TableHeader>
                 <TableRow className='bg-muted/50'>
-                  <TableHead className='w-[120px]'>Order ID</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className='text-right'>Actions</TableHead>
+                  <TableHead className='w-[120px]'>
+                    {t('Orders.OrderID')}
+                  </TableHead>{' '}
+                  {/* Translate table headers */}
+                  <TableHead>{t('Orders.Date')}</TableHead>
+                  <TableHead>{t('Orders.Total')}</TableHead>
+                  <TableHead>{t('Orders.Status')}</TableHead>
+                  <TableHead className='text-right'>
+                    {t('Orders.Actions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -149,7 +159,7 @@ export default async function OrdersPage(props: {
                           'font-medium'
                         )}
                       >
-                        View Details
+                        {t('Orders.ViewDetails')} {/* Translate button */}
                       </Link>
                     </TableCell>
                   </TableRow>
@@ -191,11 +201,13 @@ export default async function OrdersPage(props: {
                   </div>
                   <div className='flex items-center justify-between'>
                     <h3 className='text-base font-semibold'>
-                      Order #{formatId(order._id)}
+                      {t('Orders.Order')} #{formatId(order._id)}{' '}
+                      {/* Translate order label */}
                     </h3>
                     <div className='text-right'>
                       <span className='block text-xs text-muted-foreground mb-1'>
-                        Total Amount
+                        {t('Orders.TotalAmount')}{' '}
+                        {/* Translate total amount label */}
                       </span>
                       <span className='font-bold text-base'>
                         <ProductPrice price={order.totalPrice} plain />
@@ -209,7 +221,7 @@ export default async function OrdersPage(props: {
                   {/* Order items preview */}
                   <div className='mb-3'>
                     <h4 className='text-xs font-medium text-muted-foreground mb-2'>
-                      ITEMS
+                      {t('Orders.Items')} {/* Translate items label */}
                     </h4>
                     <div className='space-y-3'>
                       {/* Show first item with image */}
@@ -229,7 +241,10 @@ export default async function OrdersPage(props: {
                               {order.items[0].name}
                             </p>
                             <p className='text-xs text-muted-foreground'>
-                              Qty: {order.items[0].quantity}
+                              {t('Orders.Quantity', {
+                                quantity: order.items[0].quantity,
+                              })}{' '}
+                              {/* Translate quantity */}
                             </p>
                           </div>
                         </div>
@@ -238,8 +253,10 @@ export default async function OrdersPage(props: {
                       {/* Item count indicator */}
                       {order.items.length > 1 && (
                         <p className='text-xs text-muted-foreground'>
-                          + {order.items.length - 1} more{' '}
-                          {order.items.length - 1 === 1 ? 'item' : 'items'}
+                          {t('Orders.MoreItems', {
+                            count: order.items.length - 1,
+                          })}{' '}
+                          {/* Translate more items */}
                         </p>
                       )}
                     </div>
@@ -254,12 +271,20 @@ export default async function OrdersPage(props: {
                           order.isPaid ? 'bg-green-500' : 'bg-amber-500'
                         )}
                       ></span>
-                      <span>{order.isPaid ? 'Paid' : 'Payment pending'}</span>
+                      <span>
+                        {order.isPaid
+                          ? t('Orders.Paid')
+                          : t('Orders.PaymentPending')}
+                      </span>{' '}
+                      {/* Translate payment status */}
                     </div>
 
                     <div className='text-xs'>
-                      Expected delivery:{' '}
-                      {formatDateTime(order.expectedDeliveryDate!).dateOnly}
+                      {t('Orders.ExpectedDelivery', {
+                        date: formatDateTime(order.expectedDeliveryDate!)
+                          .dateOnly,
+                      })}{' '}
+                      {/* Translate expected delivery */}
                     </div>
                   </div>
                 </div>
@@ -268,8 +293,11 @@ export default async function OrdersPage(props: {
                 <div className='p-4 bg-background flex items-center justify-between'>
                   <div className='text-xs text-muted-foreground'>
                     {order.isPaid
-                      ? `Paid on ${formatDateTime(order.paidAt!).dateOnly}`
-                      : 'Awaiting payment'}
+                      ? t('Orders.PaidOn', {
+                          date: formatDateTime(order.paidAt!).dateOnly,
+                        }) // Translate paid message
+                      : t('Orders.AwaitingPayment')}{' '}
+                    {/* Translate awaiting payment */}
                   </div>
                   <Link
                     href={`/account/orders/${order._id}`}
@@ -278,7 +306,7 @@ export default async function OrdersPage(props: {
                       'gap-1'
                     )}
                   >
-                    View Details
+                    {t('Orders.ViewDetails')} {/* Translate button */}
                     <ChevronRight className='h-3 w-3' />
                   </Link>
                 </div>
@@ -294,10 +322,12 @@ export default async function OrdersPage(props: {
           )}
         </>
       )}
-
       {/* Browsing History */}
       <div className='mt-16'>
-        <h2 className='text-xl font-bold mb-4'>Recommended for You</h2>
+        <h2 className='text-xl font-bold mb-4'>
+          {t('Orders.RecommendedForYou')}
+        </h2>{' '}
+        {/* Translate section title */}
         <BrowsingHistoryList />
       </div>
     </div>

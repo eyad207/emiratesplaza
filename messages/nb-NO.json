@@ -234,7 +234,7 @@
     "Details": "Detaljer"
   },
   "Dashboard": {
-    "Hello": "Hei, John",
+    "Hello": "Hei",
     "WelcomeMessage": "Velkommen til ditt kontodashboard",
     "Orders": "Bestillinger",
     "TrackReturnBuy": "Spor, returner eller kjøp ting igjen",
@@ -260,7 +260,11 @@
     "Your Account": "Din konto",
     "Your Orders": "Dine bestillinger",
     "Your Account Settings": "Dine kontoinnstillinger",
-    "Your Browsing History": "Din nettleserhistorikk"
+    "Your Browsing History": "Din nettleserhistorikk",
+    "Orders": "Bestillinger",
+    "TrackReturnBuy": "Spor, returner eller kjøp ting igjen",
+    "LoginSecurity": "Innlogging og sikkerhet",
+    "EditLoginNameMobile": "Rediger innlogging, navn og mobilnummer"
   },
   "Orders": {
     "Your Orders": "Dine bestillinger",
@@ -271,10 +275,27 @@
     "Actions": "Handlinger",
     "Delivered": "Levert",
     "Processing": "Behandler",
-    "Header": {
-      "Your Account": "Din konto"
-    },
+    "NoRecentOrders": "Du har ingen nylige bestillinger",
+    "ContinueShopping": "Fortsett å handle",
+    "Details": "Detaljer",
     "Recommended for You": "Anbefalt for deg",
+    "Order": "Bestilling",
+    "Quantity": "Antall: {quantity}",
+    "ViewAllOrders": "Se alle bestillinger",
+    "Shipped": "Sendt",
+    "NoOrdersYet": "Du har ingen bestillinger ennå.",
+    "StartShopping": "Start shopping",
+    "ViewDetails": "Vis detaljer",
+    "PaidOn": "Betalt den {date}",
+    "AwaitingPayment": "Venter på betaling",
+    "RecommendedForYou": "Anbefalt for deg",
+    "Pending": "Venter",
+    "PaymentPending": "Betaling venter",
+    "TotalAmount": "Totalbeløp",
+    "Items": "Varer",
+    "MoreItems": "+ {count} flere varer",
+    "Paid": "Betalt",
+    "ExpectedDelivery": "Forventet levering: {date}",
     "Error": {
       "View Details": "Vis detaljer"
     }

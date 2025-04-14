@@ -242,11 +242,43 @@
     "Delivered": "Delivered",
     "Processing": "Processing",
     "Recommended for You": "Recommended for You",
+    "NoRecentOrders": "You have no recent orders",
+    "ContinueShopping": "Continue shopping",
+    "Details": "Details",
+    "Order": "Order",
+    "Quantity": "Qty: {quantity}",
+    "MoreItems": "and {count} more items",
+    "ViewAllOrders": "View all orders",
+    "Shipped": "Shipped",
+    "NoOrdersYet": "You have no orders yet.",
+    "StartShopping": "Start Shopping",
+    "ViewDetails": "View Details",
+    "PaidOn": "Paid on {date}",
+    "AwaitingPayment": "Awaiting payment",
+    "RecommendedForYou": "Recommended for You",
+    "PaymentPending": "Payment pending",
+    "TotalAmount": "Total Amount",
+    "Items": "Items",
+    "Paid": "Paid",
+    "ExpectedDelivery": "Expected delivery: {date}",
     "Error": {
       "View Details": "View Details"
     },
     "Header": {
       "Your Account": "Your Account"
     }
+  },
+  "Account": {
+    "Orders": "Orders",
+    "TrackReturnBuy": "Track, return, or buy things again",
+    "LoginSecurity": "Login & security",
+    "EditLoginNameMobile": "Edit login, name, and mobile number",
+    "YourAccount": "Your Account"
+  },
+  "Dashboard": {
+    "Hello": "Hello",
+    "WelcomeMessage": "Welcome to your account dashboard",
+    "RecentOrders": "Recent Orders",
+    "QuickAccess": "Quick access to your latest purchases"
   }
 }
