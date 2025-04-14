@@ -31,9 +31,7 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
       </nav>
 
       {/* Mobile menu - visible below 1000px */}
-      <nav className='nav:hidden flex items-center gap-3'>
-        <CartButton />{' '}
-        {/* Ensure the cart button is next to the hamburger menu */}
+      <nav className='nav:hidden'>
         <Sheet>
           <SheetTrigger className='header-button !p-1.5 rounded-md hover:bg-white/10 transition-colors'>
             <MenuIcon className='h-5 w-5' />
@@ -54,6 +52,7 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
               <div className='space-y-4'>
                 <div className='space-y-3'>
                   <UserButton />
+                  {!forAdmin && <CartButton />}
                 </div>
               </div>
 
