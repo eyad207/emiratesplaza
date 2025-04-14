@@ -10,6 +10,7 @@ const InfiniteProductList = () => {
   const [page, setPage] = useState<number>(1)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [isPending, setIsPending] = useState<boolean>(false)
+  const [isMobile, setIsMobile] = useState<boolean>(false) // Track if it's mobile
   const observer = useRef<IntersectionObserver | null>(null)
 
   const lastProductElementRef = useCallback(
@@ -45,6 +46,16 @@ const InfiniteProductList = () => {
     fetchProducts()
   }, [page])
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024) // Consider 1024px as the breakpoint for mobile
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   return (
     <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2 lg:gap-7'>
       {allProducts.map((product, index) => (
@@ -55,7 +66,7 @@ const InfiniteProductList = () => {
         >
           <ProductCard
             product={product}
-            hideAddToCartButton={true}
+            hideAddToCartButton={isMobile} // Hide "Add to Cart" button for mobile
             hideBrandOnMobile={true}
             isInInfiniteList={true} // Apply new styling for infinite list
             className='lg:w-[30vw]'

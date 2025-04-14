@@ -1,8 +1,8 @@
 export const i18n = {
   locales: [
+    { code: 'nb-NO', name: 'Norsk', icon: '🇳🇴', direction: 'ltr' },
     { code: 'en-US', name: 'English', icon: '🇺🇸', direction: 'ltr' },
     { code: 'ar', name: 'العربية', icon: '🇸🇦', direction: 'rtl' },
-    { code: 'nb-NO', name: 'Norsk', icon: '🇳🇴', direction: 'ltr' },
   ],
   defaultLocale: 'nb-NO',
 }
