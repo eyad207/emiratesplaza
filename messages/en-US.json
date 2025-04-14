@@ -231,5 +231,22 @@
     "Status": "Status",
     "Actions": "Actions",
     "Details": "Details"
+  },
+  "Orders": {
+    "Your Orders": "Your Orders",
+    "Order ID": "Order ID",
+    "Date": "Date",
+    "Total": "Total",
+    "Status": "Status",
+    "Actions": "Actions",
+    "Delivered": "Delivered",
+    "Processing": "Processing",
+    "Recommended for You": "Recommended for You",
+    "Error": {
+      "View Details": "View Details"
+    },
+    "Header": {
+      "Your Account": "Your Account"
+    }
   }
 }

@@ -36,9 +36,13 @@ export default function LanguageSwitcher() {
       <DropdownMenuTrigger className='header-button h-[41px]'>
         <div className='flex items-center gap-1'>
           <span className='text-xl'>
-            {locales.find((l) => l.code === locale)?.icon}
+            {locales.find((l) => l.code === locale)?.icon} {/* Display flag */}
           </span>
-          {locale.toUpperCase().slice(0, 2)}
+          <span className='hidden sm:inline'>
+            {' '}
+            {/* Ensure locale code is visible on PC */}
+            {locale.toUpperCase().slice(0, 2)}
+          </span>
           <ChevronDownIcon />
         </div>
       </DropdownMenuTrigger>
@@ -52,7 +56,8 @@ export default function LanguageSwitcher() {
                 href={pathname}
                 locale={c.code}
               >
-                <span className='text-lg'>{c.icon}</span> {c.name}
+                <span className='text-lg'>{c.icon}</span> {c.name}{' '}
+                {/* Display flag and name */}
               </Link>
             </DropdownMenuRadioItem>
           ))}
