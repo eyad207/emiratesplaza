@@ -11,7 +11,7 @@ export default function BrowsingHistoryList({}: { className?: string }) {
 
   return (
     products.length !== 0 && (
-      <div className='bg-background mt-3 sm:mt-5 md:mt-10'>
+      <div className='mt-3 sm:mt-5 md:mt-10'>
         <Card className='w-full'>
           <CardContent className='p-3 sm:p-4 md:p-6'>
             <div className='space-y-6 md:space-y-10'>
