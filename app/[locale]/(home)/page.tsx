@@ -107,7 +107,7 @@ export default async function HomePage() {
       </div>
 
       <div className='px-2 sm:px-3 md:p-4 bg-border'>
-        <h2 className='font-bold text-xl py-4'>{t('See More')}</h2>
+        <h2 className='font-bold text-xl py-4'>See More</h2>
         <InfiniteProductList />
       </div>
     </div>

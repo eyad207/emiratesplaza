@@ -18,7 +18,6 @@ import { formatDateTime } from '@/lib/utils'
 import { IOrderList } from '@/types'
 import ProductPrice from '@/components/shared/product/product-price'
 import FilterInput from './FilterInput'
-import { getTranslations } from 'next-intl/server'
 
 export const metadata: Metadata = {
   title: 'Admin Orders',
@@ -27,12 +26,12 @@ export default async function OrdersPage(props: {
   searchParams: Promise<{ page: string; orderId: string }>
 }) {
   const searchParams = await props.searchParams
-  const t = await getTranslations()
+
   const { page = '1', orderId = '' } = searchParams
 
   const session = await auth()
   if (session?.user.role !== 'Admin')
-    throw new Error(t('errors.adminPermissionRequired'))
+    throw new Error('Admin permission required')
 
   const orders = await getAllOrders({
     page: Number(page),
@@ -41,11 +40,11 @@ export default async function OrdersPage(props: {
 
   return (
     <div className='space-y-2'>
-      <h1 className='h1-bold'>{t('orders.title')}</h1>
+      <h1 className='h1-bold'>Orders</h1>
       <FilterInput defaultValue={orderId} />
       <div className='overflow-x-auto'>
         {orders.data.length === 0 ? (
-          <p>{t('orders.noOrdersFound')}</p>
+          <p>No orders found</p>
         ) : (
           <Table>
             <TableHeader>

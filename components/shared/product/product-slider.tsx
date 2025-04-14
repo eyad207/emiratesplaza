@@ -7,7 +7,6 @@ import { IProduct } from '@/lib/db/models/product.model'
 import Link from 'next/link'
 import useEmblaCarousel from 'embla-carousel-react'
 import ProductCard from './product-card'
-import { useTranslations } from 'next-intl'
 
 export default function ProductSlider({
   title,
@@ -22,16 +21,14 @@ export default function ProductSlider({
   linkText?: string
   hideDetails?: boolean
 }) {
-  const t = useTranslations('Home') // Use translations to detect locale
-  const isRTL = t('direction') === 'rtl' // Check if the direction is RTL
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: 'start',
     containScroll: 'trimSnaps',
-    dragFree: false,
-    slidesToScroll: 1,
-    direction: isRTL ? 'rtl' : 'ltr', // Dynamically set direction
+    dragFree: false, // Disable dragFree to ensure one product scroll at a time
+    slidesToScroll: 1, // Scroll 1 slide at a time
     breakpoints: {
+      // Responsive breakpoints
       '(max-width: 1200px)': { slidesToScroll: 1 },
       '(max-width: 768px)': { slidesToScroll: 1 },
       '(max-width: 640px)': { slidesToScroll: 1 },
