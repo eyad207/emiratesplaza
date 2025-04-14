@@ -31,7 +31,14 @@
     "Help": "مساعدة",
     "Site Menu": "قائمة الموقع",
     "Subtotal": "المجموع الفرعي",
-    "Go to cart": "اذهب إلى السلة"
+    "Go to cart": "اذهب إلى السلة",
+    "Your Account": "حسابك",
+    "All Categories": "جميع الفئات",
+    "Search": "بحث",
+    "Contact Us": "اتصل بنا",
+    "Help & Support": "المساعدة والدعم",
+    "Preferences": "التفضيلات",
+    "Menu": "القائمة"
   },
   "Home": {
     "Categories to explore": "فئات للاستكشاف",
@@ -47,7 +54,8 @@
     "Your browsing history": "سجل التصفح الخاص بك",
     "Most Popular Shoes For Sale": "الأحذية الأكثر شعبية للبيع",
     "Best Sellers in T-Shirts": "الأكثر مبيعًا في التيشيرتات",
-    "Best Deals on Wrist Watches": "أفضل العروض على ساعات المعصم"
+    "Best Deals on Wrist Watches": "أفضل العروض على ساعات المعصم",
+    "direction": "rtl"
   },
   "Product": {
     "Added to Cart": "أضيف إلى السلة",
@@ -99,13 +107,16 @@
     "Loading": "جاري التحميل...",
     "Rating": "التقييم",
     "No reviews yet": "لا توجد مراجعات حتى الآن",
-    "Submitting": "جاري الإرسال..."
+    "Submitting": "جاري الإرسال...",
+    "Only X left in stock - order soon": "تبقى {count} فقط في المخزون - اطلب قريبًا",
+    "You can only review products you have purchased": "يمكنك فقط مراجعة المنتجات التي قمت بشرائها"
   },
   "Cart": {
     "Shopping Cart": "عربة التسوق",
     "Price": "السعر",
     "Quantity": "الكمية",
     "items": "العناصر",
+    "item": "عنصر",
     "Your Shopping Cart is empty": "عربة التسوق فارغة.",
     "Your order qualifies for FREE Shipping": "طلبك مؤهل للشحن المجاني.",
     "of eligible items to your order to qualify for FREE Shipping": "من العناصر المؤهلة لطلبك للتأهل للشحن المجاني.",
@@ -123,7 +134,8 @@
     "Proceed to Checkout": "المتابعة إلى الخروج",
     "Delete": "حذف",
     "Update": "تحديث",
-    "Checkout": "الخروج"
+    "Checkout": "الخروج",
+    "Total": "الإجمالي"
   },
   "Search": {
     "for": "لـ",
@@ -178,7 +190,8 @@
   "Error": {
     "Error": "خطأ",
     "Try again": "حاول مرة أخرى",
-    "Back To Home": "العودة إلى الرئيسية"
+    "Back To Home": "العودة إلى الرئيسية",
+    "View Details": "عرض التفاصيل"
   },
   "Admin": {
     "Deleted User": "مستخدم محذوف",
@@ -210,5 +223,22 @@
     "Status": "الحالة",
     "Actions": "الإجراءات",
     "Details": "التفاصيل"
+  },
+  "Orders": {
+    "Your Orders": "طلباتك",
+    "Order ID": "رقم الطلب",
+    "Date": "التاريخ",
+    "Total": "الإجمالي",
+    "Status": "الحالة",
+    "Actions": "الإجراءات",
+    "Delivered": "تم التوصيل",
+    "Processing": "قيد المعالجة",
+    "Recommended for You": "موصى به لك",
+    "Error": {
+      "View Details": "عرض التفاصيل"
+    },
+    "Header": {
+      "Your Account": "حسابك"
+    }
   }
 }

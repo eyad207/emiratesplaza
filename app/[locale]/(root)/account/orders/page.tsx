@@ -1,4 +1,3 @@
-import { Metadata } from 'next'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import Image from 'next/image'
@@ -21,11 +20,7 @@ import ProductPrice from '@/components/shared/product/product-price'
 import { buttonVariants } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-
-const PAGE_TITLE = 'Your Orders'
-export const metadata: Metadata = {
-  title: PAGE_TITLE,
-}
+import { getTranslations } from 'next-intl/server'
 
 export default async function OrdersPage(props: {
   searchParams: Promise<{ page: string }>
@@ -35,6 +30,8 @@ export default async function OrdersPage(props: {
   const orders = await getMyOrders({
     page,
   })
+  const t = await getTranslations('Orders') // Updated namespace for translations
+  const PAGE_TITLE = t('Your Orders') // Use translation for "Your Orders"
 
   // Function to get status badge style
   const getStatusBadge = (
@@ -44,7 +41,7 @@ export default async function OrdersPage(props: {
   ) => {
     if (isDelivered) {
       return {
-        text: 'Delivered',
+        text: t('Delivered'), // Use translation for "Delivered"
         variant:
           'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
       }
@@ -58,7 +55,7 @@ export default async function OrdersPage(props: {
     }
     if (isPaid) {
       return {
-        text: 'Processing',
+        text: t('Processing'), // Use translation for "Processing"
         variant:
           'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300',
       }
@@ -78,7 +75,7 @@ export default async function OrdersPage(props: {
           href='/account'
           className='hover:text-foreground transition-colors'
         >
-          Your Account
+          {t('Header.Your Account')}
         </Link>
         <ChevronRight className='h-4 w-4' />
         <span className='font-medium text-foreground'>{PAGE_TITLE}</span>
@@ -102,11 +99,11 @@ export default async function OrdersPage(props: {
             <Table>
               <TableHeader>
                 <TableRow className='bg-muted/50'>
-                  <TableHead className='w-[120px]'>Order ID</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className='text-right'>Actions</TableHead>
+                  <TableHead className='w-[120px]'>{t('Order ID')}</TableHead>
+                  <TableHead>{t('Date')}</TableHead>
+                  <TableHead>{t('Total')}</TableHead>
+                  <TableHead>{t('Status')}</TableHead>
+                  <TableHead className='text-right'>{t('Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -149,7 +146,7 @@ export default async function OrdersPage(props: {
                           'font-medium'
                         )}
                       >
-                        View Details
+                        {t('Error.View Details')}
                       </Link>
                     </TableCell>
                   </TableRow>
@@ -297,7 +294,7 @@ export default async function OrdersPage(props: {
 
       {/* Browsing History */}
       <div className='mt-16'>
-        <h2 className='text-xl font-bold mb-4'>Recommended for You</h2>
+        <h2 className='text-xl font-bold mb-4'>{t('Recommended for You')}</h2>
         <BrowsingHistoryList />
       </div>
     </div>

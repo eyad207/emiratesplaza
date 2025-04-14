@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { formatId } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { ChevronRight } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>
@@ -28,6 +29,7 @@ export default async function OrderDetailsPage(props: {
 
   const order = await getOrderById(id)
   if (!order) notFound()
+  const t = await getTranslations()
 
   const session = await auth()
 
@@ -39,28 +41,28 @@ export default async function OrderDetailsPage(props: {
           href='/account'
           className='hover:text-foreground transition-colors'
         >
-          Your Account
+          {t('Header.Your Account')}
         </Link>
         <ChevronRight className='h-4 w-4' />
         <Link
           href='/account/orders'
           className='hover:text-foreground transition-colors'
         >
-          Your Orders
+          {t('Header.Your Orders')}
         </Link>
         <ChevronRight className='h-4 w-4' />
         <span className='font-medium text-foreground'>
-          Order #{formatId(order._id)}
+          {t('Order')} #{formatId(order._id)}
         </span>
       </div>
 
       {/* Order Details Header */}
       <div className='mb-6'>
         <h1 className='text-2xl sm:text-3xl font-bold mb-1'>
-          Order #{order._id}
+          {t('Order')} #{order._id}
         </h1>
         <p className='text-muted-foreground'>
-          Placed on{' '}
+          {t('Placed on')}{' '}
           {new Date(order.createdAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -71,37 +73,49 @@ export default async function OrderDetailsPage(props: {
 
       <Card className='overflow-hidden border-border/40 mb-6'>
         <div className='bg-muted/50 p-4 border-b'>
-          <h2 className='font-semibold'>Order Status</h2>
+          <h2 className='font-semibold'>{t('Order Status')}</h2>
         </div>
         <CardContent className='p-4'>
           <div className='flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between'>
             <div className='space-y-1'>
-              <p className='text-sm text-muted-foreground'>Payment Status</p>
+              <p className='text-sm text-muted-foreground'>
+                {t('Payment Status')}
+              </p>
               <p className='font-medium flex items-center gap-2'>
                 <span
-                  className={`w-2 h-2 rounded-full ${order.isPaid ? 'bg-green-500' : 'bg-amber-500'}`}
+                  className={`w-2 h-2 rounded-full ${
+                    order.isPaid ? 'bg-green-500' : 'bg-amber-500'
+                  }`}
                 ></span>
-                {order.isPaid ? 'Paid' : 'Payment pending'}
+                {order.isPaid ? t('Paid') : t('Payment pending')}
               </p>
             </div>
 
             <div className='space-y-1'>
-              <p className='text-sm text-muted-foreground'>Shipping Status</p>
+              <p className='text-sm text-muted-foreground'>
+                {t('Shipping Status')}
+              </p>
               <p className='font-medium flex items-center gap-2'>
                 <span
-                  className={`w-2 h-2 rounded-full ${order.isShipped ? 'bg-blue-500' : 'bg-gray-400'}`}
+                  className={`w-2 h-2 rounded-full ${
+                    order.isShipped ? 'bg-blue-500' : 'bg-gray-400'
+                  }`}
                 ></span>
-                {order.isShipped ? 'Shipped' : 'Processing'}
+                {order.isShipped ? t('Shipped') : t('Processing')}
               </p>
             </div>
 
             <div className='space-y-1'>
-              <p className='text-sm text-muted-foreground'>Delivery Status</p>
+              <p className='text-sm text-muted-foreground'>
+                {t('Delivery Status')}
+              </p>
               <p className='font-medium flex items-center gap-2'>
                 <span
-                  className={`w-2 h-2 rounded-full ${order.isDelivered ? 'bg-green-500' : 'bg-gray-400'}`}
+                  className={`w-2 h-2 rounded-full ${
+                    order.isDelivered ? 'bg-green-500' : 'bg-gray-400'
+                  }`}
                 ></span>
-                {order.isDelivered ? 'Delivered' : 'Not delivered yet'}
+                {order.isDelivered ? t('Delivered') : t('Not delivered yet')}
               </p>
             </div>
           </div>
@@ -121,7 +135,9 @@ export default async function OrderDetailsPage(props: {
         <Card className='mt-6'>
           <CardContent className='p-4'>
             <div className='flex items-center gap-2 text-sm'>
-              <p className='text-muted-foreground'>Expected delivery by:</p>
+              <p className='text-muted-foreground'>
+                {t('Expected delivery by')}:
+              </p>
               <p className='font-medium'>
                 {new Date(order.expectedDeliveryDate).toLocaleDateString(
                   'en-US',
