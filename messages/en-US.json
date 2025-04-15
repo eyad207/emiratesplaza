@@ -302,9 +302,13 @@
   "Account": {
     "Orders": "Orders",
     "TrackReturnBuy": "Track, return, or buy things again",
-    "LoginSecurity": "Login & security",
-    "EditLoginNameMobile": "Edit login, name, and mobile number",
-    "YourAccount": "Your Account"
+    "LoginSecurity": "Login & Security",
+    "Name": "Name",
+    "Email": "Email",
+    "Password": "Password",
+    "Edit": "Edit",
+    "YourAccount": "Your Account",
+    "Your Account": "Your Account"
   },
   "Dashboard": {
     "Hello": "Hello",

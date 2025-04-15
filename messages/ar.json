@@ -295,8 +295,12 @@
     "Orders": "الطلبات",
     "TrackReturnBuy": "تتبع، إرجاع، أو شراء الأشياء مرة أخرى",
     "LoginSecurity": "تسجيل الدخول والأمان",
-    "EditLoginNameMobile": "تحرير تسجيل الدخول، الاسم، ورقم الجوال",
-    "YourAccount": "حسابك"
+    "Name": "الاسم",
+    "Email": "البريد الإلكتروني",
+    "Password": "كلمة المرور",
+    "Edit": "تعديل",
+    "YourAccount": "حسابك",
+    "Your Account": "حسابك"
   },
   "Dashboard": {
     "Hello": "مرحباً",

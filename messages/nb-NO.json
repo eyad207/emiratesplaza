@@ -264,7 +264,11 @@
     "Orders": "Bestillinger",
     "TrackReturnBuy": "Spor, returner eller kjøp ting igjen",
     "LoginSecurity": "Innlogging og sikkerhet",
-    "EditLoginNameMobile": "Rediger innlogging, navn og mobilnummer"
+    "EditLoginNameMobile": "Rediger innlogging, navn og mobilnummer",
+    "Name": "Navn",
+    "Email": "E-post",
+    "Password": "Passord",
+    "Edit": "Rediger"
   },
   "Orders": {
     "Your Orders": "Dine bestillinger",
