@@ -326,7 +326,6 @@
     "OrderSummary": "Bestillingsoversikt",
     "Tax": "Avgift",
     "Shipping": "Frakt",
-    "Total": "Totalt",
     "PayOrder": "Betal bestilling",
     "MarkAsPaid": "Merk som betalt",
     "MarkAsShipped": "Merk som sendt",
@@ -335,6 +334,7 @@
     "UnmarkAsDelivered": "Fjern merking som levert",
     "Price": "Pris",
     "Color": "Farge",
-    "Size": "Størrelse"
+    "Size": "Størrelse",
+    "Product": "Produkt"
   }
 }
