@@ -79,16 +79,16 @@ export default async function OrdersPage(props: {
           href='/account'
           className='hover:text-foreground transition-colors'
         >
-          {t('Account.YourAccount')} {/* Translate breadcrumb */}
+          {t('Account.Your Account')} {/* Translate breadcrumb */}
         </Link>
         <ChevronRight className='h-4 w-4' />
         <span className='font-medium text-foreground'>
-          {t('Orders.YourOrders')}
+          {t('Orders.Your Orders')}
         </span>{' '}
         {/* Translate title */}
       </div>
       <h1 className='text-2xl sm:text-3xl font-bold mb-6'>
-        {t('Orders.YourOrders')}
+        {t('Orders.Your Orders')}
       </h1>{' '}
       {/* Translate title */}
       {orders.data.length === 0 ? (
@@ -108,9 +108,8 @@ export default async function OrdersPage(props: {
               <TableHeader>
                 <TableRow className='bg-muted/50'>
                   <TableHead className='w-[120px]'>
-                    {t('Orders.OrderID')}
-                  </TableHead>{' '}
-                  {/* Translate table headers */}
+                    {t('Orders.Order ID')}
+                  </TableHead>
                   <TableHead>{t('Orders.Date')}</TableHead>
                   <TableHead>{t('Orders.Total')}</TableHead>
                   <TableHead>{t('Orders.Status')}</TableHead>
@@ -132,7 +131,6 @@ export default async function OrdersPage(props: {
                       <ProductPrice price={order.totalPrice} plain />
                     </TableCell>
                     <TableCell>
-                      {/* Dynamic status badge */}
                       <Badge
                         className={
                           getStatusBadge(
@@ -159,7 +157,7 @@ export default async function OrdersPage(props: {
                           'font-medium'
                         )}
                       >
-                        {t('Orders.ViewDetails')} {/* Translate button */}
+                        {t('Orders.ViewDetails')}
                       </Link>
                     </TableCell>
                   </TableRow>
