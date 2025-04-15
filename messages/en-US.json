@@ -107,6 +107,7 @@
     "See more reviews": "See more reviews",
     "Loading": "Loading ",
     "Rating": "Rating",
+    "You cant add it to cart, change color or size": "You can't add it to cart, change color or size",
     "No reviews yet": "No reviews yet",
     "Submitting": "Submitting...",
     "Only X left in stock - order soon": "Only {count} left in stock - order soon",
@@ -300,14 +301,15 @@
   },
   "Account": {
     "Orders": "Orders",
-    "TrackReturnBuy": "Track, return, or buy things again",
+    "TrackReturnBuy": "Track and check ordered items, or buy things again",
     "LoginSecurity": "Login & Security",
     "Name": "Name",
     "Email": "Email",
     "Password": "Password",
     "Edit": "Edit",
     "YourAccount": "Your Account",
-    "Your Account": "Your Account"
+    "Your Account": "Your Account",
+    "Edit Login Name Mobile": "Edit Login name, email, and password"
   },
   "Dashboard": {
     "Hello": "Hello",

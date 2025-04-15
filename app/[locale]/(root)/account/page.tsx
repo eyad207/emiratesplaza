@@ -31,7 +31,7 @@ export default async function AccountPage() {
     },
     {
       title: t('Account.LoginSecurity'), // Translate title
-      description: t('Account.EditLoginNameMobile'), // Translate description
+      description: t('Account.Edit Login Name Mobile'), // Translate description
       icon: <ShieldCheckIcon className='w-8 h-8 text-primary' />,
       href: '/account/manage',
     },

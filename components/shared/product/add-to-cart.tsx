@@ -40,32 +40,53 @@ export default function AddToCart({
     return sizeObj ? sizeObj.countInStock : 0
   }
 
+  const handleAddToCart = () => {
+    const countInStock = getCountInStockForSelectedSize()
+    if (countInStock === 0) {
+      toast({
+        variant: 'destructive',
+        description: t('Product.You cant add it to cart, change color or size'),
+      })
+      return
+    }
+
+    if (quantity > countInStock) {
+      toast({
+        variant: 'destructive',
+        description: t('Product.Only X left in stock - order soon', {
+          count: countInStock,
+        }),
+      })
+      return
+    }
+
+    try {
+      addItem(item, quantity)
+      toast({
+        description: t('Product.Added to Cart'),
+        action: (
+          <Button
+            className='dark:border dark:border-border/70 dark:hover:border-primary/70'
+            onClick={() => {
+              router.push('/cart')
+            }}
+          >
+            {t('Product.Go to Cart')}
+          </Button>
+        ),
+      })
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        description: error.message,
+      })
+    }
+  }
+
   return minimal ? (
     <Button
       className='rounded-full w-auto font-semibold shadow-sm hover:shadow-md transition-all border-2 border-primary/80 dark:border-primary/60 dark:hover:border-primary'
-      onClick={() => {
-        try {
-          addItem(item, 1)
-          toast({
-            description: t('Product.Added to Cart'),
-            action: (
-              <Button
-                className='dark:border dark:border-border/70 dark:hover:border-primary/70'
-                onClick={() => {
-                  router.push('/cart')
-                }}
-              >
-                {t('Product.Go to Cart')}
-              </Button>
-            ),
-          })
-        } catch (error: any) {
-          toast({
-            variant: 'destructive',
-            description: error.message,
-          })
-        }
-      }}
+      onClick={handleAddToCart}
     >
       {t('Product.Add to Cart')}
     </Button>
@@ -94,23 +115,34 @@ export default function AddToCart({
       <Button
         className='rounded-full w-full'
         type='button'
-        onClick={async () => {
-          try {
-            const itemId = await addItem(item, quantity)
-            router.push(`/cart/${itemId}`)
-          } catch (error: any) {
-            toast({
-              variant: 'destructive',
-              description: error.message,
-            })
-          }
-        }}
+        onClick={handleAddToCart}
       >
         {t('Product.Add to Cart')}
       </Button>
       <Button
         variant='secondary'
         onClick={() => {
+          const countInStock = getCountInStockForSelectedSize()
+          if (countInStock === 0) {
+            toast({
+              variant: 'destructive',
+              description: t(
+                'Product.You cant add it to cart, change color or size'
+              ),
+            })
+            return
+          }
+
+          if (quantity > countInStock) {
+            toast({
+              variant: 'destructive',
+              description: t('Product.Only X left in stock - order soon', {
+                count: countInStock,
+              }),
+            })
+            return
+          }
+
           try {
             addItem(item, quantity)
             router.push(`/checkout`)

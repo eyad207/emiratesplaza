@@ -108,6 +108,7 @@
     "Rating": "التقييم",
     "No reviews yet": "لا توجد مراجعات حتى الآن",
     "Submitting": "جاري الإرسال...",
+    "You cant add it to cart, change color or size": "لا يمكنك إضافته إلى السلة، تغيير اللون أو الحجم",
     "Only X left in stock - order soon": "تبقى {count} فقط في المخزون - اطلب قريبًا",
     "You can only review products you have purchased": "يمكنك فقط مراجعة المنتجات التي قمت بشرائها"
   },
@@ -299,7 +300,8 @@
     "Password": "كلمة المرور",
     "Edit": "تعديل",
     "YourAccount": "حسابك",
-    "Your Account": "حسابك"
+    "Your Account": "حسابك",
+    "Edit Login Name Mobile": "تعديل تسجيل الدخول، الاسم، ورقم الهاتف المحمول"
   },
   "Dashboard": {
     "Hello": "مرحباً",
