@@ -12,12 +12,14 @@ export default function AppInitializer({
   const [rendered, setRendered] = useState(false)
 
   useEffect(() => {
+    useSettingStore.setState({
+      setting, // Move setState here to avoid calling it during render
+    })
     setRendered(true)
   }, [setting])
+
   if (!rendered) {
-    useSettingStore.setState({
-      setting,
-    })
+    return null // Prevent rendering children until state is set
   }
 
   return children
