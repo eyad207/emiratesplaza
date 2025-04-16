@@ -28,6 +28,7 @@ export default function CartSidebar() {
     cart: { items, itemsPrice },
     updateItem,
     removeItem,
+    clearCart,
   } = useCartStore()
   const {
     setting: {
@@ -64,7 +65,7 @@ export default function CartSidebar() {
             transition={{ type: 'spring', damping: 20 }}
             className={cn(
               'fixed top-0 bottom-0 z-50 w-full max-w-[320px] xs:max-w-[350px] bg-background shadow-xl',
-              rtl ? 'right-0' : 'right-0',
+              rtl ? 'left-0' : 'right-0',
               'border-l border-border/30'
             )}
           >
@@ -230,6 +231,16 @@ export default function CartSidebar() {
                   >
                     {t('Cart.Go to Cart')}
                   </Link>
+                  <Button
+                    variant='destructive'
+                    className='w-full'
+                    onClick={() => {
+                      clearCart()
+                      closeSidebar()
+                    }}
+                  >
+                    {t('Cart.Empty Cart')}
+                  </Button>
                 </div>
               </div>
             </div>

@@ -358,3 +358,48 @@ export async function getAllTags() {
       ) as string[]) || []
   )
 }
+
+export async function addItem(
+  productId: string,
+  color: string,
+  size: string,
+  quantity: number
+) {
+  try {
+    await connectToDatabase()
+    const product = await Product.findById(productId)
+
+    if (!product) {
+      throw new Error('Product not found')
+    }
+
+    const selectedColor = product.colors.find((c) => c.color === color)
+    if (!selectedColor) {
+      throw new Error('Selected color not available')
+    }
+
+    const selectedSize = selectedColor.sizes.find((s) => s.size === size)
+    if (!selectedSize) {
+      throw new Error('Selected size not available')
+    }
+
+    if (selectedSize.countInStock < quantity) {
+      throw new Error('Not enough items in stock')
+    }
+
+    // Proceed with adding the item to the cart or desired action
+    selectedSize.countInStock -= quantity
+    await product.save()
+
+    return {
+      success: true,
+      message: 'Item added successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : 'An unknown error occurred',
+    }
+  }
+}
