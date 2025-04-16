@@ -35,10 +35,10 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import CheckoutFooter from './checkout-footer'
 import { ShippingAddress } from '@/types'
 import useIsMounted from '@/hooks/use-is-mounted'
-import Link from 'next/link'
 import useCartStore from '@/hooks/use-cart-store'
 import useSettingStore from '@/hooks/use-setting-store'
 import ProductPrice from '@/components/shared/product/product-price'
+import { useTranslations } from 'next-intl'
 
 const shippingAddressDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -62,11 +62,11 @@ const shippingAddressDefaultValues =
       }
 
 const CheckoutForm = () => {
+  const t = useTranslations('Checkout')
   const { toast } = useToast()
   const router = useRouter()
   const {
     setting: {
-      site,
       availablePaymentMethods,
       defaultPaymentMethod,
       availableDeliveryDates,
@@ -163,11 +163,10 @@ const CheckoutForm = () => {
               className='rounded-full w-full'
               onClick={handleSelectShippingAddress}
             >
-              Ship to this address
+              {t('shipToThisAddress')}
             </Button>
             <p className='text-xs text-center py-2'>
-              Choose a shipping address and payment method in order to calculate
-              shipping, handling, and tax.
+              {t('chooseShippingAddressAndPayment')}
             </p>
           </div>
         )}
@@ -177,52 +176,44 @@ const CheckoutForm = () => {
               className='rounded-full w-full'
               onClick={handleSelectPaymentMethod}
             >
-              Use this payment method
+              {t('useThisPaymentMethod')}
             </Button>
-
             <p className='text-xs text-center py-2'>
-              Choose a payment method to continue checking out. You&apos;ll
-              still have a chance to review and edit your order before it&apos;s
-              final.
+              {t('choosePaymentMethodToContinue')}
             </p>
           </div>
         )}
         {isPaymentMethodSelected && isAddressSelected && (
           <div>
             <Button onClick={handlePlaceOrder} className='rounded-full w-full'>
-              Place Your Order
+              {t('placeYourOrder')}
             </Button>
-            <p className='text-xs text-center py-2'>
-              By placing your order, you agree to {site.name}&apos;s{' '}
-              <Link href='/page/privacy-policy'>privacy notice</Link> and
-              <Link href='/page/conditions-of-use'> conditions of use</Link>.
-            </p>
           </div>
         )}
 
         <div>
-          <div className='text-lg font-bold'>Order Summary</div>
+          <div className='text-lg font-bold'>{t('orderSummary')}</div>
           <div className='space-y-2'>
             <div className='flex justify-between'>
-              <span>Items:</span>
+              <span>{t('items')}:</span>
               <span>
                 <ProductPrice price={itemsPrice} plain />
               </span>
             </div>
             <div className='flex justify-between'>
-              <span>Shipping & Handling:</span>
+              <span>{t('shippingHandling')}:</span>
               <span>
                 {shippingPrice === undefined ? (
                   '--'
                 ) : shippingPrice === 0 ? (
-                  'FREE'
+                  t('free')
                 ) : (
                   <ProductPrice price={shippingPrice} plain />
                 )}
               </span>
             </div>
             <div className='flex justify-between'>
-              <span> Tax:</span>
+              <span>{t('tax')}:</span>
               <span>
                 {taxPrice === undefined ? (
                   '--'
@@ -232,7 +223,7 @@ const CheckoutForm = () => {
               </span>
             </div>
             <div className='flex justify-between  pt-4 font-bold text-lg'>
-              <span> Order Total:</span>
+              <span>{t('orderTotal')}:</span>
               <span>
                 <ProductPrice price={totalPrice} plain />
               </span>
@@ -253,7 +244,7 @@ const CheckoutForm = () => {
               <div className='grid grid-cols-1 md:grid-cols-12    my-3  pb-3'>
                 <div className='col-span-5 flex text-lg font-bold '>
                   <span className='w-8'>1 </span>
-                  <span>Shipping address</span>
+                  <span>{t('shippingAddress')}</span>
                 </div>
                 <div className='col-span-5 '>
                   <p>
@@ -271,7 +262,7 @@ const CheckoutForm = () => {
                       setIsDeliveryDateSelected(true)
                     }}
                   >
-                    Change
+                    {t('change')}
                   </Button>
                 </div>
               </div>
@@ -279,7 +270,7 @@ const CheckoutForm = () => {
               <>
                 <div className='flex text-primary text-lg font-bold my-2'>
                   <span className='w-8'>1 </span>
-                  <span>Enter shipping address</span>
+                  <span>{t('enterShippingAddress')}</span>
                 </div>
                 <Form {...shippingAddressForm}>
                   <form
@@ -292,7 +283,7 @@ const CheckoutForm = () => {
                     <Card className='md:ml-8 my-4'>
                       <CardContent className='p-4 space-y-2'>
                         <div className='text-lg font-bold mb-2'>
-                          Your address
+                          {t('yourAddress')}
                         </div>
 
                         <div className='flex flex-col gap-5 md:flex-row'>
@@ -301,10 +292,10 @@ const CheckoutForm = () => {
                             name='fullName'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Full Name</FormLabel>
+                                <FormLabel>{t('fullName')}</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter full name'
+                                    placeholder={t('enterFullName')}
                                     {...field}
                                   />
                                 </FormControl>
@@ -319,10 +310,10 @@ const CheckoutForm = () => {
                             name='street'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Address</FormLabel>
+                                <FormLabel>{t('address')}</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter address'
+                                    placeholder={t('enterAddress')}
                                     {...field}
                                   />
                                 </FormControl>
@@ -337,9 +328,12 @@ const CheckoutForm = () => {
                             name='city'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>City</FormLabel>
+                                <FormLabel>{t('city')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder='Enter city' {...field} />
+                                  <Input
+                                    placeholder={t('enterCity')}
+                                    {...field}
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -350,10 +344,10 @@ const CheckoutForm = () => {
                             name='province'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Province</FormLabel>
+                                <FormLabel>{t('province')}</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter province'
+                                    placeholder={t('enterProvince')}
                                     {...field}
                                   />
                                 </FormControl>
@@ -366,10 +360,10 @@ const CheckoutForm = () => {
                             name='country'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Country</FormLabel>
+                                <FormLabel>{t('country')}</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter country'
+                                    placeholder={t('enterCountry')}
                                     {...field}
                                   />
                                 </FormControl>
@@ -384,10 +378,10 @@ const CheckoutForm = () => {
                             name='postalCode'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Postal Code</FormLabel>
+                                <FormLabel>{t('postalCode')}</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter postal code'
+                                    placeholder={t('enterPostalCode')}
                                     {...field}
                                   />
                                 </FormControl>
@@ -400,10 +394,10 @@ const CheckoutForm = () => {
                             name='phone'
                             render={({ field }) => (
                               <FormItem className='w-full'>
-                                <FormLabel>Phone number</FormLabel>
+                                <FormLabel>{t('phoneNumber')}</FormLabel>
                                 <FormControl>
                                   <Input
-                                    placeholder='Enter phone number'
+                                    placeholder={t('enterPhoneNumber')}
                                     {...field}
                                   />
                                 </FormControl>
@@ -418,7 +412,7 @@ const CheckoutForm = () => {
                           type='submit'
                           className='rounded-full font-bold'
                         >
-                          Ship to this address
+                          {t('shipToThisAddress')}
                         </Button>
                       </CardFooter>
                     </Card>
@@ -433,7 +427,7 @@ const CheckoutForm = () => {
               <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
                 <div className='flex text-lg font-bold  col-span-5'>
                   <span className='w-8'>2 </span>
-                  <span>Payment Method</span>
+                  <span>{t('paymentMethod')}</span>
                 </div>
                 <div className='col-span-5 '>
                   <p>{paymentMethod}</p>
@@ -446,7 +440,7 @@ const CheckoutForm = () => {
                       if (paymentMethod) setIsDeliveryDateSelected(true)
                     }}
                   >
-                    Change
+                    {t('change')}
                   </Button>
                 </div>
               </div>
@@ -454,7 +448,7 @@ const CheckoutForm = () => {
               <>
                 <div className='flex text-primary text-lg font-bold my-2'>
                   <span className='w-8'>2 </span>
-                  <span>Choose a payment method</span>
+                  <span>{t('choosePaymentMethod')}</span>
                 </div>
                 <Card className='md:ml-8 my-4'>
                   <CardContent className='p-4'>
@@ -483,7 +477,7 @@ const CheckoutForm = () => {
                       onClick={handleSelectPaymentMethod}
                       className='rounded-full font-bold'
                     >
-                      Use this payment method
+                      {t('useThisPaymentMethod')}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -491,7 +485,7 @@ const CheckoutForm = () => {
             ) : (
               <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
                 <span className='w-8'>2 </span>
-                <span>Choose a payment method</span>
+                <span>{t('choosePaymentMethod')}</span>
               </div>
             )}
           </div>
@@ -501,11 +495,11 @@ const CheckoutForm = () => {
               <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
                 <div className='flex text-lg font-bold  col-span-5'>
                   <span className='w-8'>3 </span>
-                  <span>Items and shipping</span>
+                  <span>{t('itemsAndShipping')}</span>
                 </div>
                 <div className='col-span-5'>
                   <p>
-                    Delivery date:{' '}
+                    {t('deliveryDate')}:{' '}
                     {
                       formatDateTime(
                         calculateFutureDate(
@@ -531,7 +525,7 @@ const CheckoutForm = () => {
                       setIsDeliveryDateSelected(false)
                     }}
                   >
-                    Change
+                    {t('change')}
                   </Button>
                 </div>
               </div>
@@ -539,13 +533,13 @@ const CheckoutForm = () => {
               <>
                 <div className='flex text-primary  text-lg font-bold my-2'>
                   <span className='w-8'>3 </span>
-                  <span>Review items and shipping</span>
+                  <span>{t('reviewItemsAndShipping')}</span>
                 </div>
                 <Card className='md:ml-8'>
                   <CardContent className='p-4'>
                     <p className='mb-2'>
                       <span className='text-lg font-bold text-green-700'>
-                        Arriving{' '}
+                        {t('arriving')}{' '}
                         {
                           formatDateTime(
                             calculateFutureDate(
@@ -555,8 +549,10 @@ const CheckoutForm = () => {
                           ).dateOnly
                         }
                       </span>{' '}
-                      If you order in the next {timeUntilMidnight().hours} hours
-                      and {timeUntilMidnight().minutes} minutes.
+                      {t('orderInNext', {
+                        hours: timeUntilMidnight().hours,
+                        minutes: timeUntilMidnight().minutes,
+                      })}
                     </p>
                     <div className='grid md:grid-cols-2 gap-6'>
                       <div>
@@ -591,7 +587,7 @@ const CheckoutForm = () => {
                               >
                                 <SelectTrigger className='w-24'>
                                   <SelectValue>
-                                    Qty: {item.quantity}
+                                    {t('qty', { quantity: item.quantity })}
                                   </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent position='popper'>
@@ -608,7 +604,7 @@ const CheckoutForm = () => {
                                     </SelectItem>
                                   ))}
                                   <SelectItem key='delete' value='0'>
-                                    Delete
+                                    {t('delete')}
                                   </SelectItem>
                                 </SelectContent>
                               </Select>
@@ -618,7 +614,7 @@ const CheckoutForm = () => {
                       </div>
                       <div>
                         <div className=' font-bold'>
-                          <p className='mb-2'> Choose a shipping speed:</p>
+                          <p className='mb-2'>{t('chooseShippingSpeed')}:</p>
 
                           <ul>
                             <RadioGroup
@@ -655,7 +651,7 @@ const CheckoutForm = () => {
                                       itemsPrice >= dd.freeShippingMinPrice
                                         ? 0
                                         : dd.shippingPrice) === 0 ? (
-                                        'FREE Shipping'
+                                        t('freeShipping')
                                       ) : (
                                         <ProductPrice
                                           price={dd.shippingPrice}
@@ -677,7 +673,7 @@ const CheckoutForm = () => {
             ) : (
               <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
                 <span className='w-8'>3 </span>
-                <span>Items and shipping</span>
+                <span>{t('itemsAndShipping')}</span>
               </div>
             )}
           </div>
@@ -690,24 +686,12 @@ const CheckoutForm = () => {
               <Card className='hidden md:block '>
                 <CardContent className='p-4 flex flex-col md:flex-row justify-between items-center gap-3'>
                   <Button onClick={handlePlaceOrder} className='rounded-full'>
-                    Place Your Order
+                    {t('placeYourOrder')}
                   </Button>
                   <div className='flex-1'>
                     <p className='font-bold text-lg'>
-                      Order Total: <ProductPrice price={totalPrice} plain />
-                    </p>
-                    <p className='text-xs'>
-                      {' '}
-                      By placing your order, you agree to {
-                        site.name
-                      }&apos;s{' '}
-                      <Link href='/page/privacy-policy'>privacy notice</Link>{' '}
-                      and
-                      <Link href='/page/conditions-of-use'>
-                        {' '}
-                        conditions of use
-                      </Link>
-                      .
+                      {t('orderTotal')}:{' '}
+                      <ProductPrice price={totalPrice} plain />
                     </p>
                   </div>
                 </CardContent>
