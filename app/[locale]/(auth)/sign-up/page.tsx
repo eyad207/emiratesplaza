@@ -5,6 +5,7 @@ import { auth } from '@/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 import SignUpForm from './signup-form'
+import { getTranslations } from 'next-intl/server'
 
 export const metadata: Metadata = {
   title: 'Sign Up',
@@ -24,11 +25,13 @@ export default async function SignUpPage(props: {
     return redirect(callbackUrl || '/')
   }
 
+  const t = await getTranslations('SignUp')
+
   return (
     <div className='w-full'>
       <Card>
         <CardHeader>
-          <CardTitle className='text-2xl'>Create account</CardTitle>
+          <CardTitle className='text-2xl'>{t('CreateAccount')}</CardTitle>
         </CardHeader>
         <CardContent>
           <SignUpForm />

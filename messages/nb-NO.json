@@ -396,5 +396,62 @@
     "returnPolicy": "Innen 30 dager etter levering kan du returnere nye, uåpnede varer i original stand. Unntak og begrensninger gjelder.",
     "seeReturnsPolicy": "Se {siteName}s Returpolicy.",
     "and": "og"
+  },
+  "SignIn": {
+    "SignIn": "Logg inn",
+    "NewToSite": "Ny på {siteName}?",
+    "CreateAccount": "Opprett din {siteName}-konto",
+    "Email": "E-post",
+    "EnterEmail": "Skriv inn e-postadresse",
+    "Password": "Passord",
+    "EnterPassword": "Skriv inn passord",
+    "ForgotPassword": "Glemt passord?",
+    "ResetItHere": "Tilbakestill det her",
+    "BySigningIn": "Ved å logge inn, godtar du {siteName}s",
+    "ConditionsOfUse": "Bruksvilkår",
+    "PrivacyNotice": "Personvernerklæring",
+    "InvalidEmailOrPassword": "Ugyldig e-post eller passord",
+    "Error": "Feil",
+    "and": "og"
+  },
+  "SignUp": {
+    "CreateAccount": "Opprett konto",
+    "Name": "Navn",
+    "EnterName": "Skriv inn navn",
+    "Email": "E-post",
+    "EnterEmail": "Skriv inn e-postadresse",
+    "Password": "Passord",
+    "EnterPassword": "Skriv inn passord",
+    "ConfirmPassword": "Bekreft passord",
+    "EnterConfirmPassword": "Bekreft passordet",
+    "SignUp": "Registrer deg",
+    "ByCreatingAccount": "Ved å opprette en konto, godtar du {siteName}s",
+    "ConditionsOfUse": "Bruksvilkår",
+    "PrivacyNotice": "Personvernerklæring",
+    "AlreadyHaveAccount": "Har du allerede en konto?",
+    "SignIn": "Logg inn",
+    "Error": "Feil",
+    "FailedToSendVerificationCode": "Kunne ikke sende bekreftelseskode",
+    "and": "og"
+  },
+  "ForgotPassword": {
+    "ForgotPassword": "Glemt passord",
+    "Email": "E-post",
+    "EnterEmail": "Skriv inn e-postadresse",
+    "SignIn": "Logg inn?",
+    "Error": "Feil",
+    "Success": "Suksess",
+    "PasswordResetEmailSent": "E-post for tilbakestilling av passord sendt",
+    "FailedToSendEmail": "Kunne ikke sende e-post for tilbakestilling av passord"
+  },
+  "ResetPassword": {
+    "UserNotFound": "Bruker ikke funnet",
+    "PasswordResetSuccessfully": "Passord tilbakestilt",
+    "UnknownErrorOccurred": "En ukjent feil oppstod"
+  },
+  "Email": {
+    "VerificationCodePreview": "Din bekreftelseskode",
+    "Welcome": "Velkommen, {firstName}!",
+    "YourVerificationCode": "Din bekreftelseskode er:"
   }
 }

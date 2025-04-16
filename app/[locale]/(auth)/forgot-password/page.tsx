@@ -15,10 +15,11 @@ import { UserEmailSchema } from '@/lib/validator'
 import { sendResetPasswordEmail } from '@/lib/actions/user.actions'
 import { useRouter } from 'next/navigation'
 import EmailButton from '@/components/EmailButton'
-////////
+import { useTranslations } from 'next-intl'
 
 export default function ForgotPasswordPage() {
   const router = useRouter()
+  const t = useTranslations('ForgotPassword')
 
   const form = useForm({
     resolver: zodResolver(UserEmailSchema),
@@ -33,21 +34,21 @@ export default function ForgotPasswordPage() {
       const res = await sendResetPasswordEmail(data.email)
       if (!res.success) {
         toast({
-          title: 'Error',
+          title: t('Error'),
           description: res.message,
           variant: 'destructive',
         })
         return
       }
       toast({
-        title: 'Success',
-        description: 'Password reset email sent successfully',
+        title: t('Success'),
+        description: t('PasswordResetEmailSent'),
         variant: 'default',
       })
     } catch {
       toast({
-        title: 'Error',
-        description: 'Failed to send password reset email',
+        title: t('Error'),
+        description: t('FailedToSendEmail'),
         variant: 'destructive',
       })
     }
@@ -58,7 +59,7 @@ export default function ForgotPasswordPage() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
           <h1 className='text-2xl font-bold bg-orange-400 py-2 text-center rounded-xl mb-5'>
-            Forgot Password
+            {t('ForgotPassword')}
           </h1>
         </div>
         <div className='space-y-6'>
@@ -67,9 +68,9 @@ export default function ForgotPasswordPage() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('Email')}</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter email address' {...field} />
+                  <Input placeholder={t('EnterEmail')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -85,7 +86,7 @@ export default function ForgotPasswordPage() {
               onClick={() => router.push('/sign-in')}
               className='text-blue-600 hover:underline'
             >
-              Sign-in?
+              {t('SignIn')}
             </button>
           </div>
         </div>

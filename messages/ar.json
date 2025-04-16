@@ -366,5 +366,61 @@
     "returnPolicy": "في غضون 30 يومًا من التسليم، يمكنك إرجاع البضائع الجديدة وغير المفتوحة في حالتها الأصلية. تنطبق الاستثناءات والقيود.",
     "seeReturnsPolicy": "راجع سياسة الإرجاع الخاصة بـ {siteName}.",
     "and": "و"
+  },
+  "SignIn": {
+    "SignIn": "تسجيل الدخول",
+    "NewToSite": "جديد على {siteName}؟",
+    "CreateAccount": "أنشئ حسابك على {siteName}",
+    "Email": "البريد الإلكتروني",
+    "EnterEmail": "أدخل البريد الإلكتروني",
+    "Password": "كلمة المرور",
+    "EnterPassword": "أدخل كلمة المرور",
+    "ForgotPassword": "هل نسيت كلمة المرور؟",
+    "ResetItHere": "قم بإعادة تعيينها هنا",
+    "BySigningIn": "بتسجيل الدخول، فإنك توافق على {siteName}",
+    "ConditionsOfUse": "شروط الاستخدام",
+    "PrivacyNotice": "إشعار الخصوصية",
+    "InvalidEmailOrPassword": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "Error": "خطأ",
+    "and": "و"
+  },
+  "SignUp": {
+    "CreateAccount": "إنشاء حساب",
+    "Name": "الاسم",
+    "EnterName": "أدخل الاسم",
+    "Email": "البريد الإلكتروني",
+    "EnterEmail": "أدخل البريد الإلكتروني",
+    "Password": "كلمة المرور",
+    "EnterPassword": "أدخل كلمة المرور",
+    "ConfirmPassword": "تأكيد كلمة المرور",
+    "EnterConfirmPassword": "أكد كلمة المرور",
+    "SignUp": "اشتراك",
+    "ByCreatingAccount": "بإنشاء حساب، فإنك توافق على {siteName}",
+    "ConditionsOfUse": "شروط الاستخدام",
+    "PrivacyNotice": "إشعار الخصوصية",
+    "AlreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "SignIn": "تسجيل الدخول",
+    "Error": "خطأ",
+    "FailedToSendVerificationCode": "فشل في إرسال رمز التحقق"
+  },
+  "ForgotPassword": {
+    "ForgotPassword": "نسيت كلمة المرور",
+    "Email": "البريد الإلكتروني",
+    "EnterEmail": "أدخل البريد الإلكتروني",
+    "SignIn": "تسجيل الدخول؟",
+    "Error": "خطأ",
+    "Success": "نجاح",
+    "PasswordResetEmailSent": "تم إرسال بريد إعادة تعيين كلمة المرور بنجاح",
+    "FailedToSendEmail": "فشل في إرسال بريد إعادة تعيين كلمة المرور"
+  },
+  "ResetPassword": {
+    "UserNotFound": "المستخدم غير موجود",
+    "PasswordResetSuccessfully": "تم إعادة تعيين كلمة المرور بنجاح",
+    "UnknownErrorOccurred": "حدث خطأ غير معروف"
+  },
+  "Email": {
+    "VerificationCodePreview": "رمز التحقق الخاص بك",
+    "Welcome": "مرحباً، {firstName}!",
+    "YourVerificationCode": "رمز التحقق الخاص بك هو:"
   }
 }

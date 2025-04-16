@@ -375,5 +375,61 @@
     "returnPolicy": "Within 30 days of delivery, you may return new, unopened merchandise in its original condition. Exceptions and restrictions apply.",
     "seeReturnsPolicy": "See {siteName}'s Returns Policy.",
     "and": "and"
+  },
+  "SignIn": {
+    "SignIn": "Sign In",
+    "NewToSite": "New to {siteName}?",
+    "CreateAccount": "Create your {siteName} account",
+    "Email": "Email",
+    "EnterEmail": "Enter email address",
+    "Password": "Password",
+    "EnterPassword": "Enter password",
+    "ForgotPassword": "Forgot Password?",
+    "ResetItHere": "Reset it here",
+    "BySigningIn": "By signing in, you agree to {siteName}'s",
+    "ConditionsOfUse": "Conditions of Use",
+    "PrivacyNotice": "Privacy Notice",
+    "InvalidEmailOrPassword": "Invalid email or password",
+    "Error": "Error",
+    "and": "and"
+  },
+  "SignUp": {
+    "CreateAccount": "Create account",
+    "Name": "Name",
+    "EnterName": "Enter name",
+    "Email": "Email",
+    "EnterEmail": "Enter email address",
+    "Password": "Password",
+    "EnterPassword": "Enter password",
+    "ConfirmPassword": "Confirm Password",
+    "EnterConfirmPassword": "Confirm your password",
+    "SignUp": "Sign Up",
+    "ByCreatingAccount": "By creating an account, you agree to {siteName}'s",
+    "ConditionsOfUse": "Conditions of Use",
+    "PrivacyNotice": "Privacy Notice",
+    "AlreadyHaveAccount": "Already have an account?",
+    "SignIn": "Sign In",
+    "Error": "Error",
+    "FailedToSendVerificationCode": "Failed to send verification code"
+  },
+  "ForgotPassword": {
+    "ForgotPassword": "Forgot Password",
+    "Email": "Email",
+    "EnterEmail": "Enter email address",
+    "SignIn": "Sign-in?",
+    "Error": "Error",
+    "Success": "Success",
+    "PasswordResetEmailSent": "Password reset email sent successfully",
+    "FailedToSendEmail": "Failed to send password reset email"
+  },
+  "ResetPassword": {
+    "UserNotFound": "User not found",
+    "PasswordResetSuccessfully": "Password reset successfully",
+    "UnknownErrorOccurred": "An unknown error occurred"
+  },
+  "Email": {
+    "VerificationCodePreview": "Your Verification Code",
+    "Welcome": "Welcome, {firstName}!",
+    "YourVerificationCode": "Your verification code is:"
   }
 }

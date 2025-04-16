@@ -20,6 +20,7 @@ import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignInSchema } from '@/lib/validator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
+import { useTranslations } from 'next-intl'
 
 export default function CredentialsSignInForm() {
   const {
@@ -28,6 +29,7 @@ export default function CredentialsSignInForm() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams?.get('callbackUrl') || '/'
   const router = useRouter()
+  const t = useTranslations('SignIn')
 
   const form = useForm<IUserSignIn>({
     resolver: zodResolver(UserSignInSchema),
@@ -51,8 +53,8 @@ export default function CredentialsSignInForm() {
         throw error
       }
       toast({
-        title: 'Error',
-        description: 'Invalid email or password',
+        title: t('Error'),
+        description: t('InvalidEmailOrPassword'),
         variant: 'destructive',
       })
     }
@@ -68,9 +70,9 @@ export default function CredentialsSignInForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('Email')}</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter email address' {...field} />
+                  <Input placeholder={t('EnterEmail')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -82,11 +84,11 @@ export default function CredentialsSignInForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('Password')}</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='Enter password'
+                    placeholder={t('EnterPassword')}
                     {...field}
                   />
                 </FormControl>
@@ -96,34 +98,34 @@ export default function CredentialsSignInForm() {
           />
 
           <div>
-            <Button type='submit'>Sign In</Button>
+            <Button type='submit'>{t('SignIn')}</Button>
           </div>
           <div className='text-sm'>
-            <span className='mr-1'> Forgot Password?</span>
+            <span className='mr-1'>{t('ForgotPassword')}</span>
             <button
               type='button'
               onClick={() => router.push('/forgot-password')}
               className='text-blue-600 hover:underline'
             >
-              Reset it here
+              {t('ResetItHere')}
             </button>
           </div>
           <div className='text-sm'>
-            By signing in, you agree to {site.name}&apos;s{' '}
+            {t('BySigningIn', { siteName: site.name })}{' '}
             <button
               type='button'
               onClick={() => router.push('/page/conditions-of-use')}
               className='text-blue-600 hover:underline'
             >
-              Conditions of Use
+              {t('ConditionsOfUse')}
             </button>{' '}
-            and{' '}
+            {t('and')}{' '}
             <button
               type='button'
               onClick={() => router.push('/page/privacy-policy')}
               className='text-blue-600 hover:underline'
             >
-              Privacy Notice.
+              {t('PrivacyNotice')}
             </button>
           </div>
         </div>
