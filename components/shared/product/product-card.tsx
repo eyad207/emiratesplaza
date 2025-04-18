@@ -107,7 +107,7 @@ const ProductCard = ({
   )
 
   const AddButton = () => (
-    <div className='w-full text-center transform transition-all duration-300 hover:scale-105 pb-1 hidden lg:block'>
+    <div className='w-full text-center transform transition-all duration-300 hover:scale-105 pb-1 lg:block'>
       <AddToCart
         minimal
         item={{
