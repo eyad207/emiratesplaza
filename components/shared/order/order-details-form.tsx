@@ -6,7 +6,6 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -264,6 +263,20 @@ export default function OrderDetailsForm({
                   ? t('Orders.UnmarkAsDelivered')
                   : t('Orders.MarkAsDelivered')}
               </Button>
+            )}
+            {isAdmin && (
+              <Card>
+                <CardContent className='p-4 space-y-4'>
+                  <h2 className='text-xl pb-2'>Admin Notepad</h2>
+                  <textarea
+                    className='w-full h-32 p-2 border rounded-md'
+                    placeholder='Write internal notes about this order...'
+                  />
+                  <Button disabled={isPending}>
+                    {isPending ? 'Saving...' : 'Save Note'}
+                  </Button>
+                </CardContent>
+              </Card>
             )}
           </CardContent>
         </Card>
