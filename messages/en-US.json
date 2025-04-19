@@ -100,12 +100,13 @@
     "Enter title": "Enter title",
     "Comment": "Comment",
     "Enter comment": "Enter comment",
+    "Deleted User": "Deleted User",
     "Select a rating": "Select a rating",
     "Please": "Please",
     "sign in": "sign in",
     "to write a review": "to write a review",
     "See more reviews": "See more reviews",
-    "Loading": "Loading ",
+    "Loading": "Loading...",
     "Rating": "Rating",
     "You cant add it to cart, change color or size": "You can't add it to cart, change color or size",
     "No reviews yet": "No reviews yet",
@@ -190,7 +191,7 @@
     "Help": "Help"
   },
   "Loading": {
-    "Loading": "Loading "
+    "Loading": "Loading... "
   },
   "Error": {
     "Error": "Error",

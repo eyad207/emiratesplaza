@@ -13,6 +13,7 @@ import ThemeSwitcher from './theme-switcher'
 import LanguageSwitcher from './language-switcher'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
+import CurrencySwitcher from './currency-switcher'
 
 const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
   const t = useTranslations()
@@ -21,6 +22,7 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
       {/* Desktop menu - visible above 1000px */}
       <nav className='hidden nav:flex items-center gap-3 lg:gap-4'>
         <div className='flex items-center gap-2'>
+          <CurrencySwitcher />
           <LanguageSwitcher />
           <ThemeSwitcher />
         </div>
@@ -63,8 +65,9 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
                   {t('Header.Preferences')}
                 </h3>
                 <div className='space-y-3'>
-                  <ThemeSwitcher />
+                  <CurrencySwitcher />
                   <LanguageSwitcher />
+                  <ThemeSwitcher />
                 </div>
               </div>
 

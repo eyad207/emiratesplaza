@@ -64,6 +64,7 @@
     "DeletedUser": "Slettet bruker",
     "Brand": "Merke",
     "Limited time deal": "Tidsbegrenset tilbud",
+    "Deleted User": "Slettet bruker",
     "Was": "Var",
     "List price": "Listepris",
     "Off": "Avslag",
@@ -106,7 +107,7 @@
     "sign in": "logg inn",
     "to write a review": "for å skrive en anmeldelse",
     "See more reviews": "Se flere anmeldelser",
-    "Loading": "Laster",
+    "Loading": "Laster... ",
     "Rating": "Vurdering",
     "No reviews yet": "Ingen anmeldelser ennå",
     "Submitting": "Sender inn...",
@@ -190,7 +191,7 @@
     "Help": "Hjelp"
   },
   "Loading": {
-    "Loading": "Laster"
+    "Loading": "Laster... "
   },
   "Error": {
     "Error": "Feil",
