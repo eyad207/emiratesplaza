@@ -16,6 +16,10 @@ const links = [
     href: '/admin/products',
   },
   {
+    title: 'Tags',
+    href: '/admin/tags',
+  },
+  {
     title: 'Orders',
     href: '/admin/orders',
   },
@@ -30,10 +34,6 @@ const links = [
   {
     title: 'Settings',
     href: '/admin/settings',
-  },
-  {
-    title: 'Tags',
-    href: '/admin/tags',
   },
 ]
 
