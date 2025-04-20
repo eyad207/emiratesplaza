@@ -62,7 +62,12 @@ const productSchema = new Schema<IProduct>(
       type: Number,
       required: true,
     },
-    tags: [{ type: Schema.Types.ObjectId, ref: 'Tag', default: [] }],
+    tags: [
+      {
+        type: Schema.Types.ObjectId, // Define each element as an ObjectId
+        ref: 'Tag', // Reference the 'Tag' model
+      },
+    ],
     colors: {
       type: [colorSchema],
       default: [],

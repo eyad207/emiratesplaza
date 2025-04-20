@@ -9,10 +9,19 @@ export default function TagsPage() {
   useEffect(() => {
     async function fetchTags() {
       setLoading(true)
-      const response = await fetch('/api/tags')
-      const data = await response.json()
-      if (data.success) setTags(data.tags)
-      setLoading(false)
+      try {
+        const response = await fetch('/api/tags')
+        const data = await response.json()
+        if (data.success && Array.isArray(data.tags)) {
+          setTags(data.tags)
+        } else {
+          console.error('Invalid tags data:', data)
+        }
+      } catch (error) {
+        console.error('Error fetching tags:', error)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchTags()
   }, [])
@@ -20,35 +29,45 @@ export default function TagsPage() {
   const addTag = async () => {
     if (newTag.trim()) {
       setLoading(true)
-      const response = await fetch('/api/tags', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newTag }),
-      })
-      const data = await response.json()
-      if (data.success) {
-        setTags((prev) => [...prev, { name: newTag, _id: data._id }])
-        setNewTag('')
-      } else {
-        alert(data.message)
+      try {
+        const response = await fetch('/api/tags', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newTag }),
+        })
+        const data = await response.json()
+        if (data.success) {
+          setTags((prev) => [...prev, { name: newTag, _id: data._id }])
+          setNewTag('')
+        } else {
+          alert(data.message)
+        }
+      } catch (error) {
+        console.error('Error adding tag:', error)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
   }
 
   const deleteTag = async (tagId: string) => {
     if (confirm('Are you sure you want to delete this tag?')) {
       setLoading(true)
-      const response = await fetch(`/api/tags?id=${tagId}`, {
-        method: 'DELETE',
-      })
-      const data = await response.json()
-      if (data.success) {
-        setTags((prev) => prev.filter((t) => t._id !== tagId))
-      } else {
-        alert(data.message)
+      try {
+        const response = await fetch(`/api/tags?id=${tagId}`, {
+          method: 'DELETE',
+        })
+        const data = await response.json()
+        if (data.success) {
+          setTags((prev) => prev.filter((t) => t._id !== tagId))
+        } else {
+          alert(data.message)
+        }
+      } catch (error) {
+        console.error('Error deleting tag:', error)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
   }
 

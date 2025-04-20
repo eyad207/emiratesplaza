@@ -19,11 +19,14 @@ export default async function handler(
   if (req.method === 'POST') {
     const { name } = req.body
 
-    // Check if the tag name is empty
-    if (!name || name.trim() === '') {
+    // Check if the tag name is empty or not a string
+    if (!name || typeof name !== 'string' || name.trim() === '') {
       return res
         .status(400)
-        .json({ success: false, message: 'Tag name cannot be empty' })
+        .json({
+          success: false,
+          message: 'Tag name must be a non-empty string',
+        })
     }
 
     try {

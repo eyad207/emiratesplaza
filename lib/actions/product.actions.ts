@@ -10,6 +10,7 @@ import { ProductInputSchema, ProductUpdateSchema } from '../validator'
 import { IProductInput } from '@/types'
 import { z } from 'zod'
 import { getSetting } from './setting.actions'
+import mongoose from 'mongoose' // Add this import
 
 // CREATE
 export async function createProduct(data: IProductInput) {
@@ -417,16 +418,20 @@ export async function addItem(
   }
 }
 
-async function resolveTagIds(tagNamesOrIds: string[]) {
-  const tags = (await Tag.find({
+async function resolveTagIds(tagNamesOrIds: string[]): Promise<string[]> {
+  if (!Array.isArray(tagNamesOrIds)) return [] // Ensure the input is an array
+  const tags = await Tag.find({
     $or: [{ name: { $in: tagNamesOrIds } }, { _id: { $in: tagNamesOrIds } }],
-  })) as Array<{ _id: string }>
-  return tags.map((tag) => tag._id.toString())
+  }).lean()
+  return tags.map((tag) =>
+    new mongoose.Types.ObjectId(tag._id as mongoose.Types.ObjectId).toString()
+  ) // Convert _id to string
 }
 
-async function resolveTagId(tagIdOrName: string) {
+async function resolveTagId(tagIdOrName: string): Promise<string | null> {
+  if (!tagIdOrName) return null // Ensure the input is not undefined or null
   const tag = (await Tag.findOne({
     $or: [{ _id: tagIdOrName }, { name: tagIdOrName }],
-  })) as { _id: string } | null
-  return tag ? tag._id.toString() : null
+  }).lean()) as { _id: mongoose.Types.ObjectId } | null // Explicitly type _id as mongoose.Types.ObjectId to avoid type mismatch
+  return tag ? tag._id.toString() : null // Convert _id to string
 }
