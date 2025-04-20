@@ -65,46 +65,50 @@ const ProductCard = ({
     </div>
   )
 
-  const ProductDetails = () => (
-    <div className='flex-1 space-y-2 flex flex-col'>
-      <p
-        className={cn('font-bold text-foreground dark:text-foreground/90', {
-          'hidden sm:block': hideBrandOnMobile,
-        })}
-      >
-        {product.brand}
-      </p>
-      <p
-        className='overflow-hidden text-ellipsis font-medium hover:text-primary transition-colors duration-300 dark:text-foreground/80 dark:hover:text-primary'
-        style={{
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-        }}
-      >
-        {product.name}
-      </p>
-      <div
-        className={cn('flex gap-2 justify-center', {
-          'hidden sm:flex': isInInfiniteList,
-        })}
-      >
-        <Rating rating={product.avgRating} />
-        <span className='font-medium'>
-          ({formatNumber(product.numReviews)})
-        </span>
-      </div>
+  const ProductDetails = () => {
+    const tags = product?.tags || [] // Ensure tags is always an array
 
-      <div className='mt-auto pt-2'>
-        <ProductPrice
-          isDeal={product.tags.includes('todays-deal')}
-          price={product.price}
-          listPrice={product.listPrice}
-          forListing
-        />
+    return (
+      <div className='flex-1 space-y-2 flex flex-col'>
+        <p
+          className={cn('font-bold text-foreground dark:text-foreground/90', {
+            'hidden sm:block': hideBrandOnMobile,
+          })}
+        >
+          {product.brand}
+        </p>
+        <p
+          className='overflow-hidden text-ellipsis font-medium hover:text-primary transition-colors duration-300 dark:text-foreground/80 dark:hover:text-primary'
+          style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
+          {product.name}
+        </p>
+        <div
+          className={cn('flex gap-2 justify-center', {
+            'hidden sm:flex': isInInfiniteList,
+          })}
+        >
+          <Rating rating={product.avgRating} />
+          <span className='font-medium'>
+            ({formatNumber(product.numReviews)})
+          </span>
+        </div>
+
+        <div className='mt-auto pt-2'>
+          <ProductPrice
+            isDeal={tags.includes('todays-deal')}
+            price={product.price}
+            listPrice={product.listPrice}
+            forListing
+          />
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   const AddButton = () => (
     <div className='w-full text-center transform transition-all duration-300 hover:scale-105 pb-1 lg:block'>

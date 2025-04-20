@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import { Card, CardContent } from '../ui/card'
 
 export default function BrowsingHistoryList({}: { className?: string }) {
-  const { products } = useBrowsingHistory()
+  const { products = [] } = useBrowsingHistory() // Ensure products is always an array
   const t = useTranslations('Home')
 
   return (
@@ -46,7 +46,7 @@ function ProductList({
   excludeId?: string
   hideDetails?: boolean
 }) {
-  const { products } = useBrowsingHistory()
+  const { products = [] } = useBrowsingHistory() // Ensure products is always an array
   const [data, setData] = React.useState([])
   useEffect(() => {
     const fetchProducts = async () => {

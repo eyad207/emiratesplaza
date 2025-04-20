@@ -50,7 +50,7 @@ export default async function HomePage() {
       })),
     },
     ...tagsWithProducts.map((tag) => ({
-      title: t(`Explore ${tag.name}`),
+      title: `${tag.name}`,
       items: tag.products.map((product) => ({
         name: product.name,
         image: product.images[0],
@@ -61,6 +61,7 @@ export default async function HomePage() {
         text: t('View All'),
         href: `/search?tag=${tag._id}`,
       },
+      key: `tag-${tag._id}`, // Ensure unique key
     })),
   ]
 
@@ -86,7 +87,7 @@ export default async function HomePage() {
           <HomeCard cards={cards} />
         </div>
         {tagSections.map((section, index) => (
-          <Card key={index} className='w-full'>
+          <Card key={`section-${section.title}-${index}`} className='w-full'>
             <CardContent className='p-2 sm:p-3 md:p-4 items-center gap-3'>
               <ProductSlider
                 title={section.title}

@@ -38,8 +38,8 @@ export default function LanguageSwitcher() {
       <DropdownMenuContent className='w-56'>
         <DropdownMenuLabel>Language</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={locale}>
-          {locales.map((c) => (
-            <DropdownMenuRadioItem key={c.name} value={c.code}>
+          {locales.map((c, index) => (
+            <DropdownMenuRadioItem key={`${c.code}-${index}`} value={c.code}>
               <Link
                 className='w-full flex items-center gap-1'
                 href={pathname}

@@ -64,19 +64,20 @@ export default function ProductSlider({
       <div className='relative px-2 sm:px-6 overflow-hidden'>
         <div className='overflow-hidden scrollbar-hide' ref={emblaRef}>
           <div className='flex gap-2 pl-1 pr-8'>
-            {products.map((product) => (
-              <div
-                key={product._id.toString()}
-                className='w-[75vw] max-w-[280px] sm:w-[45vw] md:w-[30vw] lg:w-[22vw] flex-shrink-0 px-1 sm:px-2'
-              >
-                <ProductCard
-                  product={product}
-                  hideDetails={hideDetails}
-                  hideBorder={false}
-                  className='h-full flex flex-col'
-                />
-              </div>
-            ))}
+            {products?.length > 0 &&
+              products.map((product, index) => (
+                <div
+                  key={`${product._id}-${index}`} // Ensure unique key
+                  className='w-[75vw] max-w-[280px] sm:w-[45vw] md:w-[30vw] lg:w-[22vw] flex-shrink-0 px-1 sm:px-2'
+                >
+                  <ProductCard
+                    product={product}
+                    hideDetails={hideDetails}
+                    hideBorder={false}
+                    className='h-full flex flex-col'
+                  />
+                </div>
+              ))}
           </div>
         </div>
 
