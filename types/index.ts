@@ -28,7 +28,9 @@ export type IReviewDetails = IReviewInput & {
     name: string
   }
 }
-export type IProductInput = z.infer<typeof ProductInputSchema>
+export type IProductInput = z.infer<typeof ProductInputSchema> & {
+  primaryTag?: string // Add primaryTag as an optional field
+}
 
 // Re-export IOrder from the model
 export type { IOrder }

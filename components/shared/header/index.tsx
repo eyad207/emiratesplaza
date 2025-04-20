@@ -3,10 +3,8 @@ import Link from 'next/link'
 import { getAllCategories } from '@/lib/actions/product.actions'
 import Menu from './menu'
 import Search from './search'
-import data from '@/lib/data'
 import Sidebar from './sidebar'
 import { getSetting } from '@/lib/actions/setting.actions'
-import { getTranslations } from 'next-intl/server'
 import { EllipsisVerticalIcon, TagIcon } from 'lucide-react'
 import {
   DropdownMenu,
@@ -14,16 +12,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import Tag from '@/lib/db/models/tag.model'
+import { connectToDatabase } from '@/lib/db'
 
 export default async function Header() {
+  await connectToDatabase()
+  const tags = await Tag.find().sort({ name: 1 }).lean()
   const categories = await getAllCategories()
   const { site } = await getSetting()
-  const t = await getTranslations()
 
   // Popular links to show on mobile
-  const mobileLinks = data.headerMenus.filter((menu) =>
-    ["Today's Deal", 'New Arrivals', 'Best Sellers'].includes(menu.name)
-  )
+  const mobileLinks = tags.slice(0, 3).map((tag) => ({
+    name: tag.name,
+    href: `/search?tag=${tag._id}`,
+  }))
 
   return (
     <header className='bg-header text-white shadow-md w-full'>
@@ -78,13 +80,13 @@ export default async function Header() {
 
           {/* Desktop nav links */}
           <div className='hidden nav:flex items-center flex-wrap gap-x-6 overflow-hidden px-4'>
-            {data.headerMenus.map((menu) => (
+            {tags.map((tag) => (
               <Link
-                href={menu.href}
-                key={menu.href}
+                href={`/search?tag=${tag._id}`}
+                key={String(tag._id)}
                 className='text-sm font-medium whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary hover:text-primary transition-all duration-200'
               >
-                {t('Header.' + menu.name)}
+                {tag.name}
               </Link>
             ))}
           </div>
@@ -98,7 +100,7 @@ export default async function Header() {
                 className='flex items-center whitespace-nowrap text-xs py-1 px-2 hover:bg-primary/10 rounded-md transition-colors'
               >
                 <TagIcon className='h-3 w-3 mr-1' />
-                {t('Header.' + menu.name)}
+                {menu.name}
               </Link>
             ))}
           </div>
@@ -113,18 +115,21 @@ export default async function Header() {
                 align='end'
                 className='min-w-[200px] z-50 rounded-md'
               >
-                {data.headerMenus
+                {tags
                   .filter(
-                    (menu) => !mobileLinks.some((m) => m.name === menu.name)
+                    (tag) => !mobileLinks.some((m) => m.name === tag.name)
                   )
-                  .map((menu) => (
+                  .map((tag) => (
                     <DropdownMenuItem
-                      key={menu.href}
+                      key={String(tag._id)}
                       asChild
                       className='cursor-pointer focus:bg-primary/10'
                     >
-                      <Link href={menu.href} className='w-full py-1.5'>
-                        {t('Header.' + menu.name)}
+                      <Link
+                        href={`/search?tag=${tag._id}`}
+                        className='w-full py-1.5'
+                      >
+                        {tag.name}
                       </Link>
                     </DropdownMenuItem>
                   ))}

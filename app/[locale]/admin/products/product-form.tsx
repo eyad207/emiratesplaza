@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -75,6 +76,18 @@ const ProductForm = ({
   productId?: string
 }) => {
   const router = useRouter()
+  const [availableTags, setAvailableTags] = useState<
+    { name: string; _id: string }[]
+  >([])
+
+  useEffect(() => {
+    async function fetchTags() {
+      const response = await fetch('/api/tags')
+      const data = await response.json()
+      if (data.success) setAvailableTags(data.tags) // Fetch updated tags
+    }
+    fetchTags()
+  }, [])
 
   const form = useForm<IProductInput>({
     resolver:
@@ -442,6 +455,40 @@ const ProductForm = ({
           >
             Add Color
           </Button>
+        </div>
+
+        <div>
+          <FormField
+            control={form.control}
+            name='tags'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <div className='flex flex-wrap gap-2'>
+                    {availableTags.map((tag) => (
+                      <label
+                        key={tag._id}
+                        className='flex items-center space-x-2'
+                      >
+                        <Checkbox
+                          checked={field.value.includes(tag._id)}
+                          onCheckedChange={(checked) => {
+                            const newTags = checked
+                              ? [...field.value, tag._id]
+                              : field.value.filter((t) => t !== tag._id)
+                            field.onChange(newTags)
+                          }}
+                        />
+                        <span>{tag.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div>

@@ -62,7 +62,7 @@ const productSchema = new Schema<IProduct>(
       type: Number,
       required: true,
     },
-    tags: { type: [String], default: ['new arrival'] },
+    tags: [{ type: Schema.Types.ObjectId, ref: 'Tag', default: [] }],
     colors: {
       type: [colorSchema],
       default: [],
@@ -106,6 +106,7 @@ const productSchema = new Schema<IProduct>(
         default: [],
       },
     ],
+    primaryTag: { type: Schema.Types.ObjectId, ref: 'Tag', default: null },
   },
   {
     timestamps: true,

@@ -2,6 +2,7 @@
 
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
+import Tag from '@/lib/db/models/tag.model'
 import { revalidatePath } from 'next/cache'
 import { formatError } from '../utils'
 import { toSlug } from '../utils' // Add this import for toSlug
@@ -15,6 +16,10 @@ export async function createProduct(data: IProductInput) {
   try {
     const product = ProductInputSchema.parse(data)
     await connectToDatabase()
+    product.tags = await resolveTagIds(product.tags)
+    if (product.primaryTag) {
+      product.primaryTag = (await resolveTagId(product.primaryTag)) ?? undefined // Resolve primaryTag ID
+    }
     await Product.create(product)
     revalidatePath('/admin/products')
     return {
@@ -31,6 +36,10 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
   try {
     const product = ProductUpdateSchema.parse(data)
     await connectToDatabase()
+    product.tags = await resolveTagIds(product.tags)
+    if (product.primaryTag) {
+      product.primaryTag = (await resolveTagId(product.primaryTag)) ?? undefined // Resolve primaryTag ID
+    }
     await Product.findByIdAndUpdate(product._id, product)
     revalidatePath('/admin/products')
     return {
@@ -41,6 +50,7 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
     return { success: false, message: formatError(error) }
   }
 }
+
 // DELETE
 export async function deleteProduct(id: string) {
   try {
@@ -56,6 +66,7 @@ export async function deleteProduct(id: string) {
     return { success: false, message: formatError(error) }
   }
 }
+
 // GET ONE PRODUCT BY ID
 export async function getProductById(productId: string) {
   await connectToDatabase()
@@ -186,6 +197,7 @@ export async function getProductsForCard({
     image: string
   }[]
 }
+
 // GET PRODUCTS BY TAG
 export async function getProductsByTag({
   tag,
@@ -211,6 +223,7 @@ export async function getProductBySlug(slug: string) {
   if (!product) throw new Error('Product not found')
   return JSON.parse(JSON.stringify(product)) as IProduct
 }
+
 // GET RELATED PRODUCTS: PRODUCTS WITH SAME CATEGORY
 export async function getRelatedProductsByCategory({
   category,
@@ -402,4 +415,18 @@ export async function addItem(
         error instanceof Error ? error.message : 'An unknown error occurred',
     }
   }
+}
+
+async function resolveTagIds(tagNamesOrIds: string[]) {
+  const tags = (await Tag.find({
+    $or: [{ name: { $in: tagNamesOrIds } }, { _id: { $in: tagNamesOrIds } }],
+  })) as Array<{ _id: string }>
+  return tags.map((tag) => tag._id.toString())
+}
+
+async function resolveTagId(tagIdOrName: string) {
+  const tag = (await Tag.findOne({
+    $or: [{ _id: tagIdOrName }, { name: tagIdOrName }],
+  })) as { _id: string } | null
+  return tag ? tag._id.toString() : null
 }

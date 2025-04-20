@@ -50,7 +50,7 @@ export const ProductInputSchema = z.object({
   isPublished: z.boolean(),
   price: Price('Price'),
   listPrice: Price('List price'),
-  tags: z.array(z.string()).default([]),
+  tags: z.array(MongoId).default([]),
   colors: z.array(ColorSchema).default([]),
   avgRating: z.coerce
     .number()
@@ -68,6 +68,7 @@ export const ProductInputSchema = z.object({
     .number()
     .int()
     .nonnegative('Number of sales must be a non-negative number'),
+  primaryTag: MongoId.optional(), // Add primaryTag as an optional MongoDB ID
 })
 
 export const ProductUpdateSchema = ProductInputSchema.extend({

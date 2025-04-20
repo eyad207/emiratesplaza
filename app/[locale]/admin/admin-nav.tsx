@@ -31,6 +31,10 @@ const links = [
     title: 'Settings',
     href: '/admin/settings',
   },
+  {
+    title: 'Tags',
+    href: '/admin/tags',
+  },
 ]
 
 export function AdminNav({ ...props }: React.HTMLAttributes<HTMLElement>) {
