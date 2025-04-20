@@ -91,13 +91,13 @@ export default async function Header() {
               {t('Header.Customer Service')}
             </Link>
             <Link
-              href='/page/about'
+              href='/page/about-us'
               className='text-sm font-medium whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary hover:text-primary transition-all duration-200'
             >
               {t('Header.About Us')}
             </Link>
             <Link
-              href='/page/contact'
+              href='/page/contact-us'
               className='text-sm font-medium whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary hover:text-primary transition-all duration-200'
             >
               {t('Header.Contact Us')}
