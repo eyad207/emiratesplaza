@@ -18,9 +18,6 @@ export async function createProduct(data: IProductInput) {
     const product = ProductInputSchema.parse(data)
     await connectToDatabase()
     product.tags = await resolveTagIds(product.tags)
-    if (product.primaryTag) {
-      product.primaryTag = (await resolveTagId(product.primaryTag)) ?? undefined // Resolve primaryTag ID
-    }
     await Product.create(product)
     revalidatePath('/admin/products')
     return {
@@ -38,9 +35,6 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
     const product = ProductUpdateSchema.parse(data)
     await connectToDatabase()
     product.tags = await resolveTagIds(product.tags)
-    if (product.primaryTag) {
-      product.primaryTag = (await resolveTagId(product.primaryTag)) ?? undefined // Resolve primaryTag ID
-    }
     await Product.findByIdAndUpdate(product._id, product)
     revalidatePath('/admin/products')
     return {
@@ -426,12 +420,4 @@ async function resolveTagIds(tagNamesOrIds: string[]): Promise<string[]> {
   return tags.map((tag) =>
     new mongoose.Types.ObjectId(tag._id as mongoose.Types.ObjectId).toString()
   ) // Convert _id to string
-}
-
-async function resolveTagId(tagIdOrName: string): Promise<string | null> {
-  if (!tagIdOrName) return null // Ensure the input is not undefined or null
-  const tag = (await Tag.findOne({
-    $or: [{ _id: tagIdOrName }, { name: tagIdOrName }],
-  }).lean()) as { _id: mongoose.Types.ObjectId } | null // Explicitly type _id as mongoose.Types.ObjectId to avoid type mismatch
-  return tag ? tag._id.toString() : null // Convert _id to string
 }
