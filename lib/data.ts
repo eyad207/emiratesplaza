@@ -21,244 +21,6 @@ const users: IUserInput[] = [
     paymentMethod: 'Stripe',
     emailVerified: false,
   },
-  {
-    name: 'Jane',
-    email: 'jane@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Jane Harris',
-      street: '222 Main St',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '1002',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'Cash On Delivery',
-    emailVerified: false,
-  },
-  {
-    name: 'Jack',
-    email: 'jack@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Jack Ryan',
-      street: '333 Main St',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '1003',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'PayPal',
-    emailVerified: false,
-  },
-  {
-    name: 'Sarah',
-    email: 'sarah@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Sarah Smith',
-      street: '444 Main St',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '1005',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'Cash On Delivery',
-    emailVerified: false,
-  },
-  {
-    name: 'Michael',
-    email: 'michael@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'John Alexander',
-      street: '555 Main St',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '1006',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'PayPal',
-    emailVerified: false,
-  },
-  {
-    name: 'Emily',
-    email: 'emily@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Emily Johnson',
-      street: '666 Main St',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10001',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'Stripe',
-    emailVerified: false,
-  },
-  {
-    name: 'Alice',
-    email: 'alice@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Alice Cooper',
-      street: '777 Main St',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10007',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'Cash On Delivery',
-    emailVerified: false,
-  },
-  {
-    name: 'Tom',
-    email: 'tom@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Tom Hanks',
-      street: '888 Main St',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10008',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'Stripe',
-    emailVerified: false,
-  },
-  {
-    name: 'Linda',
-    email: 'linda@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Linda Holmes',
-      street: '999 Main St',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10009',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'PayPal',
-    emailVerified: false,
-  },
-  {
-    name: 'George',
-    email: 'george@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'George Smith',
-      street: '101 First Ave',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10010',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'Stripe',
-    emailVerified: false,
-  },
-  {
-    name: 'Jessica',
-    email: 'jessica@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Jessica Brown',
-      street: '102 First Ave',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10011',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'Cash On Delivery',
-    emailVerified: false,
-  },
-  {
-    name: 'Chris',
-    email: 'chris@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Chris Evans',
-      street: '103 First Ave',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10012',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'PayPal',
-    emailVerified: false,
-  },
-  {
-    name: 'Samantha',
-    email: 'samantha@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Samantha Wilson',
-      street: '104 First Ave',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10013',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'Stripe',
-    emailVerified: false,
-  },
-  {
-    name: 'David',
-    email: 'david@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'David Lee',
-      street: '105 First Ave',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10014',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'Cash On Delivery',
-    emailVerified: false,
-  },
-  {
-    name: 'Anna',
-    email: 'anna@example.com',
-    password: bcrypt.hashSync('123456', 5),
-    role: 'User',
-    address: {
-      fullName: 'Anna Smith',
-      street: '106 First Ave',
-      city: 'New York',
-      province: 'NY',
-      postalCode: '10015',
-      country: 'USA',
-      phone: '123-456-7890',
-    },
-    paymentMethod: 'PayPal',
-    emailVerified: false,
-  },
 ]
 
 const products: IProductInput[] = [
@@ -267,7 +29,7 @@ const products: IProductInput[] = [
     slug: toSlug('Nike Mens Slim-fit Long-Sleeve T-Shirt'),
     category: 'T-Shirts',
     images: ['/images/p11-1.jpg', '/images/p11-2.jpg'],
-    tags: ['new-arrival'],
+    tags: [], // Initialize tags as an empty array
     isPublished: true,
     price: 21.8,
     listPrice: 0,
@@ -313,7 +75,7 @@ const products: IProductInput[] = [
       '/images/p12-3.jpg',
       '/images/p12-4.jpg',
     ],
-    tags: ['featured'],
+    tags: [],
     isPublished: true,
     price: 23.78,
     listPrice: 0,
@@ -356,7 +118,7 @@ const products: IProductInput[] = [
     category: 'T-Shirts',
     brand: 'Jerzees',
     images: ['/images/p13-1.jpg', '/images/p13-2.jpg'],
-    tags: ['best-seller'],
+    tags: [],
     isPublished: true,
     price: 13.86,
     listPrice: 16.03,
@@ -399,7 +161,7 @@ const products: IProductInput[] = [
     category: 'T-Shirts',
     brand: 'Jerzees',
     images: ['/images/p14-1.jpg', '/images/p14-2.jpg'],
-    tags: ['todays-deal'],
+    tags: [],
     isPublished: true,
     price: 26.95,
     listPrice: 46.03,
@@ -442,7 +204,7 @@ const products: IProductInput[] = [
     category: 'T-Shirts',
     brand: ' Muscle Cmdr',
     images: ['/images/p15-1.jpg', '/images/p15-2.jpg'],
-    tags: ['new-arrival', 'featured'],
+    tags: [],
     isPublished: true,
     price: 29.99,
     listPrice: 35.99,
@@ -483,7 +245,7 @@ const products: IProductInput[] = [
     category: 'T-Shirts',
     brand: 'Jerzees',
     images: ['/images/p16-1.jpg', '/images/p16-2.jpg'],
-    tags: ['best-seller', 'todays-deal'],
+    tags: [],
     isPublished: true,
     price: 25.3,
     listPrice: 32.99,
@@ -525,7 +287,7 @@ const products: IProductInput[] = [
     category: 'Jeans',
     brand: 'Silver Jeans Co',
     images: ['/images/p21-1.jpg', '/images/p21-2.jpg'],
-    tags: ['new-arrival'],
+    tags: [],
     isPublished: true,
     price: 95.34,
     listPrice: 0,
@@ -568,7 +330,7 @@ const products: IProductInput[] = [
     category: 'Jeans',
     brand: "Levi's",
     images: ['/images/p22-1.jpg', '/images/p22-2.jpg'],
-    tags: ['featured'],
+    tags: [],
     isPublished: true,
     price: 59.99,
     listPrice: 69.99,
@@ -609,7 +371,7 @@ const products: IProductInput[] = [
     category: 'Jeans',
     brand: 'Essentials',
     images: ['/images/p23-1.jpg', '/images/p23-2.jpg'],
-    tags: ['best-seller'],
+    tags: [],
     isPublished: true,
     price: 38.9,
     listPrice: 45,
@@ -652,7 +414,7 @@ const products: IProductInput[] = [
     category: 'Jeans',
     brand: 'Buffalo David Bitton',
     images: ['/images/p24-1.jpg', '/images/p24-2.jpg'],
-    tags: ['todays-deal'],
+    tags: [],
     isPublished: true,
     price: 69.99,
     listPrice: 100,
@@ -693,7 +455,7 @@ const products: IProductInput[] = [
     category: 'Jeans',
     brand: 'Dickies',
     images: ['/images/p25-1.jpg', '/images/p25-2.jpg'],
-    tags: ['new-arrival', 'featured'],
+    tags: [],
     isPublished: true,
     price: 95.34,
     listPrice: 0,
@@ -734,7 +496,7 @@ const products: IProductInput[] = [
     category: 'Jeans',
     brand: 'Wrangler',
     images: ['/images/p26-1.jpg', '/images/p26-2.jpg'],
-    tags: ['best-seller', 'todays-deal'],
+    tags: [],
     isPublished: true,
     price: 81.78,
     listPrice: 149.99,
@@ -776,7 +538,7 @@ const products: IProductInput[] = [
     category: 'Wrist Watches',
     brand: 'Seiko',
     images: ['/images/p31-1.jpg', '/images/p31-2.jpg'],
-    tags: ['new-arrival'],
+    tags: [],
     isPublished: true,
     price: 530.0,
     listPrice: 0,
@@ -819,7 +581,7 @@ const products: IProductInput[] = [
     category: 'Wrist Watches',
     brand: 'Seiko',
     images: ['/images/p32-1.jpg', '/images/p32-2.jpg'],
-    tags: ['featured'],
+    tags: [],
     isPublished: true,
     price: 375.83,
     listPrice: 400,
@@ -862,7 +624,7 @@ const products: IProductInput[] = [
     category: 'Wrist Watches',
     brand: 'Casio',
     images: ['/images/p33-1.jpg', '/images/p33-2.jpg'],
-    tags: ['best-seller'],
+    tags: [],
     isPublished: true,
     price: 60.78,
     listPrice: 0,
@@ -905,7 +667,7 @@ const products: IProductInput[] = [
     category: 'Wrist Watches',
     brand: 'Casio',
     images: ['/images/p34-1.jpg', '/images/p34-2.jpg'],
-    tags: ['todays-deal'],
+    tags: [],
     isPublished: true,
     price: 34.22,
     listPrice: 54.99,
@@ -946,7 +708,7 @@ const products: IProductInput[] = [
     category: 'Wrist Watches',
     brand: 'Fossil',
     images: ['/images/p35-1.jpg', '/images/p35-2.jpg'],
-    tags: ['new-arrival', 'featured'],
+    tags: [],
     isPublished: true,
     price: 171.22,
     listPrice: 225,
@@ -987,7 +749,7 @@ const products: IProductInput[] = [
     category: 'Wrist Watches',
     brand: 'Fossil',
     images: ['/images/p36-1.jpg', '/images/p36-2.jpg'],
-    tags: ['best-seller', 'todays-deal'],
+    tags: [],
     isPublished: true,
     price: 158.21,
     listPrice: 229.0,
@@ -1029,7 +791,7 @@ const products: IProductInput[] = [
     category: 'Shoes',
     brand: 'adidas',
     images: ['/images/p41-1.jpg', '/images/p41-2.jpg'],
-    tags: ['new-arrival'],
+    tags: [],
     isPublished: true,
     price: 81.99,
     listPrice: 0,
@@ -1072,7 +834,7 @@ const products: IProductInput[] = [
     category: 'Shoes',
     brand: 'ziitop',
     images: ['/images/p42-1.jpg', '/images/p42-2.jpg'],
-    tags: ['featured'],
+    tags: [],
     isPublished: true,
     price: 39.97,
     listPrice: 49.96,
@@ -1115,7 +877,7 @@ const products: IProductInput[] = [
     category: 'Shoes',
     brand: 'Skechers',
     images: ['/images/p43-1.jpg', '/images/p43-2.jpg'],
-    tags: ['best-seller'],
+    tags: [],
     isPublished: true,
     price: 99.99,
     listPrice: 0,
@@ -1158,7 +920,7 @@ const products: IProductInput[] = [
     category: 'Shoes',
     brand: 'DLWKIPV',
     images: ['/images/p44-1.jpg', '/images/p44-2.jpg'],
-    tags: ['todays-deal'],
+    tags: [],
     isPublished: true,
     price: 36.99,
     listPrice: 56.9,
@@ -1199,7 +961,7 @@ const products: IProductInput[] = [
     category: 'Shoes',
     brand: 'ASICS',
     images: ['/images/p45-1.jpg', '/images/p45-2.jpg'],
-    tags: ['new-arrival', 'featured'],
+    tags: [],
     isPublished: true,
     price: 179.95,
     listPrice: 200,
@@ -1242,7 +1004,7 @@ const products: IProductInput[] = [
     category: 'Shoes',
     brand: 'Generic',
     images: ['/images/p46-1.jpg', '/images/p46-2.jpg'],
-    tags: ['best-seller', 'todays-deal'],
+    tags: [],
     isPublished: true,
     price: 32.99,
     listPrice: 80,
@@ -1278,6 +1040,21 @@ const products: IProductInput[] = [
     reviews: [],
   },
 ]
+
+const tags = [
+  { name: 'new-arrival', _id: '1' },
+  { name: 'featured', _id: '2' },
+  { name: 'best-seller', _id: '3' },
+  { name: 'todays-deal', _id: '4' },
+]
+
+// Update products to reference tags by name
+products.forEach((product) => {
+  product.tags = product.tags.map(
+    (tagName) => tags.find((tag) => tag.name === tagName)?._id || tagName
+  )
+})
+
 const reviews = [
   {
     rating: 1,
@@ -1374,16 +1151,42 @@ const reviews = [
 const data: Data = {
   users,
   products,
+  tags, // Include tags in the data export
   reviews,
   webPages: [
     {
       title: 'About Us',
       slug: 'about-us',
-      content: `Welcome to [Your Store Name], your trusted destination for quality products and exceptional service. Our journey began with a mission to bring you the best shopping experience by offering a wide range of products at competitive prices, all in one convenient platform.
+      content: `About Us | EmiratesPlaza
+Welcome to EmiratesPlaza – Your Destination for Quality, Convenience, and Innovation.
 
-At [Your Store Name], we prioritize customer satisfaction and innovation. Our team works tirelessly to curate a diverse selection of items, from everyday essentials to exclusive deals, ensuring there's something for everyone. We also strive to make your shopping experience seamless with fast shipping, secure payments, and excellent customer support.
+At EmiratesPlaza, we’re more than just an online store – we’re a trusted marketplace built with passion, precision, and a strong focus on customer satisfaction. Based in the heart of the UAE, our goal is to bring you a seamless shopping experience that combines quality products, competitive prices, and exceptional service.
 
-As we continue to grow, our commitment to quality and service remains unwavering. Thank you for choosing [Your Store Name]—we look forward to being a part of your journey and delivering value every step of the way.`,
+🌍 Who We Are
+Founded with the vision of redefining e-commerce in the Emirates and beyond, EmiratesPlaza is your go-to platform for everything from daily essentials to luxury finds. We serve customers across the UAE and the region with a curated collection of top brands and unique items from trusted suppliers.
+
+🛍️ What We Offer
+A wide variety of products across categories such as fashion, electronics, home & living, beauty, and more.
+
+Fast and secure checkout with multiple payment options.
+
+Reliable shipping and delivery tracking to keep you informed every step of the way.
+
+An easy-to-use platform with support for multiple languages and devices.
+
+💡 Why Choose EmiratesPlaza?
+Customer-first approach – your satisfaction is our top priority.
+
+Local expertise with a global vision.
+
+Modern technology that powers smart recommendations and secure transactions.
+
+A dedicated team ready to support you whenever you need us.
+
+🤝 Join Our Journey
+Whether you're shopping for yourself or for loved ones, EmiratesPlaza is here to serve you with integrity, style, and care. We're constantly growing and evolving to meet your needs—thank you for being a part of our journey.
+
+Follow us on social media and stay updated on the latest products, offers, and news!`,
       isPublished: true,
     },
     {
@@ -1443,20 +1246,92 @@ We strive to ensure all product descriptions, pricing, and availability informat
     {
       title: 'Customer Service',
       slug: 'customer-service',
-      content: `At [Your Store Name], our customer service team is here to ensure you have the best shopping experience. Whether you need assistance with orders, product details, or returns, we are committed to providing prompt and helpful support.
+      content: `At EmiratesPlaza, we believe that excellent customer service is the foundation of a great shopping experience. Our team is committed to making sure you feel confident, supported, and satisfied every step of the way.
 
-If you have questions or concerns, please reach out to us through our multiple contact options:
-- **Email:** support@example.com
-- **Phone:** +1 (123) 456-7890
-- **Live Chat:** Available on our website for instant assistance
+🧑‍💼 How We Can Help You
+Whether you're placing your first order or returning an item, we’re here to assist you with:
 
-We also provide helpful resources such as order tracking, product guides, and FAQs to assist you with common inquiries. Your satisfaction is our priority, and we’re here to resolve any issues quickly and efficiently. Thank you for choosing us!`,
+Order Management
+Track your order, change your shipping details, or cancel before dispatch.
+
+Returns & Exchanges
+We offer a simple and fair return policy. If you’re not satisfied with your purchase, you can initiate a return within 14 days of delivery.
+
+Product Questions
+Not sure if something is right for you? Reach out to our product specialists for honest advice and details before you buy.
+
+Technical Support
+Having trouble with your account, payment process, or accessing a feature on our website? We’ll help you resolve it quickly.
+
+Complaints & Feedback
+We value your opinion! Share your suggestions, reviews, or concerns to help us serve you better.
+
+📞 Get in Touch
+Live Chat: Available Sunday to Thursday, 9:00 AM – 6:00 PM (GST)
+
+Email: support@emiratesplaza.ae (Replies within 24–48 hours)
+
+Phone: +971-XXX-XXXXXX (During working hours)
+
+WhatsApp: Coming soon for real-time support!
+
+You can also use our Contact Form for non-urgent inquiries.
+
+🕒 Our Support Hours
+Customer Service agents are available:
+
+Sunday to Thursday: 9:00 AM – 6:00 PM (Gulf Standard Time)
+
+Friday & Saturday: Limited support via email only
+
+🔄 Returns & Refund Policy Summary
+Products must be unused and returned in original packaging
+
+Some items (e.g. personal care, food, custom items) may not be returnable
+
+Refunds are processed within 7–10 business days after approval
+
+Return shipping is free for defective or incorrect items
+
+Full return policy available here.
+
+📦 Order Tracking
+To track your order, simply go to the Order Tracking page and enter your Order ID and email address. You’ll receive real-time updates as your package moves through our delivery network.
+
+🛡️ Your Satisfaction, Guaranteed
+If anything goes wrong with your experience, we’ll make it right. From quick replacements to full refunds, we stand behind every product we sell. Shopping with EmiratesPlaza means shopping with confidence.
+
+`,
       isPublished: true,
     },
     {
       title: 'Returns Policy',
       slug: 'returns-policy',
-      content: 'Returns Policy Content',
+      content: `We want you to love your purchase, but if something isn’t right, we’re here to help.
+
+Return Window:
+You can return eligible items within 14 days of receiving your order.
+
+Conditions for Returns:
+
+Items must be unused, unwashed, and in original packaging.
+
+Proof of purchase (order number or receipt) is required.
+
+Certain items (e.g., personal care, customized products, digital items) may be non-returnable for hygiene or legal reasons.
+
+How to Return:
+
+Contact our support team at returns@emiratesplaza.ae with your order number.
+
+Follow the instructions we send for packaging and return shipping.
+
+Once received and inspected, we’ll issue a refund or exchange within 5–10 business days.
+
+Return Shipping:
+Customers are responsible for return shipping unless the item was incorrect or defective.
+
+For more details, visit our Returns Center.`,
       isPublished: true,
     },
     {
@@ -1496,40 +1371,7 @@ We also provide helpful resources such as order tracking, product guides, and FA
       isPublished: true,
     },
   ],
-  headerMenus: [
-    {
-      name: "Today's Deal",
-      href: '/search?tag=todays-deal',
-    },
-    {
-      name: 'New Arrivals',
-      href: '/search?tag=new-arrival',
-    },
-    {
-      name: 'Featured Products',
-      href: '/search?tag=featured',
-    },
-    {
-      name: 'Best Sellers',
-      href: '/search?tag=best-seller',
-    },
-    {
-      name: 'Browsing History',
-      href: '/#browsing-history',
-    },
-    {
-      name: 'Customer Service',
-      href: '/page/customer-service',
-    },
-    {
-      name: 'About Us',
-      href: '/page/about-us',
-    },
-    {
-      name: 'Help',
-      href: '/page/help',
-    },
-  ],
+
   carousels: [
     {
       title: 'Most Popular Shoes For Sale',
@@ -1567,7 +1409,7 @@ We also provide helpful resources such as order tracking, product guides, and FA
         description:
           'EmiratesPlaza is a platform that allows you to buy and sell products online.',
         keywords: 'Spend less, enjoy more',
-        url: 'https://next-mongo-ecommerce-final.vercel.app',
+        url: 'https://www.emiratesplaza.vercel.app',
         logo: '/icons/logo.svg',
         slogan: 'Spend less, enjoy more.',
         author: 'Next Ecommerce',
