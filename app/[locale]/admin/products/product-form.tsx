@@ -30,6 +30,7 @@ import { IProductInput } from '@/types'
 const productDefaultValues: IProductInput =
   process.env.NODE_ENV === 'development'
     ? {
+        product: '',
         name: 'Sample Product',
         slug: 'sample-product',
         category: 'Sample Category',
@@ -48,6 +49,7 @@ const productDefaultValues: IProductInput =
         reviews: [],
       }
     : {
+        product: '',
         name: '',
         slug: '',
         category: '',

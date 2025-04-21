@@ -25,6 +25,7 @@ const users: IUserInput[] = [
 
 const products: IProductInput[] = [
   {
+    product: '',
     name: 'Nike Mens Slim-fit Long-Sleeve T-Shirt',
     slug: toSlug('Nike Mens Slim-fit Long-Sleeve T-Shirt'),
     category: 'T-Shirts',
@@ -66,6 +67,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'Jerzees Long-Sleeve Heavyweight Blend T-Shirt',
     slug: toSlug('Jerzees Long-Sleeve Heavyweight Blend T-Shirt'),
     category: 'T-Shirts',
@@ -113,6 +115,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "Jerzees Men's Long-Sleeve T-Shirt",
     slug: toSlug('Jerzees Men Long-Sleeve T-Shirt'),
     category: 'T-Shirts',
@@ -154,6 +157,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'Decrum Mens Plain Long Sleeve T-Shirt - Comfortable Soft Fashion V Neck Full Sleeves Jersey Shirts',
     slug: toSlug(
       'Decrum Mens Plain Long Sleeve T-Shirt - Comfortable Soft Fashion V Neck Full Sleeves Jersey Shirts'
@@ -197,6 +201,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "Muscle Cmdr Men's Slim Fit Henley Shirt Long&Short Business Sleeve Casual 3 Metal Buton Placket Casual Stylish T-Shirt",
     slug: toSlug(
       "Muscle Cmdr Men's Slim Fit Henley Shirt Long&Short Business Sleeve Casual 3 Metal Buton Placket Casual Stylish T-Shirt"
@@ -240,6 +245,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'Hanes Mens Long Sleeve Beefy Henley Shirt',
     slug: toSlug('Hanes Mens Long Sleeve Beefy Henley Shirt'),
     category: 'T-Shirts',
@@ -282,6 +288,7 @@ const products: IProductInput[] = [
   },
   // Jeans
   {
+    product: '',
     name: 'Silver Jeans Co. Mens Jace Slim Fit Bootcut Jeans',
     slug: toSlug('Silver Jeans Co. Mens Jace Slim Fit Bootcut Jeans'),
     category: 'Jeans',
@@ -323,6 +330,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "Levi's mens 505 Regular Fit Jeans (Also Available in Big & Tall)",
     slug: toSlug(
       "Levi's mens 505 Regular Fit Jeans (Also Available in Big & Tall)"
@@ -366,6 +374,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'Essentials Mens Straight-Fit Stretch Jean',
     slug: toSlug('Essentials Mens Straight-Fit Stretch Jean'),
     category: 'Jeans',
@@ -407,6 +416,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "Buffalo David Bitton Mens Men's Driven Relaxed Denim JeansJeans",
     slug: toSlug(
       "Buffalo David Bitton Mens Men's Driven Relaxed Denim JeansJeans"
@@ -450,6 +460,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'Dickies Mens Relaxed Fit Carpenter Jean',
     slug: toSlug('Dickies Mens Relaxed Fit Carpenter Jean'),
     category: 'Jeans',
@@ -491,6 +502,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'Wrangler mens Premium Performance Cowboy Cut Slim Fit Jean',
     slug: toSlug('Wrangler mens Premium Performance Cowboy Cut Slim Fit Jean'),
     category: 'Jeans',
@@ -533,6 +545,7 @@ const products: IProductInput[] = [
   },
   // Watches
   {
+    product: '',
     name: "Seiko Men's Analogue Watch with Black Dial",
     slug: toSlug("Seiko Men's Analogue Watch with Black Dial"),
     category: 'Wrist Watches',
@@ -574,6 +587,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'SEIKO 5 Sport SRPJ83 Beige Dial Nylon Automatic Watch, Beige, Automatic Watch',
     slug: toSlug(
       'SEIKO 5 Sport SRPJ83 Beige Dial Nylon Automatic Watch, Beige, Automatic Watch'
@@ -617,6 +631,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "Casio Men's Heavy Duty Analog Quartz Stainless Steel Strap, Silver, 42 Casual Watch ",
     slug: toSlug(
       "Casio Men's Heavy Duty Analog Quartz Stainless Steel Strap, Silver, 42 Casual Watch"
@@ -660,6 +675,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'Casio Classic Silver-Tone Stainless Steel Band Date Indicator Watch',
     slug: toSlug(
       'Casio Classic Silver-Tone Stainless Steel Band Date Indicator Watch'
@@ -703,6 +719,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "Fossil Men's Grant Stainless Steel Quartz Chronograph Watch",
     slug: toSlug("Fossil Men's Grant Stainless Steel Quartz Chronograph Watch"),
     category: 'Wrist Watches',
@@ -744,6 +761,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "Fossil Men's Machine Stainless Steel Quartz Watch",
     slug: toSlug("Fossil Men's Machine Stainless Steel Quartz Watch"),
     category: 'Wrist Watches',
@@ -786,6 +804,7 @@ const products: IProductInput[] = [
   },
   // Sneakers
   {
+    product: '',
     name: 'adidas Mens Grand Court 2.0 Training Shoes Training Shoes',
     slug: toSlug('adidas Mens Grand Court 2.0 Training Shoes Training Shoes'),
     category: 'Shoes',
@@ -827,6 +846,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "ziitop Men's Running Walking Shoes Fashion Sneakers Mesh Dress Shoes Business Oxfords Shoes Lightweight Casual Breathable Work Formal Shoes",
     slug: toSlug(
       "ziitop Men's Running Walking Shoes Fashion Sneakers Mesh Dress Shoes Business Oxfords Shoes Lightweight Casual Breathable Work Formal Shoes"
@@ -870,6 +890,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'Skechers mens Summits High Range Hands Free Slip-in Shoes Work shoe',
     slug: toSlug(
       'Skechers mens Summits High Range Hands Free Slip-in Shoes Work shoe'
@@ -913,6 +934,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: 'DLWKIPV Mens Running Shoes Tennis Cross Training Sneakers Fashion Non Slip Outdoor Walking Jogging Shoes Mesh Light Flexible Comfortable Breathable Shoes',
     slug: toSlug(
       'DLWKIPV Mens Running Shoes Tennis Cross Training Sneakers Fashion Non Slip Outdoor Walking Jogging Shoes Mesh Light Flexible Comfortable Breathable Shoes'
@@ -956,6 +978,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "ASICS Men's GT-2000 13 Running Shoes",
     slug: toSlug("ASICS Men's GT-2000 13 Running Shoes"),
     category: 'Shoes',
@@ -997,6 +1020,7 @@ const products: IProductInput[] = [
     reviews: [],
   },
   {
+    product: '',
     name: "Mens Wearbreeze Shoes, Urban - Ultra Comfortable Shoes, Breeze Shoes for Men, Men's Mesh Dress Sneakers Business Shoes",
     slug: toSlug(
       "Mens Wearbreeze Shoes, Urban - Ultra Comfortable Shoes, Breeze Shoes for Men, Men's Mesh Dress Sneakers Business Shoes"
