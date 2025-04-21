@@ -357,6 +357,7 @@ export async function getAllTags() {
   ])
   return (
     (tags[0]?.uniqueTags
+      .filter((tag: unknown) => typeof tag === 'string') // Ensure only strings are processed
       .sort((a: string, b: string) => a.localeCompare(b))
       .map((x: string) =>
         x
