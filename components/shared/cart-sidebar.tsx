@@ -154,7 +154,14 @@ export default function CartSidebar() {
                                 </SelectTrigger>
                                 <SelectContent>
                                   {Array.from({
-                                    length: 10,
+                                    length: Math.min(
+                                      item.colors
+                                        .find((c) => c.color === item.color)
+                                        ?.sizes.find(
+                                          (s) => s.size === item.size
+                                        )?.countInStock || 0,
+                                      10
+                                    ),
                                   }).map((_, i) => (
                                     <SelectItem
                                       value={(i + 1).toString()}
