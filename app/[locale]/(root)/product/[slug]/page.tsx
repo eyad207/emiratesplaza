@@ -5,7 +5,6 @@ import {
   getProductBySlug,
   getRelatedProductsByCategory,
 } from '@/lib/actions/product.actions'
-
 import ReviewList from './review-list'
 import { generateId, round2 } from '@/lib/utils'
 import SelectVariant from '@/components/shared/product/select-variant'
