@@ -68,7 +68,6 @@ export const ProductInputSchema = z.object({
     .number()
     .int()
     .nonnegative('Number of sales must be a non-negative number'),
-  product: z.string(),
 })
 
 export const ProductUpdateSchema = ProductInputSchema.extend({
