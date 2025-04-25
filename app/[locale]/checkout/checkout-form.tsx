@@ -510,8 +510,8 @@ const CheckoutForm = () => {
                     }
                   </p>
                   <ul>
-                    {items.map((item, _index) => (
-                      <li key={_index}>
+                    {items.map((item, index) => (
+                      <li key={`${item.slug}-${index}`}>
                         {item.name} x {item.quantity} = {item.price}
                       </li>
                     ))}
@@ -556,8 +556,11 @@ const CheckoutForm = () => {
                     </p>
                     <div className='grid md:grid-cols-2 gap-6'>
                       <div>
-                        {items.map((item, _index) => (
-                          <div key={_index} className='flex gap-4 py-2'>
+                        {items.map((item, index) => (
+                          <div
+                            key={`${item.slug}-${index}`}
+                            className='flex gap-4 py-2'
+                          >
                             <div className='relative w-16 h-16'>
                               <Image
                                 src={item.image}

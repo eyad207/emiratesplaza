@@ -121,6 +121,13 @@ export default function OrderDetailsForm({
                 <ProductPrice price={totalPrice} plain />
               </span>
             </div>
+            <ul>
+              {items.map((item, index) => (
+                <li key={`${item.slug}-${index}`}>
+                  {item.name} x {item.quantity} = {item.price}
+                </li>
+              ))}
+            </ul>
 
             {!isPaid && paymentMethod === 'PayPal' && (
               <div>

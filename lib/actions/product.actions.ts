@@ -396,8 +396,11 @@ export async function addItem(
       throw new Error('Not enough items in stock')
     }
 
-    // Proceed with adding the item to the cart or desired action
-    selectedSize.countInStock -= quantity
+    // Ensure countInStock does not go below 0
+    selectedSize.countInStock = Math.max(
+      0,
+      selectedSize.countInStock - quantity
+    )
     await product.save()
 
     return {
