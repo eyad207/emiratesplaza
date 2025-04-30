@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import useCartStore from '@/hooks/use-cart-store'
-import { formatCurrency } from '@/lib/utils'
+import useSettingStore from '@/hooks/use-setting-store'
 import { TrashIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -33,11 +33,20 @@ export default function Cart() {
     updateItem,
   } = useCartStore()
 
+  const {
+    setting: { availableCurrencies, currency },
+  } = useSettingStore()
+
   const t = useTranslations()
 
   if (items.length === 0) {
     return <EmptyCart />
   }
+
+  const selectedCurrency = availableCurrencies.find((c) => c.code === currency)
+  const convertRate = selectedCurrency?.convertRate || 1
+  const formatCurrency = (price: number) =>
+    `${(price * convertRate).toFixed(2)} ${selectedCurrency?.symbol || '$'}`
 
   return (
     <div className='container py-6 md:py-8 lg:py-10'>

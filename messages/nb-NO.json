@@ -370,6 +370,8 @@
     "country": "Land",
     "enterCountry": "Skriv inn land",
     "postalCode": "Postnummer",
+    "back": "Tilbake",
+    "next": "Neste",
     "enterPostalCode": "Skriv inn postnummer",
     "phoneNumber": "Telefonnummer",
     "enterPhoneNumber": "Skriv inn telefonnummer",

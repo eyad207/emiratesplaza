@@ -125,6 +125,9 @@
     "Add": "إضافة",
     "Added to cart": "تمت الإضافة إلى السلة",
     "Color": "اللون",
+    "Product": "المنتج",
+    "Continue shopping": "متابعة التسوق",
+    "Order Summary": "ملخص الطلب",
     "Size": "الحجم",
     "Go to Cart": "اذهب إلى السلة",
     "Choose this option at checkout": "اختر هذا الخيار عند الخروج.",
@@ -136,7 +139,7 @@
     "Delete": "حذف",
     "Empty Cart": "أفرغ السلة",
     "Update": "تحديث",
-    "Checkout": "الخروج",
+    "Checkout": "الدفع النهائي",
     "Total": "الإجمالي"
   },
   "Search": {
@@ -330,6 +333,8 @@
     "shippingHandling": "الشحن والمناولة",
     "free": "مجاني",
     "tax": "الضريبة",
+    "back": "العودة إلى السلة",
+    "next": "التالي",
     "orderTotal": "إجمالي الطلب",
     "shippingAddress": "عنوان الشحن",
     "enterShippingAddress": "أدخل عنوان الشحن",
