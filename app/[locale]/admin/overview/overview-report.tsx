@@ -42,7 +42,7 @@ import ProductPrice from '@/components/shared/product/product-price'
 import { Skeleton } from '@/components/ui/skeleton'
 import TableChart from './table-chart'
 import { cn } from '@/lib/utils'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 
 export default function OverviewReport() {
   const t = useTranslations('Admin')
@@ -336,10 +336,6 @@ export default function OverviewReport() {
             <CardHeader className='border-b bg-muted/40 py-4'>
               <div className='flex items-center justify-between'>
                 <CardTitle>{t('Recent Activity')}</CardTitle>
-                <TabsList>
-                  <TabsTrigger value='orders'>Orders</TabsTrigger>
-                  <TabsTrigger value='customers'>Customers</TabsTrigger>
-                </TabsList>
               </div>
             </CardHeader>
 

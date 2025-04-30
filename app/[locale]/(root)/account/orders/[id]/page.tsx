@@ -30,7 +30,7 @@ export default async function OrderDetailsPage(props: {
 
   const t = await getTranslations()
   const order = await getOrderById(id)
-  if (!order) notFound()
+  if (!order || !order.isPaid) notFound() // Redirect if order is not paid
 
   const session = await auth()
 

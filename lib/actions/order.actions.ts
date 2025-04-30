@@ -223,8 +223,12 @@ export async function getAllOrders({
   limit = limit || pageSize
   await connectToDatabase()
   const skipAmount = (Number(page) - 1) * limit
-  const filter =
-    orderId && mongoose.Types.ObjectId.isValid(orderId) ? { _id: orderId } : {}
+  const filter = {
+    isPaid: true, // Only fetch paid orders
+    ...(orderId && mongoose.Types.ObjectId.isValid(orderId)
+      ? { _id: orderId }
+      : {}),
+  }
   const orders = await Order.find(filter)
     .populate('user', 'name')
     .sort({ createdAt: 'desc' })
@@ -255,11 +259,15 @@ export async function getMyOrders({
   const skipAmount = (Number(page) - 1) * limit
   const orders = await Order.find({
     user: session?.user?.id,
+    isPaid: true, // Only fetch paid orders
   })
     .sort({ createdAt: 'desc' })
     .skip(skipAmount)
     .limit(limit)
-  const ordersCount = await Order.countDocuments({ user: session?.user?.id })
+  const ordersCount = await Order.countDocuments({
+    user: session?.user?.id,
+    isPaid: true, // Only count paid orders
+  })
 
   return {
     data: JSON.parse(JSON.stringify(orders)),
@@ -619,6 +627,7 @@ export async function getOrdersByUserId({
   const skipAmount = (Number(page) - 1) * limit
   const filter = {
     user: userId,
+    isPaid: true, // Only fetch paid orders
     ...(orderId && mongoose.Types.ObjectId.isValid(orderId)
       ? { _id: orderId }
       : {}),
