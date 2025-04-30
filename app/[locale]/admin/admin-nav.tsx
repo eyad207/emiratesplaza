@@ -43,7 +43,7 @@ export function AdminNav({ ...props }: React.HTMLAttributes<HTMLElement>) {
   return (
     <nav
       className={cn(
-        'flex items-center justify-around flex-wrap gap-2 md:gap-4',
+        'flex items-center justify-around overflow-scroll flex-wrap gap-2 md:gap-4',
         props.className
       )}
       {...props}
@@ -53,7 +53,7 @@ export function AdminNav({ ...props }: React.HTMLAttributes<HTMLElement>) {
           key={item.href}
           href={item.href}
           className={cn(
-            'px-2.5 py-2 rounded-md text-xs font-medium transition-colors duration-200',
+            'px-2.5 py-2 rounded-md text-s font-medium transition-colors duration-200',
             pathname.includes(item.href)
               ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:bg-muted hover:text-foreground'

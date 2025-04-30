@@ -29,8 +29,8 @@ export default async function AdminLayout({
               <Menu forAdmin />
             </div>
           </div>
-          <div>
-            <AdminNav className='flex md:hidden px-4 pb-2' />
+          <div className='flex md:hidden px-4 pb-2 overflow-scroll'>
+            <AdminNav className='flex md:hidden' />
           </div>
         </div>
         <div className='flex-1 p-4'>{children}</div>
