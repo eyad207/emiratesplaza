@@ -66,17 +66,53 @@ export const createOrderFromCart = async (
 export async function updateOrderToPaid(orderId: string) {
   try {
     await connectToDatabase()
-    const order = await Order.findById(orderId).populate<{
-      user: { email: string; name: string }
-    }>('user', 'name email')
-    if (!order) throw new Error('Order not found')
-    if (order.isPaid) throw new Error('Order is already paid')
-    order.isPaid = true
-    order.paidAt = new Date()
-    await order.save()
-    if (order.user?.email) await sendPurchaseReceipt({ order })
-    revalidatePath(`/account/orders/${orderId}`)
-    return { success: true, message: 'Order paid successfully' }
+    const session = await mongoose.connection.startSession()
+
+    try {
+      session.startTransaction()
+      const opts = { session }
+
+      const order = await Order.findById(orderId).populate<{
+        user: { email: string; name: string }
+      }>('user', 'name email')
+      if (!order) throw new Error('Order not found')
+      if (order.isPaid) throw new Error('Order is already paid')
+
+      // Mark the order as paid
+      order.isPaid = true
+      order.paidAt = new Date()
+      await order.save(opts)
+
+      // Update product stock
+      for (const item of order.items) {
+        const product = await Product.findById(item.product).session(session)
+        if (!product) throw new Error('Product not found')
+
+        const color = product.colors.find((c) => c.color === item.color)
+        if (!color) throw new Error('Color not found')
+
+        const size = color.sizes.find((s) => s.size === item.size)
+        if (!size) throw new Error('Size not found')
+
+        size.countInStock -= item.quantity
+        if (size.countInStock < 0) throw new Error('Insufficient stock')
+
+        await product.save(opts)
+      }
+
+      await session.commitTransaction()
+      session.endSession()
+
+      // Send purchase receipt email
+      if (order.user?.email) await sendPurchaseReceipt({ order })
+
+      revalidatePath(`/account/orders/${orderId}`)
+      return { success: true, message: 'Order paid successfully' }
+    } catch (error) {
+      await session.abortTransaction()
+      session.endSession()
+      throw error
+    }
   } catch (err) {
     return { success: false, message: formatError(err) }
   }
@@ -224,7 +260,10 @@ export async function getAllOrders({
   await connectToDatabase()
   const skipAmount = (Number(page) - 1) * limit
   const filter = {
-    isPaid: true, // Only fetch paid orders
+    $or: [
+      { isPaid: true }, // Include paid orders
+      { paymentMethod: 'Cash On Delivery' }, // Include COD orders
+    ],
     ...(orderId && mongoose.Types.ObjectId.isValid(orderId)
       ? { _id: orderId }
       : {}),
@@ -259,14 +298,20 @@ export async function getMyOrders({
   const skipAmount = (Number(page) - 1) * limit
   const orders = await Order.find({
     user: session?.user?.id,
-    isPaid: true, // Only fetch paid orders
+    $or: [
+      { isPaid: true }, // Include paid orders
+      { paymentMethod: 'Cash On Delivery' }, // Include COD orders
+    ],
   })
     .sort({ createdAt: 'desc' })
     .skip(skipAmount)
     .limit(limit)
   const ordersCount = await Order.countDocuments({
     user: session?.user?.id,
-    isPaid: true, // Only count paid orders
+    $or: [
+      { isPaid: true }, // Include paid orders
+      { paymentMethod: 'Cash On Delivery' }, // Include COD orders
+    ],
   })
 
   return {
@@ -627,7 +672,10 @@ export async function getOrdersByUserId({
   const skipAmount = (Number(page) - 1) * limit
   const filter = {
     user: userId,
-    isPaid: true, // Only fetch paid orders
+    $or: [
+      { isPaid: true }, // Include paid orders
+      { paymentMethod: 'Cash On Delivery' }, // Include COD orders
+    ],
     ...(orderId && mongoose.Types.ObjectId.isValid(orderId)
       ? { _id: orderId }
       : {}),
