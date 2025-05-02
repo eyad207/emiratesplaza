@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select'
 import { ISettingInput } from '@/types'
 import { TrashIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
 
 export default function PaymentMethodForm({
@@ -40,14 +40,33 @@ export default function PaymentMethodForm({
 
   const availablePaymentMethods = watch('availablePaymentMethods')
   const defaultPaymentMethod = watch('defaultPaymentMethod')
+  const [duplicateError, setDuplicateError] = useState<string | null>(null)
 
   useEffect(() => {
-    const validCodes = availablePaymentMethods.map((lang) => lang.name)
-    if (!validCodes.includes(defaultPaymentMethod)) {
+    const validNames = availablePaymentMethods.map((method) => method.name)
+    if (!validNames.includes(defaultPaymentMethod)) {
       setValue('defaultPaymentMethod', '')
+    }
+
+    const duplicates = availablePaymentMethods.filter(
+      (method, index, self) =>
+        self.findIndex((m) => m.name === method.name) !== index
+    )
+
+    if (duplicates.length > 0) {
+      setDuplicateError(
+        'Duplicate payment methods detected. Please ensure all payment methods are unique.'
+      )
+    } else {
+      setDuplicateError(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(availablePaymentMethods)])
+
+  const uniquePaymentMethods = availablePaymentMethods.filter(
+    (method, index, self) =>
+      index === self.findIndex((m) => m.name === method.name) && method.name
+  )
 
   return (
     <Card id={id}>
@@ -55,9 +74,12 @@ export default function PaymentMethodForm({
         <CardTitle>Payment Methods</CardTitle>
       </CardHeader>
       <CardContent className='space-y-4'>
+        {duplicateError && (
+          <div className='text-red-500 text-sm'>{duplicateError}</div>
+        )}
         <div className='space-y-4'>
           {fields.map((field, index) => (
-            <div key={field.id} className='flex   gap-2'>
+            <div key={field.id} className='flex gap-2'>
               <FormField
                 control={form.control}
                 name={`availablePaymentMethods.${index}.name`}
@@ -113,7 +135,7 @@ export default function PaymentMethodForm({
             variant={'outline'}
             onClick={() => append({ name: '', commission: 0 })}
           >
-            Add PaymentMethod
+            Add Payment Method
           </Button>
         </div>
 
@@ -122,7 +144,7 @@ export default function PaymentMethodForm({
           name='defaultPaymentMethod'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Default PaymentMethod</FormLabel>
+              <FormLabel>Default Payment Method</FormLabel>
               <FormControl>
                 <Select
                   value={field.value || ''}
@@ -132,13 +154,11 @@ export default function PaymentMethodForm({
                     <SelectValue placeholder='Select a payment method' />
                   </SelectTrigger>
                   <SelectContent>
-                    {availablePaymentMethods
-                      .filter((x) => x.name)
-                      .map((lang, index) => (
-                        <SelectItem key={index} value={lang.name}>
-                          {lang.name} ({lang.name})
-                        </SelectItem>
-                      ))}
+                    {uniquePaymentMethods.map((method) => (
+                      <SelectItem key={method.name} value={method.name}>
+                        {method.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>

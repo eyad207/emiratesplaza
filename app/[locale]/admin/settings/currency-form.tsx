@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select'
 import { ISettingInput } from '@/types'
 import { TrashIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
 
 export default function CurrencyForm({
@@ -40,14 +40,40 @@ export default function CurrencyForm({
 
   const availableCurrencies = watch('availableCurrencies')
   const defaultCurrency = watch('defaultCurrency')
+  const [duplicateError, setDuplicateError] = useState<string | null>(null) // State for duplicate error
 
   useEffect(() => {
     const validCodes = availableCurrencies.map((lang) => lang.code)
     if (!validCodes.includes(defaultCurrency)) {
       setValue('defaultCurrency', '')
     }
+
+    // Check for duplicate currencies
+    const duplicates = availableCurrencies.filter(
+      (currency, index, self) =>
+        self.findIndex(
+          (c) =>
+            c.name === currency.name ||
+            c.code === currency.code ||
+            c.symbol === currency.symbol
+        ) !== index
+    )
+
+    if (duplicates.length > 0) {
+      setDuplicateError(
+        'Duplicate currencies detected. Please ensure all currencies are unique.'
+      )
+    } else {
+      setDuplicateError(null)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(availableCurrencies)])
+
+  // Ensure unique and non-empty currency codes
+  const uniqueCurrencies = availableCurrencies.filter(
+    (currency, index, self) =>
+      index === self.findIndex((c) => c.code === currency.code) && currency.code
+  )
 
   return (
     <Card id={id}>
@@ -55,6 +81,9 @@ export default function CurrencyForm({
         <CardTitle>Currencies</CardTitle>
       </CardHeader>
       <CardContent className='space-y-4'>
+        {duplicateError && (
+          <div className='text-red-500 text-sm'>{duplicateError}</div>
+        )}
         <div className='space-y-4'>
           {fields.map((field, index) => (
             <div key={field.id} className='flex   gap-2'>
@@ -167,13 +196,11 @@ export default function CurrencyForm({
                     <SelectValue placeholder='Select a currency' />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableCurrencies
-                      .filter((x) => x.code)
-                      .map((lang, index) => (
-                        <SelectItem key={index} value={lang.code}>
-                          {lang.name} ({lang.code})
-                        </SelectItem>
-                      ))}
+                    {uniqueCurrencies.map((currency) => (
+                      <SelectItem key={currency.code} value={currency.code}>
+                        {currency.name} ({currency.code})
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>

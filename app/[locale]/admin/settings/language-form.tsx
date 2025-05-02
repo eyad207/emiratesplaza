@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select'
 import { ISettingInput } from '@/types'
 import { TrashIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
 
 export default function LanguageForm({
@@ -40,14 +40,36 @@ export default function LanguageForm({
 
   const availableLanguages = watch('availableLanguages')
   const defaultLanguage = watch('defaultLanguage')
+  const [duplicateError, setDuplicateError] = useState<string | null>(null)
 
   useEffect(() => {
     const validCodes = availableLanguages.map((lang) => lang.code)
     if (!validCodes.includes(defaultLanguage)) {
       setValue('defaultLanguage', '')
     }
+
+    // Check for duplicate languages by both name and code
+    const duplicates = availableLanguages.filter(
+      (lang, index, self) =>
+        self.findIndex((l) => l.code === lang.code || l.name === lang.name) !==
+        index
+    )
+
+    if (duplicates.length > 0) {
+      setDuplicateError(
+        'Duplicate languages detected. Please ensure all language names and codes are unique.'
+      )
+    } else {
+      setDuplicateError(null)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(availableLanguages)])
+
+  // Ensure unique languages for rendering
+  const uniqueLanguages = availableLanguages.filter(
+    (lang, index, self) =>
+      index === self.findIndex((l) => l.code === lang.code) && lang.code
+  )
 
   return (
     <Card id={id}>
@@ -55,9 +77,12 @@ export default function LanguageForm({
         <CardTitle>Languages</CardTitle>
       </CardHeader>
       <CardContent className='space-y-4'>
+        {duplicateError && (
+          <div className='text-red-500 text-sm'>{duplicateError}</div>
+        )}
         <div className='space-y-4'>
           {fields.map((field, index) => (
-            <div key={field.id} className='flex   gap-2'>
+            <div key={field.id} className='flex gap-2'>
               <FormField
                 control={form.control}
                 name={`availableLanguages.${index}.name`}
@@ -73,7 +98,6 @@ export default function LanguageForm({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name={`availableLanguages.${index}.code`}
@@ -130,13 +154,11 @@ export default function LanguageForm({
                     <SelectValue placeholder='Select a language' />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableLanguages
-                      .filter((x) => x.code)
-                      .map((lang, index) => (
-                        <SelectItem key={index} value={lang.code}>
-                          {lang.name} ({lang.code})
-                        </SelectItem>
-                      ))}
+                    {uniqueLanguages.map((lang) => (
+                      <SelectItem key={lang.code} value={lang.code}>
+                        {lang.name} ({lang.code})
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>

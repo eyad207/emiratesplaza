@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/select'
 import { ISettingInput } from '@/types'
 import { TrashIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFieldArray, UseFormReturn } from 'react-hook-form'
 
 export default function DeliveryDateForm({
@@ -41,13 +41,35 @@ export default function DeliveryDateForm({
 
   const availableDeliveryDates = watch('availableDeliveryDates')
   const defaultDeliveryDate = watch('defaultDeliveryDate')
+  const [duplicateError, setDuplicateError] = useState<string | null>(null)
 
   useEffect(() => {
-    const validCodes = availableDeliveryDates.map((lang) => lang.name)
-    if (!validCodes.includes(defaultDeliveryDate)) {
+    const validNames = availableDeliveryDates.map((date) => date.name)
+    if (!validNames.includes(defaultDeliveryDate)) {
       setValue('defaultDeliveryDate', '')
     }
+
+    // Check for duplicate delivery dates
+    const duplicates = availableDeliveryDates.filter(
+      (date, index, self) =>
+        self.findIndex((d) => d.name === date.name) !== index
+    )
+
+    if (duplicates.length > 0) {
+      setDuplicateError(
+        'Duplicate delivery dates detected. Please ensure all delivery dates are unique.'
+      )
+    } else {
+      setDuplicateError(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(availableDeliveryDates)])
+
+  // Ensure unique delivery dates for rendering
+  const uniqueDeliveryDates = availableDeliveryDates.filter(
+    (date, index, self) =>
+      index === self.findIndex((d) => d.name === date.name) && date.name
+  )
 
   return (
     <Card id={id}>
@@ -55,6 +77,9 @@ export default function DeliveryDateForm({
         <CardTitle>Delivery Dates</CardTitle>
       </CardHeader>
       <CardContent className='space-y-4'>
+        {duplicateError && (
+          <div className='text-red-500 text-sm'>{duplicateError}</div>
+        )}
         <div className='space-y-4'>
           {fields.map((field, index) => (
             <div key={field.id} className='flex gap-2'>
@@ -78,9 +103,9 @@ export default function DeliveryDateForm({
                 name={`availableDeliveryDates.${index}.daysToDeliver`}
                 render={({ field }) => (
                   <FormItem>
-                    {index == 0 && <FormLabel>Days</FormLabel>}
+                    {index == 0 && <FormLabel>Days to Deliver</FormLabel>}
                     <FormControl>
-                      <Input {...field} placeholder='daysToDeliver' />
+                      <Input {...field} placeholder='Days to Deliver' />
                     </FormControl>
                     <FormMessage>
                       {
@@ -98,7 +123,7 @@ export default function DeliveryDateForm({
                   <FormItem>
                     {index == 0 && <FormLabel>Shipping Price</FormLabel>}
                     <FormControl>
-                      <Input {...field} placeholder='shippingPrice' />
+                      <Input {...field} placeholder='Shipping Price' />
                     </FormControl>
                     <FormMessage>
                       {
@@ -114,9 +139,11 @@ export default function DeliveryDateForm({
                 name={`availableDeliveryDates.${index}.freeShippingMinPrice`}
                 render={({ field }) => (
                   <FormItem>
-                    {index == 0 && <FormLabel>Free Shipping</FormLabel>}
+                    {index == 0 && (
+                      <FormLabel>Free Shipping Min Price</FormLabel>
+                    )}
                     <FormControl>
-                      <Input {...field} placeholder='freeShippingMinPrice' />
+                      <Input {...field} placeholder='Free Shipping Min Price' />
                     </FormControl>
                     <FormMessage>
                       {
@@ -128,7 +155,7 @@ export default function DeliveryDateForm({
                 )}
               />
               <div>
-                {index == 0 && <div className=''>Action</div>}
+                {index == 0 && <div>Action</div>}
                 <Button
                   type='button'
                   disabled={fields.length === 1}
@@ -140,7 +167,7 @@ export default function DeliveryDateForm({
                 >
                   <TrashIcon className='w-4 h-4' />
                 </Button>
-              </div>{' '}
+              </div>
             </div>
           ))}
 
@@ -156,7 +183,7 @@ export default function DeliveryDateForm({
               })
             }
           >
-            Add DeliveryDate
+            Add Delivery Date
           </Button>
         </div>
 
@@ -165,7 +192,7 @@ export default function DeliveryDateForm({
           name='defaultDeliveryDate'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Default DeliveryDate</FormLabel>
+              <FormLabel>Default Delivery Date</FormLabel>
               <FormControl>
                 <Select
                   value={field.value || ''}
@@ -175,13 +202,11 @@ export default function DeliveryDateForm({
                     <SelectValue placeholder='Select a delivery date' />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableDeliveryDates
-                      .filter((x) => x.name)
-                      .map((lang, index) => (
-                        <SelectItem key={index} value={lang.name}>
-                          {lang.name} ({lang.name})
-                        </SelectItem>
-                      ))}
+                    {uniqueDeliveryDates.map((date) => (
+                      <SelectItem key={date.name} value={date.name}>
+                        {date.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>

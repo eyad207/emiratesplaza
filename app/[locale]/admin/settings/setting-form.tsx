@@ -30,6 +30,71 @@ const SettingForm = ({ setting }: { setting: ISettingInput }) => {
 
   const { toast } = useToast()
   async function onSubmit(values: ISettingInput) {
+    // Check for duplicate payment methods
+    const duplicatePaymentMethods = values.availablePaymentMethods.filter(
+      (method, index, self) =>
+        self.findIndex((m) => m.name === method.name) !== index
+    )
+
+    if (duplicatePaymentMethods.length > 0) {
+      toast({
+        variant: 'destructive',
+        description:
+          'Duplicate payment methods detected. Please ensure all payment methods are unique.',
+      })
+      return
+    }
+
+    // Check for duplicate delivery dates
+    const duplicateDeliveryDates = values.availableDeliveryDates.filter(
+      (date, index, self) =>
+        self.findIndex((d) => d.name === date.name) !== index
+    )
+
+    if (duplicateDeliveryDates.length > 0) {
+      toast({
+        variant: 'destructive',
+        description:
+          'Duplicate delivery dates detected. Please ensure all delivery dates are unique.',
+      })
+      return
+    }
+
+    // Check for duplicate languages
+    const duplicateLanguages = values.availableLanguages.filter(
+      (lang, index, self) =>
+        self.findIndex((l) => l.code === lang.code) !== index
+    )
+
+    if (duplicateLanguages.length > 0) {
+      toast({
+        variant: 'destructive',
+        description:
+          'Duplicate languages detected. Please ensure all languages are unique.',
+      })
+      return
+    }
+
+    // Check for duplicate currencies
+    const duplicateCurrencies = values.availableCurrencies.filter(
+      (currency, index, self) =>
+        self.findIndex(
+          (c) =>
+            c.name === currency.name &&
+            c.code === currency.code &&
+            c.symbol === currency.symbol
+        ) !== index
+    )
+
+    if (duplicateCurrencies.length > 0) {
+      toast({
+        variant: 'destructive',
+        description:
+          'Duplicate currencies detected. Please ensure all currencies are unique.',
+      })
+      return
+    }
+
     const res = await updateSetting({ ...values })
     if (!res.success) {
       toast({
