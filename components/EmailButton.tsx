@@ -12,6 +12,7 @@ const EmailButton = ({ email }: { email: string }) => {
   const [code, setCode] = useState('')
   const [generatedCode, setGeneratedCode] = useState('')
   const [countdown, setCountdown] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false) // Add a loading state for the submit button
   const router = useRouter()
 
   useEffect(() => {
@@ -121,15 +122,20 @@ const EmailButton = ({ email }: { email: string }) => {
     })
   }
 
-  const handleCodeSubmit = () => {
-    if (code === generatedCode) {
-      router.push(`/reset-password?email=${currentEmail}`)
-    } else {
-      toast({
-        title: 'Error',
-        description: 'The code you entered is incorrect',
-        variant: 'destructive',
-      })
+  const handleCodeSubmit = async () => {
+    setIsSubmitting(true) // Set loading state to true immediately
+    try {
+      if (code === generatedCode) {
+        router.push(`/reset-password?email=${currentEmail}`)
+      } else {
+        toast({
+          title: 'Error',
+          description: 'The code you entered is incorrect',
+          variant: 'destructive',
+        })
+      }
+    } finally {
+      setIsSubmitting(false) // Reset loading state after submission
     }
   }
 
@@ -165,8 +171,13 @@ const EmailButton = ({ email }: { email: string }) => {
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
-          <Button onClick={handleCodeSubmit} className='mt-2'>
-            Submit Code
+          <Button
+            onClick={handleCodeSubmit}
+            className='mt-2'
+            disabled={isSubmitting} // Disable the button while submitting
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Code'}{' '}
+            {/* Show loading text */}
           </Button>
         </div>
       )}

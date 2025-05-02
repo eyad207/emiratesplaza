@@ -13,15 +13,12 @@ import {
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { useTranslations } from 'next-intl'
 import { ICarousel } from '@/types'
 
 export function HomeCarousel({ items }: { items: ICarousel[] }) {
   const plugin = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true })
   )
-
-  const t = useTranslations('Home')
 
   return (
     <Carousel
@@ -50,10 +47,10 @@ export function HomeCarousel({ items }: { items: ICarousel[] }) {
                       'text-lg sm:text-2xl md:text-4xl lg:text-6xl font-bold mb-2 md:mb-4 text-primary drop-shadow-md'
                     )}
                   >
-                    {t(`${item.title}`)}
+                    {item.title}
                   </h2>
                   <Button size='sm' className='text-xs sm:text-sm md:text-base'>
-                    {t(`${item.buttonCaption}`)}
+                    {item.buttonCaption}
                   </Button>
                 </div>
               </div>
