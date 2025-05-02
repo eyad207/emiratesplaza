@@ -62,7 +62,6 @@ export default function DeliveryDateForm({
     } else {
       setDuplicateError(null)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(availableDeliveryDates)])
 
   // Ensure unique delivery dates for rendering
