@@ -91,6 +91,13 @@ const EmailButton = ({ email }: { email: string }) => {
       return
     }
 
+    // Show a toast message immediately
+    toast({
+      title: 'Sending Code',
+      description: 'The verification code is being sent to your email.',
+      variant: 'default',
+    })
+
     const isRegistered = await checkEmailRegistered(currentEmail)
     if (!isRegistered) {
       toast({
