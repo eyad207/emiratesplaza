@@ -34,7 +34,7 @@ export default async function Sidebar({
           {t('Header.All Categories')}
         </span>
       </DrawerTrigger>
-      <DrawerContent className='w-[280px] mt-0 top-0 dark:bg-zinc-900 white:bg-white dark:text-white white:bg-slate-200 '>
+      <DrawerContent className='w-[250px] mt-0 top-0 dark:bg-zinc-900 white:bg-white dark:text-white white:bg-slate-200 '>
         <div className='flex flex-col h-full'>
           {/* User Sign In Section */}
           <div className='dark bg-gray-800 text-foreground flex items-center justify-between'>
