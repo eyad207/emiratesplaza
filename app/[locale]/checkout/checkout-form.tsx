@@ -88,7 +88,6 @@ const CheckoutForm = () => {
     setPaymentMethod,
     updateItem,
     removeItem,
-    clearCart,
     setDeliveryDateIndex,
   } = useCartStore()
   const isMounted = useIsMounted()
@@ -143,7 +142,6 @@ const CheckoutForm = () => {
         description: res.message,
         variant: 'default',
       })
-      clearCart()
       router.push(`/checkout/${res.data?.orderId}`)
     }
   }
@@ -584,8 +582,12 @@ const CheckoutForm = () => {
                               <Select
                                 value={item.quantity.toString()}
                                 onValueChange={(value) => {
-                                  if (value === '0') removeItem(item)
-                                  else updateItem(item, Number(value))
+                                  const newQuantity = Number(value)
+                                  if (newQuantity === 0) {
+                                    removeItem(item) // Remove the item if quantity is 0
+                                  } else {
+                                    updateItem(item, newQuantity)
+                                  }
                                 }}
                               >
                                 <SelectTrigger className='w-24'>
@@ -606,9 +608,10 @@ const CheckoutForm = () => {
                                       {i + 1}
                                     </SelectItem>
                                   ))}
-                                  <SelectItem key='delete' value='0'>
+                                  <SelectItem value='0'>
                                     {t('delete')}
-                                  </SelectItem>
+                                  </SelectItem>{' '}
+                                  {/* Add an option to remove */}
                                 </SelectContent>
                               </Select>
                             </div>

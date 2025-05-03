@@ -21,6 +21,7 @@ import ProductPrice from '@/components/shared/product/product-price'
 import StripeForm from './stripe-form'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
+import useCartStore from '@/hooks/use-cart-store'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
@@ -73,10 +74,15 @@ export default function OrderDetailsForm({
   }
   const handleApprovePayPalOrder = async (data: { orderID: string }) => {
     const res = await approvePayPalOrder(order._id, data)
-    toast({
-      description: res.message,
-      variant: res.success ? 'default' : 'destructive',
-    })
+    const { clearCart } = useCartStore.getState()
+    if (res.success) {
+      clearCart()
+      toast({
+        description: res.message,
+        variant: res.success ? 'default' : 'destructive',
+      })
+      router.push(`/account/orders/${order._id}`)
+    }
   }
 
   const CheckoutSummary = () => (

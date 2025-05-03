@@ -145,23 +145,26 @@ export default function CartSidebar() {
                             <div className='flex items-center gap-2'>
                               <Select
                                 value={item.quantity.toString()}
-                                onValueChange={(value) =>
-                                  updateItem(item, Number(value))
-                                }
+                                onValueChange={(value) => {
+                                  const newQuantity = Number(value)
+                                  if (newQuantity === 0) {
+                                    removeItem(item) // Remove the item if quantity is 0
+                                  } else {
+                                    updateItem(item, newQuantity)
+                                  }
+                                }}
                               >
                                 <SelectTrigger className='text-xs h-7 w-14 px-2'>
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {Array.from({
-                                    length: Math.min(
+                                    length:
                                       item.colors
                                         .find((c) => c.color === item.color)
                                         ?.sizes.find(
                                           (s) => s.size === item.size
                                         )?.countInStock || 0,
-                                      10
-                                    ),
                                   }).map((_, i) => (
                                     <SelectItem
                                       value={(i + 1).toString()}
@@ -170,6 +173,8 @@ export default function CartSidebar() {
                                       {i + 1}
                                     </SelectItem>
                                   ))}
+                                  <SelectItem value='0'>Remove</SelectItem>{' '}
+                                  {/* Add an option to remove */}
                                 </SelectContent>
                               </Select>
                               <Button

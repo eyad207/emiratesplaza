@@ -41,7 +41,7 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
           </SheetTrigger>
 
           <SheetContent
-            className='bg-header text-white flex flex-col py-6'
+            className='bg-header text-white flex flex-col py-6 w-60'
             side='right'
           >
             <SheetHeader className='w-full text-left'>
