@@ -35,7 +35,7 @@ const ProductCard = ({
       className={cn(
         'relative transform transition-transform duration-700 ease-out hover:scale-105',
         {
-          'h-60': isInInfiniteList,
+          'h-44 sm:h-60': isInInfiniteList, // Mobil: mindre høyde
           'h-52': !isInInfiniteList,
         }
       )}
@@ -166,15 +166,15 @@ const ProductCard = ({
           }
         )}
       >
-        <CardHeader className='p-3 flex-shrink-0'>
+        <CardHeader className='p-2 sm:p-3 flex-shrink-0'>
           <ProductImage />
         </CardHeader>
         {!hideDetails && (
           <>
-            <CardContent className='p-3 flex-1 text-center overflow-y-auto'>
+            <CardContent className='p-2 sm:p-1 flex-1 text-center overflow-y-auto'>
               <ProductDetails />
             </CardContent>
-            <CardFooter className='p-3 pt-2 pb-3 flex-shrink-0 mt-auto border-t border-border/10 dark:border-zinc-800'>
+            <CardFooter className='p-2 pt-1 pb-2 sm:p-3 sm:pt-2 sm:pb-3 flex-shrink-0 mt-auto border-t border-border/10 dark:border-zinc-800'>
               {!hideAddToCart && !hideAddToCartButton && <AddButton />}
             </CardFooter>
           </>
