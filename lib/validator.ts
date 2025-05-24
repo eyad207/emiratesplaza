@@ -162,7 +162,12 @@ const UserName = z
   .min(2, { message: 'Username must be at least 2 characters' })
   .max(50, { message: 'Username must be at most 30 characters' })
 const Email = z.string().min(1, 'Email is required').email('Email is invalid')
-const Password = z.string().min(6, 'Password must be at least 6 characters')
+const Password = z
+  .string()
+  .min(8, 'Password must be at least 8 characters long')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number')
 const UserRole = z.string().min(1, 'role is required')
 
 const UserEmail = z.string().email('Email is invalid')
@@ -175,9 +180,9 @@ export const UserEmailSchema = z.object({
 
 export const UserPasswordSchema = z
   .object({
-    oldPassword: UserPassword,
-    password: UserPassword,
-    confirmPassword: UserPassword,
+    oldPassword: Password,
+    password: Password,
+    confirmPassword: Password,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -233,13 +238,8 @@ export const UserSignUpSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email address'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters long')
-      .regex(/[A-Z]/, 'Password must contain at least one capital letter'),
-    confirmPassword: z
-      .string()
-      .min(8, 'Confirm Password must be at least 8 characters long'),
+    password: Password,
+    confirmPassword: Password,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
