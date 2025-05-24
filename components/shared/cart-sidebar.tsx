@@ -64,7 +64,7 @@ export default function CartSidebar() {
             exit={{ x: rtl ? -320 : 320 }}
             transition={{ type: 'spring', damping: 20 }}
             className={cn(
-              'fixed top-0 bottom-0 z-50 w-full max-w-[320px] xs:max-w-[350px] bg-background shadow-xl',
+              'fixed top-0 bottom-0 z-50 w-full max-w-[280px] xs:max-w-[320px] bg-background shadow-xl', // Reduced width for mobile
               rtl ? 'left-0' : 'right-0',
               'border-l border-border/30'
             )}

@@ -57,8 +57,8 @@ const InfiniteProductList = () => {
             product={product}
             hideAddToCartButton={false}
             hideBrandOnMobile={true}
-            isInInfiniteList={true} // Apply new styling for infinite list
-            className='lg:w-[30vw] lg:h-[75vh] md:w-[30vw] md:h-[30vh] sm:w-[50vw] sm:h-[60vh]'
+            isInInfiniteList={true}
+            className='lg:w-[30vw] lg:h-[65vh] md:w-[30vw] md:h-[50vh] sm:w-[50vw] sm:h-[60vh] space-y-4' // Adjusted height and added spacing
           />
         </div>
       ))}
