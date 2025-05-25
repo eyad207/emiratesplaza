@@ -24,6 +24,7 @@ interface CartState {
   setShippingAddress: (shippingAddress: ShippingAddress) => Promise<void>
   setPaymentMethod: (paymentMethod: string) => void
   setDeliveryDateIndex: (index: number) => Promise<void>
+  refreshCartStock: () => Promise<void>
 }
 
 const useCartStore = create(
@@ -171,6 +172,35 @@ const useCartStore = create(
           cart: {
             ...get().cart,
             items: [],
+          },
+        })
+      },
+      refreshCartStock: async () => {
+        const { items } = get().cart
+        const updatedItems = await Promise.all(
+          items.map(async (item) => {
+            const response = await fetch(`/api/products/${item.product}`)
+            const data = await response.json()
+            const colorObj:
+              | {
+                  color: string
+                  sizes: { size: string; countInStock: number }[]
+                }
+              | undefined = data.colors.find(
+              (c: { color: string }) => c.color === item.color
+            )
+            const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
+            return {
+              ...item,
+              colors: data.colors,
+              quantity: Math.min(item.quantity, sizeObj?.countInStock || 0),
+            }
+          })
+        )
+        set({
+          cart: {
+            ...get().cart,
+            items: updatedItems,
           },
         })
       },

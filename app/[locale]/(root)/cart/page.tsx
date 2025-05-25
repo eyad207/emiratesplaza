@@ -25,12 +25,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useEffect } from 'react'
 
 export default function Cart() {
   const {
     cart: { items, itemsPrice, taxPrice, shippingPrice, totalPrice },
     removeItem,
     updateItem,
+    refreshCartStock,
   } = useCartStore()
 
   const {
@@ -38,6 +40,10 @@ export default function Cart() {
   } = useSettingStore()
 
   const t = useTranslations()
+
+  useEffect(() => {
+    refreshCartStock()
+  }, [refreshCartStock])
 
   if (items.length === 0) {
     return <EmptyCart />
