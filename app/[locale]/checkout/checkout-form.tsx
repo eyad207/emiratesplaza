@@ -124,6 +124,18 @@ const CheckoutForm = () => {
     useState<boolean>(false)
 
   const handlePlaceOrder = async () => {
+    // Check if any item has a quantity of 0
+    const invalidItems = items.filter((item) => item.quantity === 0)
+    if (invalidItems.length > 0) {
+      toast({
+        description: t(
+          'Please remove items with zero quantity before placing your order'
+        ),
+        variant: 'destructive',
+      })
+      return
+    }
+
     const res = await createOrder({
       items,
       shippingAddress,

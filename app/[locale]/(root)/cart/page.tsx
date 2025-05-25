@@ -136,7 +136,8 @@ export default function Cart() {
                           <Select
                             value={item.quantity.toString()}
                             onValueChange={(value) => {
-                              updateItem(item, Number(value))
+                              const newQuantity = Number(value)
+                              updateItem(item, newQuantity) // Automatically removes the item if quantity is 0
                             }}
                           >
                             <SelectTrigger className='w-20'>
@@ -157,6 +158,8 @@ export default function Cart() {
                                   {i + 1}
                                 </SelectItem>
                               ))}
+                              <SelectItem value='0'>Remove</SelectItem>{' '}
+                              {/* Option to remove */}
                             </SelectContent>
                           </Select>
                         </TableCell>

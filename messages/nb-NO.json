@@ -353,6 +353,7 @@
     "orderSummary": "Bestillingsoversikt",
     "items": "Varer",
     "shippingHandling": "Frakt og håndtering",
+    "Please remove items with zero quantity before placing your order": "Vennligst fjern varer med null antall før du legger inn bestillingen din.",
     "free": "GRATIS",
     "tax": "Skatt",
     "orderTotal": "Totalt for bestillingen",

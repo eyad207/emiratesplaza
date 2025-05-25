@@ -47,8 +47,8 @@ export default function CartSidebar() {
     }
   }, [isOpen, refreshCartStock])
 
-  if (items.length === 0) {
-    return null
+  if (!isOpen) {
+    return null // Sidebar is not open, so don't render it
   }
 
   return (
@@ -71,7 +71,7 @@ export default function CartSidebar() {
             exit={{ x: rtl ? -320 : 320 }}
             transition={{ type: 'spring', damping: 20 }}
             className={cn(
-              'fixed top-0 bottom-0 z-50 w-full max-w-[280px] xs:max-w-[320px] bg-background shadow-xl', // Reduced width for mobile
+              'fixed top-0 bottom-0 z-50 w-full max-w-[280px] xs:max-w-[320px] bg-background shadow-xl',
               rtl ? 'left-0' : 'right-0',
               'border-l border-border/30'
             )}
@@ -104,132 +104,137 @@ export default function CartSidebar() {
               {/* Cart Items */}
               <ScrollArea className='flex-1 overflow-y-auto py-2'>
                 <div className='flex flex-col divide-y divide-border/30'>
-                  {items.map((item) => (
-                    <div
-                      key={item.clientId}
-                      className='p-3 hover:bg-muted/20 transition-colors'
-                    >
-                      <div className='flex gap-3 items-center'>
-                        <Link
-                          href={`/product/${item.slug}`}
-                          className='shrink-0'
-                          onClick={closeSidebar}
-                        >
-                          <div className='relative h-16 w-16 rounded-md overflow-hidden border border-border/30'>
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              fill
-                              sizes='64px'
-                              className='object-contain'
-                            />
-                          </div>
-                        </Link>
-                        <div className='flex-1 min-w-0'>
+                  {items.length === 0 ? (
+                    <div className='p-4 text-center text-muted-foreground'>
+                      {t('Cart.Your Shopping Cart is empty')}
+                    </div>
+                  ) : (
+                    items.map((item) => (
+                      <div
+                        key={item.clientId}
+                        className='p-3 hover:bg-muted/20 transition-colors'
+                      >
+                        <div className='flex gap-3 items-center'>
                           <Link
                             href={`/product/${item.slug}`}
-                            className='font-medium text-sm line-clamp-1 hover:text-primary transition-colors'
+                            className='shrink-0'
                             onClick={closeSidebar}
                           >
-                            {item.name}
-                          </Link>
-                          <div className='text-muted-foreground text-xs mt-1'>
-                            {item.color && (
-                              <span className='mr-2'>
-                                {t('Cart.Color')}: {item.color}
-                              </span>
-                            )}
-                            {item.size && (
-                              <span>
-                                {t('Cart.Size')}: {item.size}
-                              </span>
-                            )}
-                          </div>
-                          <div className='flex items-center justify-between mt-2'>
-                            <div className='font-medium text-sm'>
-                              <ProductPrice price={item.price} plain />
+                            <div className='relative h-16 w-16 rounded-md overflow-hidden border border-border/30'>
+                              <Image
+                                src={item.image}
+                                alt={item.name}
+                                fill
+                                sizes='64px'
+                                className='object-contain'
+                              />
                             </div>
-                            <div className='flex items-center gap-2'>
-                              <Select
-                                value={item.quantity.toString()}
-                                onValueChange={(value) => {
-                                  const newQuantity = Number(value)
-                                  if (newQuantity === 0) {
-                                    removeItem(item) // Remove the item if quantity is 0
-                                  } else {
-                                    updateItem(item, newQuantity)
-                                  }
-                                }}
-                              >
-                                <SelectTrigger className='text-xs h-7 w-14 px-2'>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {Array.from({
-                                    length:
-                                      item.colors
-                                        .find((c) => c.color === item.color)
-                                        ?.sizes.find(
-                                          (s) => s.size === item.size
-                                        )?.countInStock || 0,
-                                  }).map((_, i) => (
-                                    <SelectItem
-                                      value={(i + 1).toString()}
-                                      key={i + 1}
-                                    >
-                                      {i + 1}
-                                    </SelectItem>
-                                  ))}
-                                  <SelectItem value='0'>Remove</SelectItem>{' '}
-                                  {/* Add an option to remove */}
-                                </SelectContent>
-                              </Select>
-                              <Button
-                                variant='ghost'
-                                size='sm'
-                                className='h-7 w-7 p-0 text-muted-foreground hover:text-destructive'
-                                onClick={() => removeItem(item)}
-                              >
-                                <TrashIcon className='w-4 h-4' />
-                              </Button>
+                          </Link>
+                          <div className='flex-1 min-w-0'>
+                            <Link
+                              href={`/product/${item.slug}`}
+                              className='font-medium text-sm line-clamp-1 hover:text-primary transition-colors'
+                              onClick={closeSidebar}
+                            >
+                              {item.name}
+                            </Link>
+                            <div className='text-muted-foreground text-xs mt-1'>
+                              {item.color && (
+                                <span className='mr-2'>
+                                  {t('Cart.Color')}: {item.color}
+                                </span>
+                              )}
+                              {item.size && (
+                                <span>
+                                  {t('Cart.Size')}: {item.size}
+                                </span>
+                              )}
+                            </div>
+                            <div className='flex items-center justify-between mt-2'>
+                              <div className='font-medium text-sm'>
+                                <ProductPrice price={item.price} plain />
+                              </div>
+                              <div className='flex items-center gap-2'>
+                                <Select
+                                  value={item.quantity.toString()}
+                                  onValueChange={(value) => {
+                                    const newQuantity = Number(value)
+                                    updateItem(item, newQuantity) // Automatically removes the item if quantity is 0
+                                  }}
+                                >
+                                  <SelectTrigger className='text-xs h-7 w-14 px-2'>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Array.from({
+                                      length:
+                                        item.colors
+                                          .find((c) => c.color === item.color)
+                                          ?.sizes.find(
+                                            (s) => s.size === item.size
+                                          )?.countInStock || 0,
+                                    }).map((_, i) => (
+                                      <SelectItem
+                                        value={(i + 1).toString()}
+                                        key={i + 1}
+                                      >
+                                        {i + 1}
+                                      </SelectItem>
+                                    ))}
+                                    <SelectItem value='0'>Remove</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Button
+                                  variant='ghost'
+                                  size='sm'
+                                  className='h-7 w-7 p-0 text-muted-foreground hover:text-destructive'
+                                  onClick={() => removeItem(item)}
+                                >
+                                  <TrashIcon className='w-4 h-4' />
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </ScrollArea>
 
               {/* Summary and Checkout */}
               <div className='p-4 bg-muted/30 border-t border-border/30'>
-                {/* Free shipping message */}
-                {itemsPrice < freeShippingMinPrice ? (
-                  <div className='text-sm mb-3 p-2 bg-primary/10 rounded-md'>
-                    {t('Cart.Add')}{' '}
-                    <span className='text-primary font-medium'>
-                      {formatPrice(freeShippingMinPrice - itemsPrice)}
-                    </span>{' '}
-                    {t(
-                      'Cart.of eligible items to your order to qualify for FREE Shipping'
+                {items.length > 0 && (
+                  <>
+                    {/* Free shipping message */}
+                    {itemsPrice < freeShippingMinPrice ? (
+                      <div className='text-sm mb-3 p-2 bg-primary/10 rounded-md'>
+                        {t('Cart.Add')}{' '}
+                        <span className='text-primary font-medium'>
+                          {formatPrice(freeShippingMinPrice - itemsPrice)}
+                        </span>{' '}
+                        {t(
+                          'Cart.of eligible items to your order to qualify for FREE Shipping'
+                        )}
+                      </div>
+                    ) : (
+                      <div className='text-sm mb-3 p-2 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 rounded-md'>
+                        {t('Cart.Your order qualifies for FREE Shipping')}
+                      </div>
                     )}
-                  </div>
-                ) : (
-                  <div className='text-sm mb-3 p-2 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 rounded-md'>
-                    {t('Cart.Your order qualifies for FREE Shipping')}
-                  </div>
-                )}
 
-                {/* Subtotal */}
-                <div className='flex items-center justify-between mb-4'>
-                  <span className='text-muted-foreground'>
-                    {t('Cart.Subtotal')} ({items.length}{' '}
-                    {items.length === 1 ? t('Cart.item') : t('Cart.items')})
-                  </span>
-                  <span className='font-bold text-lg'>
-                    <ProductPrice price={itemsPrice} plain />
-                  </span>
-                </div>
+                    {/* Subtotal */}
+                    <div className='flex items-center justify-between mb-4'>
+                      <span className='text-muted-foreground'>
+                        {t('Cart.Subtotal')} ({items.length}{' '}
+                        {items.length === 1 ? t('Cart.item') : t('Cart.items')})
+                      </span>
+                      <span className='font-bold text-lg'>
+                        <ProductPrice price={itemsPrice} plain />
+                      </span>
+                    </div>
+                  </>
+                )}
 
                 {/* Buttons */}
                 <div className='space-y-2'>
@@ -250,16 +255,18 @@ export default function CartSidebar() {
                   >
                     {t('Cart.Go to Cart')}
                   </Link>
-                  <Button
-                    variant='destructive'
-                    className='w-full'
-                    onClick={() => {
-                      clearCart()
-                      closeSidebar()
-                    }}
-                  >
-                    {t('Cart.Empty Cart')}
-                  </Button>
+                  {items.length > 0 && (
+                    <Button
+                      variant='destructive'
+                      className='w-full'
+                      onClick={() => {
+                        clearCart()
+                        closeSidebar()
+                      }}
+                    >
+                      {t('Cart.Empty Cart')}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

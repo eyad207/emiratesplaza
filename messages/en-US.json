@@ -334,6 +334,7 @@
     "agreeToTerms": "By placing your order, you agree to {siteName}'s <privacyPolicy>privacy notice</privacyPolicy> and <termsOfUse>conditions of use</termsOfUse>.",
     "orderSummary": "Order Summary",
     "items": "Items",
+    "Please remove items with zero quantity before placing your order": "Please remove items with zero quantity before placing your order.",
     "shippingHandling": "Shipping & Handling",
     "free": "FREE",
     "tax": "Tax",

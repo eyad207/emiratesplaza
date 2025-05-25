@@ -365,6 +365,7 @@
     "qty": "الكمية: {quantity}",
     "delete": "حذف",
     "chooseShippingSpeed": "اختر سرعة الشحن",
+    "Please remove items with zero quantity before placing your order": "يرجى إزالة العناصر ذات الكمية صفر قبل تقديم طلبك.",
     "freeShipping": "شحن مجاني",
     "privacyPolicy": "إشعار الخصوصية",
     "termsOfUse": "شروط الاستخدام",

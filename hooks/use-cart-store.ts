@@ -95,13 +95,27 @@ const useCartStore = create(
             x.size === item.size
         )
         if (!exist) return
-        const updatedCartItems = items.map((x) =>
-          x.product === item.product &&
-          x.color === item.color &&
-          x.size === item.size
-            ? { ...exist, quantity: quantity }
-            : x
-        )
+
+        let updatedCartItems
+        if (quantity === 0) {
+          // Remove the item if quantity is 0
+          updatedCartItems = items.filter(
+            (x) =>
+              x.product !== item.product ||
+              x.color !== item.color ||
+              x.size !== item.size
+          )
+        } else {
+          // Update the item quantity
+          updatedCartItems = items.map((x) =>
+            x.product === item.product &&
+            x.color === item.color &&
+            x.size === item.size
+              ? { ...exist, quantity: quantity }
+              : x
+          )
+        }
+
         set({
           cart: {
             ...get().cart,
