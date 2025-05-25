@@ -1,2 +1,2 @@
 use Select-varient to remove size quantity.
-use data.ts to add remove links from header
+use headers/index to add remove links from under header
