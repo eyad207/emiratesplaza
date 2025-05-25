@@ -24,6 +24,7 @@ interface CartState {
   setShippingAddress: (shippingAddress: ShippingAddress) => Promise<void>
   setPaymentMethod: (paymentMethod: string) => void
   setDeliveryDateIndex: (index: number) => Promise<void>
+  syncCartWithStock: () => Promise<void>
 }
 
 const useCartStore = create(
@@ -173,6 +174,50 @@ const useCartStore = create(
             items: [],
           },
         })
+      },
+      syncCartWithStock: async () => {
+        const { items } = get().cart
+        if (items.length === 0) return
+
+        try {
+          const response = await fetch('/api/cart/sync-stock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: items.map((item) => item.product) }),
+          })
+          const data = await response.json()
+
+          if (data.success) {
+            interface StockItem {
+              product: string
+              countInStock: number
+            }
+            const updatedItems = items.map((item) => {
+              const updatedStock = data.stock.find(
+                (stockItem: StockItem) => stockItem.product === item.product
+              )
+              if (updatedStock) {
+                const colorObj = item.colors.find((c) => c.color === item.color)
+                const sizeObj = colorObj?.sizes.find(
+                  (s) => s.size === item.size
+                )
+                if (sizeObj) {
+                  sizeObj.countInStock = updatedStock.countInStock
+                }
+              }
+              return item
+            })
+
+            set({
+              cart: {
+                ...get().cart,
+                items: updatedItems,
+              },
+            })
+          }
+        } catch (error) {
+          console.error('Failed to sync cart with stock:', error)
+        }
       },
       init: () => set({ cart: initialState }),
     }),
