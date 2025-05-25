@@ -3,7 +3,7 @@
 import useCartStore from '@/hooks/use-cart-store'
 import { cn, formatPrice } from '@/lib/utils'
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Button, buttonVariants } from '../ui/button'
 import { ScrollArea } from '../ui/scroll-area'
 import Image from 'next/image'
@@ -29,7 +29,6 @@ export default function CartSidebar() {
     updateItem,
     removeItem,
     clearCart,
-    syncCartWithStock,
   } = useCartStore()
   const {
     setting: {
@@ -40,12 +39,6 @@ export default function CartSidebar() {
   const t = useTranslations()
   const locale = useLocale()
   const rtl = getDirection(locale) === 'rtl'
-
-  useEffect(() => {
-    if (isOpen) {
-      syncCartWithStock()
-    }
-  }, [isOpen, syncCartWithStock])
 
   if (items.length === 0) {
     return null

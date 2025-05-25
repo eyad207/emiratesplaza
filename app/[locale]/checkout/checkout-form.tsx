@@ -89,7 +89,6 @@ const CheckoutForm = () => {
     updateItem,
     removeItem,
     setDeliveryDateIndex,
-    syncCartWithStock,
   } = useCartStore()
   const isMounted = useIsMounted()
 
@@ -112,10 +111,6 @@ const CheckoutForm = () => {
     shippingAddressForm.setValue('province', shippingAddress.province)
     shippingAddressForm.setValue('phone', shippingAddress.phone)
   }, [items, isMounted, router, shippingAddress, shippingAddressForm])
-
-  useEffect(() => {
-    syncCartWithStock()
-  }, [syncCartWithStock])
 
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false)
   const [isPaymentMethodSelected, setIsPaymentMethodSelected] =
