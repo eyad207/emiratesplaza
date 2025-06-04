@@ -193,28 +193,41 @@ const useCartStore = create(
         const { items } = get().cart
         const updatedItems = await Promise.all(
           items.map(async (item) => {
-            const response = await fetch(`/api/products/${item.product}`)
-            const data = await response.json()
-            const colorObj:
-              | {
-                  color: string
-                  sizes: { size: string; countInStock: number }[]
-                }
-              | undefined = data.colors.find(
-              (c: { color: string }) => c.color === item.color
-            )
-            const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
-            return {
-              ...item,
-              colors: data.colors,
-              quantity: Math.min(item.quantity, sizeObj?.countInStock || 0),
+            try {
+              const response = await fetch(`/api/products/${item.product}`)
+              if (!response.ok) {
+                // If the product is not found, return null
+                return null
+              }
+              const data = await response.json()
+              const colorObj:
+                | {
+                    color: string
+                    sizes: { size: string; countInStock: number }[]
+                  }
+                | undefined = data.colors.find(
+                (c: { color: string }) => c.color === item.color
+              )
+              const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
+              return {
+                ...item,
+                colors: data.colors,
+                quantity: Math.min(item.quantity, sizeObj?.countInStock || 0),
+              }
+            } catch {
+              // Handle fetch errors by returning null
+              return null
             }
           })
         )
+
+        // Filter out items that are null (deleted products)
+        const filteredItems = updatedItems.filter((item) => item !== null)
+
         set({
           cart: {
             ...get().cart,
-            items: updatedItems,
+            items: filteredItems,
           },
         })
       },

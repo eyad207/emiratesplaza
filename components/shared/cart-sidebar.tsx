@@ -240,7 +240,11 @@ export default function CartSidebar() {
                 <div className='space-y-2'>
                   <Link
                     href='/checkout'
-                    className={cn(buttonVariants({ size: 'sm' }), 'w-full')}
+                    className={cn(
+                      buttonVariants({ size: 'sm' }),
+                      'w-full',
+                      items.length === 0 && 'opacity-50 pointer-events-none' // Disable button if cart is empty
+                    )}
                     onClick={closeSidebar}
                   >
                     {t('Cart.Proceed to Checkout')}
@@ -249,7 +253,8 @@ export default function CartSidebar() {
                     href='/cart'
                     className={cn(
                       buttonVariants({ variant: 'outline', size: 'sm' }),
-                      'w-full'
+                      'w-full',
+                      items.length === 0 && 'opacity-50 pointer-events-none' // Disable button if cart is empty
                     )}
                     onClick={closeSidebar}
                   >

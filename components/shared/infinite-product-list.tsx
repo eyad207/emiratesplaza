@@ -46,7 +46,7 @@ const InfiniteProductList = () => {
   }, [page])
 
   return (
-    <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-3 gap-5 lg:gap-7'>
+    <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-3 gap-4 lg:gap-7'>
       {allProducts.map((product, index) => (
         <div
           key={`${product._id}-${index}`} // Ensure unique keys
@@ -58,7 +58,7 @@ const InfiniteProductList = () => {
             hideAddToCartButton={false}
             hideBrandOnMobile={true}
             isInInfiniteList={true}
-            className='lg:w-[30vw] lg:h-[65vh] md:w-[30vw] md:h-[50vh] sm:w-[50vw] sm:h-[60vh] space-y-4' // Adjusted height and added spacing
+            className='lg:w-[30vw] lg:h-[73vh] md:w-[30vw] md:h-[50vh] sm:w-[50vw] sm:h-[60vh] space-y-4' // Adjusted height and added spacing
           />
         </div>
       ))}
