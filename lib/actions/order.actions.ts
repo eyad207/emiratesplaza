@@ -170,21 +170,21 @@ export async function deliverOrder(orderId: string) {
       await sendAskReviewOrderItems({ order })
       await sendEmail({
         to: order.user.email,
-        subject: 'Order Delivery Status Updated',
-        text: `Dear ${order.user.name},
+        subject: 'Fraktstatus for bestillingen er oppdatert',
+        text: `Kjære ${order.user.name},
 
-We are pleased to inform you that your order with ID ${order._id} has been ${order.isDelivered ? 'delivered' : 'marked as not delivered'}.
+Vi har gleden av å informere deg om at bestillingen din med ID ${order._id} har blitt ${order.isDelivered ? 'levert' : 'markert som ikke levert'}.
 
-Thank you for shopping with us!
+Takk for at du handlet hos oss!
 
-Best regards,
-EmiratesPlaza Support Team`,
+Med vennlig hilsen,
+EmiratesPlaza Kundeservice`,
       })
     }
     revalidatePath(`/account/orders/${orderId}`)
     return {
       success: true,
-      message: 'Order delivery status updated successfully',
+      message: 'Fraktstatus for bestillingen er oppdatert',
     }
   } catch (err) {
     return { success: false, message: formatError(err) }
@@ -205,21 +205,21 @@ export async function shipOrder(orderId: string) {
     if (order.user?.email) {
       await sendEmail({
         to: order.user.email,
-        subject: 'Order Shipping Status Updated',
-        text: `Dear ${order.user.name},
+        subject: 'Fraktstatus for bestillingen er oppdatert',
+        text: `Kjære ${order.user.name},
 
-We are pleased to inform you that your order with ID ${order._id} has been ${order.isShipped ? 'shipped' : 'marked as not shipped'}.
+Vi har gleden av å informere deg om at bestillingen din med ID ${order._id} har blitt ${order.isShipped ? 'sendt' : 'markert som ikke sendt'}.
 
-Thank you for shopping with us!
+Takk for at du handlet hos oss!
 
-Best regards,
-EmiratesPlaza Support Team`,
+Med vennlig hilsen,
+EmiratesPlaza Kundeservice`,
       })
     }
     revalidatePath(`/account/orders/${orderId}`)
     return {
       success: true,
-      message: 'Order shipping status updated successfully',
+      message: 'Fraktstatusen for bestillingen er oppdatert',
     }
   } catch (err) {
     return { success: false, message: formatError(err) }
