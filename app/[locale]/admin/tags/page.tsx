@@ -277,80 +277,82 @@ export default function TagsPage() {
   }
 
   return (
-    <div className='p-6 bg-gray-100 dark:bg-gray-800 min-h-screen'>
-      <div className='max-w-4xl mx-auto bg-white dark:bg-gray-700 shadow-md rounded-lg p-6'>
-        <h1 className='text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200'>
+    <div className='p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 min-h-screen'>
+      <div className='max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6'>
+        <h1 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100'>
           Manage Tags
         </h1>
 
         {/* Add Tag Section */}
-        <div className='flex items-center gap-4 mb-6'>
+        <div className='flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-6'>
           <input
             type='text'
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
             placeholder='Enter a new tag'
-            className='flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300'
+            className='flex-1 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
           />
           <button
             onClick={addTag}
             disabled={loading}
-            className='bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 dark:hover:bg-blue-400 transition disabled:opacity-50 disabled:cursor-not-allowed'
+            className='bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 dark:hover:bg-gray-500 transition disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto'
           >
             {loading ? 'Adding...' : 'Add Tag'}
           </button>
         </div>
 
         {/* Tags Table */}
-        <table className='w-full border-collapse border border-gray-200 dark:border-gray-600 mb-6'>
-          <thead className='bg-gray-100 dark:bg-gray-800'>
-            <tr>
-              <th className='border border-gray-200 dark:border-gray-600 px-4 py-2 text-left text-gray-600 dark:text-gray-300'>
-                Tag Name
-              </th>
-              <th className='border border-gray-200 dark:border-gray-600 px-4 py-2 text-left text-gray-600 dark:text-gray-300'>
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {tags.map((tag) => (
-              <tr
-                key={tag._id}
-                className='hover:bg-gray-50 dark:hover:bg-gray-700'
-              >
-                <td
-                  className='border border-gray-200 dark:border-gray-600 px-4 py-2 text-gray-800 dark:text-gray-300 cursor-pointer'
-                  onClick={() => handleTagSelection(tag._id)}
-                >
-                  {tag.name}
-                </td>
-                <td className='border border-gray-200 dark:border-gray-600 px-4 py-2'>
-                  <button
-                    onClick={() => deleteTag(tag._id)}
-                    className='text-red-500 hover:underline dark:text-red-400'
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {tags.length === 0 && !loading && (
+        <div className='overflow-x-auto'>
+          <table className='w-full border-collapse border border-gray-300 dark:border-gray-700 mb-4 sm:mb-6'>
+            <thead className='bg-gray-100 dark:bg-gray-800'>
               <tr>
-                <td
-                  colSpan={2}
-                  className='border border-gray-200 dark:border-gray-600 px-4 py-2 text-center text-gray-500 dark:text-gray-400'
-                >
-                  No tags found.
-                </td>
+                <th className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2 text-left text-gray-700 dark:text-gray-300'>
+                  Tag Name
+                </th>
+                <th className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2 text-left text-gray-700 dark:text-gray-300'>
+                  Actions
+                </th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tags.map((tag) => (
+                <tr
+                  key={tag._id}
+                  className='hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors'
+                >
+                  <td
+                    className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2 text-gray-900 dark:text-gray-100 cursor-pointer'
+                    onClick={() => handleTagSelection(tag._id)}
+                  >
+                    {tag.name}
+                  </td>
+                  <td className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2'>
+                    <button
+                      onClick={() => deleteTag(tag._id)}
+                      className='text-red-600 hover:underline dark:text-red-400'
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {tags.length === 0 && !loading && (
+                <tr>
+                  <td
+                    colSpan={2}
+                    className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2 text-center text-gray-500 dark:text-gray-400'
+                  >
+                    No tags found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
         {/* Search and Products */}
-        <div className='mb-6'>
-          <h2 className='text-lg font-bold mb-4 text-gray-800 dark:text-gray-200'>
+        <div className='mb-4 sm:mb-6'>
+          <h2 className='text-lg font-bold mb-4 text-gray-900 dark:text-gray-100'>
             Assign Products to Tag
           </h2>
           <div className='mb-4'>
@@ -365,7 +367,7 @@ export default function TagsPage() {
                 setPage(1) // Reset to the first page when searching
               }}
               placeholder='Search products by name'
-              className='w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300'
+              className='w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
             />
           </div>
 
@@ -376,7 +378,7 @@ export default function TagsPage() {
             <select
               value={selectedTag || ''}
               onChange={(e) => setSelectedTag(e.target.value)}
-              className='w-full border border-gray-300 dark:border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300'
+              className='w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
             >
               <option value='' disabled>
                 Select a tag
@@ -393,7 +395,7 @@ export default function TagsPage() {
             <label className='block text-gray-700 dark:text-gray-300 mb-2'>
               Select Products
             </label>
-            <div className='grid grid-cols-2 gap-4'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
               {products.map((product) => (
                 <div key={product._id} className='flex items-center'>
                   <input
@@ -405,7 +407,7 @@ export default function TagsPage() {
                   />
                   <label
                     htmlFor={product._id}
-                    className='text-gray-800 dark:text-gray-300'
+                    className='text-gray-900 dark:text-gray-100'
                   >
                     {product.name}
                   </label>
@@ -417,7 +419,7 @@ export default function TagsPage() {
           {products.length < totalProducts && (
             <button
               onClick={() => setPage((prev) => prev + 1)}
-              className='bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 dark:hover:bg-blue-400 transition'
+              className='bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 dark:hover:bg-gray-500 transition w-full sm:w-auto'
             >
               Show More
             </button>
@@ -426,14 +428,14 @@ export default function TagsPage() {
           <button
             onClick={assignProductsToTag}
             disabled={loading || !selectedTag || selectedProducts.length === 0}
-            className='bg-green-500 text-white ml-4 px-6 py-2 rounded-md hover:bg-green-600 dark:hover:bg-green-400 transition disabled:opacity-50 disabled:cursor-not-allowed mt-4'
+            className='bg-green-600 text-white ml-4 px-6 py-2 rounded-md hover:bg-green-700 dark:hover:bg-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed mt-4'
           >
             {loading ? 'Assigning...' : 'Assign Products'}
           </button>
           <button
             onClick={removeProductsFromTag}
             disabled={loading || !selectedTag || selectedProducts.length === 0}
-            className='bg-red-500 text-white ml-4 px-6 py-2 rounded-md hover:bg-red-600 dark:hover:bg-red-400 transition disabled:opacity-50 disabled:cursor-not-allowed mt-4'
+            className='bg-red-600 text-white ml-4 px-6 py-2 rounded-md hover:bg-red-700 dark:hover:bg-red-500 transition disabled:opacity-50 disabled:cursor-not-allowed mt-4'
           >
             {loading ? 'Removing...' : 'Remove Products'}
           </button>

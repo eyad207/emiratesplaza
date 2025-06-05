@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 
 const ProductPrice = ({
   price,
+  discountedPrice,
   className,
   listPrice = 0,
   isDeal = false,
@@ -12,6 +13,7 @@ const ProductPrice = ({
   plain = false,
 }: {
   price: number
+  discountedPrice?: number
   isDeal?: boolean
   listPrice?: number
   className?: string
@@ -21,7 +23,8 @@ const ProductPrice = ({
   const { getCurrency } = useSettingStore()
   const currency = getCurrency()
   const t = useTranslations()
-  const convertedPrice = round2(currency.convertRate * price)
+  const finalPrice = discountedPrice || price
+  const convertedPrice = round2(currency.convertRate * finalPrice)
   const convertedListPrice = round2(currency.convertRate * listPrice)
 
   const format = useFormatter()

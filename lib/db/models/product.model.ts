@@ -5,6 +5,8 @@ export interface IProduct extends Document, IProductInput {
   _id: string
   createdAt: Date
   updatedAt: Date
+  discountedPrice?: number | null
+  discount?: number | null
 }
 
 const sizeSchema = new Schema({
@@ -58,10 +60,10 @@ const productSchema = new Schema<IProduct>(
       type: Number,
       required: true,
     },
-    listPrice: {
+    discount: {
       type: Number,
-      required: true,
-    },
+      default: null,
+    }, // Ensure discount field is properly defined
     tags: [
       {
         type: Schema.Types.ObjectId, // Define each element as an ObjectId

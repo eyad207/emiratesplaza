@@ -35,11 +35,16 @@ const links = [
     title: 'Settings',
     href: '/admin/settings',
   },
+  {
+    title: 'Discounts',
+    href: '/admin/discounts',
+  },
 ]
 
 export function AdminNav({ ...props }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname() || ''
-  const t = useTranslations('Admin')
+  const t = useTranslations('Admin') // Ensure 'Admin' is the base key
+
   return (
     <nav
       className={cn(
@@ -59,7 +64,8 @@ export function AdminNav({ ...props }: React.HTMLAttributes<HTMLElement>) {
               : 'text-muted-foreground hover:bg-muted hover:text-foreground'
           )}
         >
-          {t(item.title)}
+          {t(item.title)}{' '}
+          {/* Use the title directly without appending 'Admin.' */}
         </Link>
       ))}
     </nav>

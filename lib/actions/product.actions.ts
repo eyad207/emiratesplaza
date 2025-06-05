@@ -416,6 +416,63 @@ export async function addItem(
   }
 }
 
+export async function applyDiscountToProducts({
+  productIds,
+  discount,
+}: {
+  productIds: string[]
+  discount: number
+}) {
+  try {
+    await connectToDatabase()
+    const products = await Product.find({ _id: { $in: productIds } })
+
+    for (const product of products) {
+      const newPrice = product.price - (product.price * discount) / 100
+      product.discountedPrice = Math.max(newPrice, 0) // Update discounted price
+      product.discount = discount
+      await product.save()
+    }
+
+    return {
+      success: true,
+      message: 'Discount applied successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    }
+  }
+}
+
+export async function removeDiscountFromProducts({
+  productIds,
+}: {
+  productIds: string[]
+}) {
+  try {
+    await connectToDatabase()
+    const products = await Product.find({ _id: { $in: productIds } })
+
+    for (const product of products) {
+      product.discountedPrice = null // Reset discounted price
+      product.discount = null // Remove discount
+      await product.save()
+    }
+
+    return {
+      success: true,
+      message: 'Discount removed successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    }
+  }
+}
+
 async function resolveTagIds(tagNamesOrIds: string[]): Promise<string[]> {
   if (!Array.isArray(tagNamesOrIds)) return [] // Ensure the input is an array
   const tags = await Tag.find({
