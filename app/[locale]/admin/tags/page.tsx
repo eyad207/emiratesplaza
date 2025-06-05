@@ -216,6 +216,58 @@ export default function TagsPage() {
     }
   }
 
+  const removeProductsFromTag = async () => {
+    if (!selectedTag || selectedProducts.length === 0) {
+      toast({
+        title: 'Warning',
+        description: 'Please select a tag and at least one product.',
+        variant: 'default',
+      })
+      return
+    }
+
+    setLoading(true)
+    try {
+      const response = await fetch('/api/tags/remove-products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tagId: selectedTag,
+          productIds: selectedProducts,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(
+          errorData.message || 'Failed to remove products from tag'
+        )
+      }
+
+      const data = await response.json()
+      toast({ title: 'Success', description: data.message, variant: 'default' })
+      setSelectedProducts([])
+      setSelectedTag(null)
+    } catch (error) {
+      console.error('Error removing products from tag:', error)
+      if (error instanceof Error) {
+        toast({
+          title: 'Error',
+          description: error.message,
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Error',
+          description: 'An error occurred',
+          variant: 'destructive',
+        })
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const toggleProductSelection = (productId: string) => {
     setSelectedProducts((prev) =>
       prev.includes(productId)
@@ -377,6 +429,13 @@ export default function TagsPage() {
             className='bg-green-500 text-white ml-4 px-6 py-2 rounded-md hover:bg-green-600 dark:hover:bg-green-400 transition disabled:opacity-50 disabled:cursor-not-allowed mt-4'
           >
             {loading ? 'Assigning...' : 'Assign Products'}
+          </button>
+          <button
+            onClick={removeProductsFromTag}
+            disabled={loading || !selectedTag || selectedProducts.length === 0}
+            className='bg-red-500 text-white ml-4 px-6 py-2 rounded-md hover:bg-red-600 dark:hover:bg-red-400 transition disabled:opacity-50 disabled:cursor-not-allowed mt-4'
+          >
+            {loading ? 'Removing...' : 'Remove Products'}
           </button>
         </div>
 
