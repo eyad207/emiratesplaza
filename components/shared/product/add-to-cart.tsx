@@ -21,7 +21,7 @@ export default function AddToCart({
   minimal = false,
   selectedSize,
 }: {
-  item: OrderItem
+  item: OrderItem & { discountedPrice?: number }
   minimal?: boolean
   selectedSize?: string
 }) {
@@ -61,7 +61,12 @@ export default function AddToCart({
     }
 
     try {
-      addItem(item, quantity)
+      // Always use discountedPrice if present
+      const itemToAdd = {
+        ...item,
+        price: item.discountedPrice ?? item.price,
+      }
+      addItem(itemToAdd, quantity)
       toast({
         description: t('Product.Added to Cart'),
         action: (
@@ -144,7 +149,12 @@ export default function AddToCart({
           }
 
           try {
-            addItem(item, quantity)
+            // Always use discountedPrice if present
+            const itemToAdd = {
+              ...item,
+              price: item.discountedPrice ?? item.price,
+            }
+            addItem(itemToAdd, quantity)
             router.push(`/checkout`)
           } catch (error: any) {
             toast({

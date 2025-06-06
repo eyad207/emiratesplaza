@@ -125,7 +125,7 @@ const ProductCard = ({
           name: product.name,
           slug: product.slug,
           category: product.category,
-          price: round2(product.discountedPrice ?? product.price), // <--- this line!
+          price: round2(product.discountedPrice ?? product.price), // <--- THIS line is key!
           quantity: 1,
           image: product.images[0],
           colors: product.colors,
