@@ -20,6 +20,8 @@ import {
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { round2 } from '@/lib/utils'
+import useSettingStore from '@/hooks/use-setting-store'
+import { useFormatter } from 'next-intl'
 
 export default function DiscountsPage() {
   const [products, setProducts] = useState<IProduct[]>([])
@@ -34,6 +36,10 @@ export default function DiscountsPage() {
   const [tags, setTags] = useState<{ name: string; _id: string }[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
+
+  const { getCurrency } = useSettingStore()
+  const currency = getCurrency()
+  const format = useFormatter()
 
   useEffect(() => {
     async function fetchProducts() {
@@ -420,6 +426,15 @@ export default function DiscountsPage() {
                       ? round2(product.price * (1 - product.discount / 100))
                       : undefined
 
+                // Convert prices using selected currency
+                const convertedOriginalPrice = round2(
+                  currency.convertRate * product.price
+                )
+                const convertedDiscountedPrice =
+                  productDiscountedPrice !== undefined
+                    ? round2(currency.convertRate * productDiscountedPrice)
+                    : undefined
+
                 return (
                   <TableRow
                     key={product._id}
@@ -434,24 +449,40 @@ export default function DiscountsPage() {
                       />
                     </TableCell>
                     <TableCell>{product.name}</TableCell>
-                    <TableCell>${product.price.toFixed(2)}</TableCell>
                     <TableCell>
-                      {productDiscountedPrice !== undefined
-                        ? `$${productDiscountedPrice.toFixed(2)}`
+                      {format.number(convertedOriginalPrice, {
+                        style: 'currency',
+                        currency: currency.code,
+                        currencyDisplay: 'narrowSymbol',
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      {convertedDiscountedPrice !== undefined
+                        ? format.number(convertedDiscountedPrice, {
+                            style: 'currency',
+                            currency: currency.code,
+                            currencyDisplay: 'narrowSymbol',
+                          })
                         : 'N/A'}
                     </TableCell>
                     <TableCell>
-                      {productDiscountedPrice !== undefined
-                        ? `$${(product.price - productDiscountedPrice).toFixed(
-                            2
-                          )}`
+                      {convertedDiscountedPrice !== undefined
+                        ? format.number(
+                            convertedOriginalPrice - convertedDiscountedPrice,
+                            {
+                              style: 'currency',
+                              currency: currency.code,
+                              currencyDisplay: 'narrowSymbol',
+                            }
+                          )
                         : 'N/A'}
                     </TableCell>
                     <TableCell>
-                      {productDiscountedPrice !== undefined
+                      {convertedDiscountedPrice !== undefined
                         ? `${(
-                            ((product.price - productDiscountedPrice) /
-                              product.price) *
+                            ((convertedOriginalPrice -
+                              convertedDiscountedPrice) /
+                              convertedOriginalPrice) *
                             100
                           ).toFixed(2)}%`
                         : 'N/A'}
@@ -526,63 +557,42 @@ export default function DiscountsPage() {
         <div className='mt-4 flex items-center gap-4 flex-wrap'>
           <Button
             onClick={applyDiscount}
-            disabled={
-              loading ||
-              discount <= 0 ||
-              selectedProducts.length === 0
-            }
+            disabled={loading || discount <= 0 || selectedProducts.length === 0}
             className='bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 dark:hover:bg-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {loading ? 'Applying...' : 'Apply Discount to Selected Products'}
           </Button>
           <Button
             onClick={applyDiscountToCategory}
-            disabled={
-              loading ||
-              discount <= 0 ||
-              !selectedCategory
-            }
+            disabled={loading || discount <= 0 || !selectedCategory}
             className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:hover:bg-blue-500 transition disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {loading ? 'Applying...' : 'Apply Discount to Category'}
           </Button>
           <Button
             onClick={applyDiscountToTag}
-            disabled={
-              loading ||
-              discount <= 0 ||
-              !selectedTag
-            }
+            disabled={loading || discount <= 0 || !selectedTag}
             className='bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 dark:hover:bg-purple-500 transition disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {loading ? 'Applying...' : 'Apply Discount to Tag'}
           </Button>
           <Button
             onClick={removeDiscount}
-            disabled={
-              loading ||
-              selectedProducts.length === 0
-            }
+            disabled={loading || selectedProducts.length === 0}
             className='bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 dark:hover:bg-red-500 transition disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {loading ? 'Removing...' : 'Remove Discount from Selected'}
           </Button>
           <Button
             onClick={removeDiscountFromCategory}
-            disabled={
-              loading ||
-              !selectedCategory
-            }
+            disabled={loading || !selectedCategory}
             className='bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800 dark:hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {loading ? 'Removing...' : 'Remove Discount from Category'}
           </Button>
           <Button
             onClick={removeDiscountFromTag}
-            disabled={
-              loading ||
-              !selectedTag
-            }
+            disabled={loading || !selectedTag}
             className='bg-red-900 text-white px-4 py-2 rounded-md hover:bg-red-950 dark:hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {loading ? 'Removing...' : 'Remove Discount from Tag'}
