@@ -63,11 +63,15 @@ const productSchema = new Schema<IProduct>(
     discount: {
       type: Number,
       default: null,
-    }, // Ensure discount field is properly defined
+    },
+    discountedPrice: {
+      type: Number,
+      default: null,
+    },
     tags: [
       {
-        type: Schema.Types.ObjectId, // Define each element as an ObjectId
-        ref: 'Tag', // Reference the 'Tag' model
+        type: Schema.Types.ObjectId,
+        ref: 'Tag',
       },
     ],
     colors: {
@@ -113,7 +117,11 @@ const productSchema = new Schema<IProduct>(
         default: [],
       },
     ],
-    primaryTag: { type: Schema.Types.ObjectId, ref: 'Tag', default: null },
+    primaryTag: {
+      type: Schema.Types.ObjectId,
+      ref: 'Tag',
+      default: null,
+    },
   },
   {
     timestamps: true,

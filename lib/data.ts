@@ -32,7 +32,6 @@ const products: IProductInput[] = [
     tags: [], // Initialize tags as an empty array
     isPublished: true,
     price: 21.8,
-    listPrice: 0,
     brand: 'Nike',
     avgRating: 4.71,
     numReviews: 7,
@@ -78,7 +77,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 23.78,
-    listPrice: 0,
     brand: 'Jerzees',
     avgRating: 4.2,
     numReviews: 10,
@@ -121,7 +119,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 13.86,
-    listPrice: 16.03,
     avgRating: 4,
     numReviews: 12,
     ratingDistribution: [
@@ -164,7 +161,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 26.95,
-    listPrice: 46.03,
     avgRating: 3.85,
     numReviews: 14,
     ratingDistribution: [
@@ -207,7 +203,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 29.99,
-    listPrice: 35.99,
     avgRating: 3.66,
     numReviews: 15,
     ratingDistribution: [
@@ -248,7 +243,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 25.3,
-    listPrice: 32.99,
     avgRating: 3.46,
     numReviews: 13,
     ratingDistribution: [
@@ -290,7 +284,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 95.34,
-    listPrice: 0,
     avgRating: 4.71,
     numReviews: 7,
     ratingDistribution: [
@@ -333,7 +326,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 59.99,
-    listPrice: 69.99,
     avgRating: 4.2,
     numReviews: 10,
     ratingDistribution: [
@@ -374,7 +366,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 38.9,
-    listPrice: 45,
     avgRating: 4,
     numReviews: 12,
     ratingDistribution: [
@@ -417,7 +408,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 69.99,
-    listPrice: 100,
     avgRating: 3.85,
     numReviews: 14,
     ratingDistribution: [
@@ -458,7 +448,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 95.34,
-    listPrice: 0,
     avgRating: 3.66,
     numReviews: 15,
     ratingDistribution: [
@@ -499,7 +488,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 81.78,
-    listPrice: 149.99,
     avgRating: 3.46,
     numReviews: 13,
     ratingDistribution: [
@@ -541,7 +529,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 530.0,
-    listPrice: 0,
     avgRating: 4.71,
     numReviews: 7,
     ratingDistribution: [
@@ -584,7 +571,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 375.83,
-    listPrice: 400,
     avgRating: 4.2,
     numReviews: 10,
     ratingDistribution: [
@@ -627,7 +613,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 60.78,
-    listPrice: 0,
     avgRating: 4,
     numReviews: 12,
     ratingDistribution: [
@@ -670,7 +655,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 34.22,
-    listPrice: 54.99,
     avgRating: 3.85,
     numReviews: 14,
     ratingDistribution: [
@@ -711,7 +695,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 171.22,
-    listPrice: 225,
     avgRating: 3.66,
     numReviews: 15,
     ratingDistribution: [
@@ -752,7 +735,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 158.21,
-    listPrice: 229.0,
     avgRating: 3.46,
     numReviews: 13,
     ratingDistribution: [
@@ -794,7 +776,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 81.99,
-    listPrice: 0,
     avgRating: 4.71,
     numReviews: 7,
     ratingDistribution: [
@@ -837,7 +818,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 39.97,
-    listPrice: 49.96,
     avgRating: 4.2,
     numReviews: 10,
     ratingDistribution: [
@@ -880,7 +860,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 99.99,
-    listPrice: 0,
     avgRating: 4,
     numReviews: 12,
     ratingDistribution: [
@@ -923,7 +902,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 36.99,
-    listPrice: 56.9,
     avgRating: 3.85,
     numReviews: 14,
     ratingDistribution: [
@@ -964,7 +942,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 179.95,
-    listPrice: 200,
     avgRating: 3.66,
     numReviews: 15,
     ratingDistribution: [
@@ -1007,7 +984,6 @@ const products: IProductInput[] = [
     tags: [],
     isPublished: true,
     price: 32.99,
-    listPrice: 80,
     avgRating: 3.46,
     numReviews: 13,
     ratingDistribution: [

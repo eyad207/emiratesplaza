@@ -10,6 +10,7 @@ import { formatNumber, generateId, round2, cn } from '@/lib/utils'
 import ProductPrice from './product-price'
 import ImageHover from './image-hover'
 import AddToCart from './add-to-cart'
+import { useTranslations } from 'next-intl'
 
 const ProductCard = ({
   product,
@@ -65,6 +66,8 @@ const ProductCard = ({
     </div>
   )
 
+  const discountedPrice = product.discountedPrice ?? undefined
+
   const ProductDetails = () => {
     const tags = product?.tags || [] // Ensure tags is always an array
 
@@ -102,7 +105,7 @@ const ProductCard = ({
           <ProductPrice
             isDeal={tags.includes('todays-deal')}
             price={product.price}
-            listPrice={product.listPrice}
+            discountedPrice={discountedPrice} // <--- add this
             forListing
           />
         </div>
@@ -122,7 +125,7 @@ const ProductCard = ({
           name: product.name,
           slug: product.slug,
           category: product.category,
-          price: round2(product.price),
+          price: round2(product.discountedPrice ?? product.price), // <--- this line!
           quantity: 1,
           image: product.images[0],
           colors: product.colors,
@@ -133,6 +136,7 @@ const ProductCard = ({
   )
 
   const discountPercent = product.discount ? Math.round(product.discount) : null
+  const t = useTranslations()
 
   return hideBorder ? (
     <Link
@@ -183,8 +187,17 @@ const ProductCard = ({
         )}
         {/* Discount Badge */}
         {discountPercent && (
-          <div className='absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded'>
-            {discountPercent}% Off
+          <div
+            className={cn(
+              'absolute top-3 left-3 opacity-80 px-2 py-1.5 text-sm font-extrabold text-white rounded-full bg-gradient-to-r from-red-700 to-red-600 shadow-lg',
+              'animate-fadeInScale transition-transform duration-300 ease-out group-hover:scale-110'
+            )}
+            style={{
+              animation: 'fadeInScale 0.4s ease-out forwards',
+              letterSpacing: '0.02em',
+            }}
+          >
+            {discountPercent}% {t('Product.OFF')}
           </div>
         )}
       </Card>

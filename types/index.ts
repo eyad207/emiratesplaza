@@ -101,7 +101,6 @@ export type IProduct = {
   description: string
   isPublished: boolean
   price: number
-  listPrice: number
   tags: string[]
   primaryTag?: string // Add primaryTag as an optional field
   colors: {

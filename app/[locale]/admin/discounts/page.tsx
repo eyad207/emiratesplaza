@@ -19,6 +19,7 @@ import {
   removeDiscountFromProducts,
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
+import { round2 } from '@/lib/utils'
 
 export default function DiscountsPage() {
   const [products, setProducts] = useState<IProduct[]>([])
@@ -76,7 +77,7 @@ export default function DiscountsPage() {
         variant: 'default',
       })
 
-      // Update discounted prices locally without modifying the original price
+      // Update discounted prices locally
       const updatedPrices = { ...discountedPrices }
       selectedProducts.forEach((productId) => {
         const product = products.find((p) => p._id === productId)
@@ -90,7 +91,7 @@ export default function DiscountsPage() {
       setSelectedProducts([])
       setDiscount(0)
 
-      // Refresh products to reflect updated prices
+      // Refresh products to reflect updated discounts
       const response = await getAllProductsForAdmin({ query: searchQuery })
       setProducts(response.products)
     } catch {
@@ -132,7 +133,7 @@ export default function DiscountsPage() {
 
       setSelectedProducts([])
 
-      // Refresh products to reflect updated prices
+      // Refresh products to reflect updated discounts
       const response = await getAllProductsForAdmin({ query: searchQuery })
       setProducts(response.products)
     } catch {
@@ -179,45 +180,55 @@ export default function DiscountsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
-                <TableRow
-                  key={product._id}
-                  className='border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted'
-                >
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedProducts.includes(product._id)}
-                      onCheckedChange={() =>
-                        toggleProductSelection(product._id)
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>${product.price}</TableCell>
-                  <TableCell>
-                    {discountedPrices[product._id]
-                      ? `$${discountedPrices[product._id].toFixed(2)}`
-                      : 'N/A'}
-                  </TableCell>
-                  <TableCell>
-                    {discountedPrices[product._id]
-                      ? `$${(product.price - discountedPrices[product._id]).toFixed(
-                          2
-                        )}`
-                      : 'N/A'}
-                  </TableCell>
-                  <TableCell>
-                    {discountedPrices[product._id]
-                      ? `${(
-                          ((product.price - discountedPrices[product._id]) /
-                            product.price) *
-                          100
-                        ).toFixed(2)}%`
-                      : 'N/A'}
-                  </TableCell>
-                  <TableCell>{product.category}</TableCell>
-                </TableRow>
-              ))}
+              {products.map((product) => {
+                // Calculate discounted price:
+                const productDiscountedPrice =
+                  discountedPrices[product._id] !== undefined
+                    ? discountedPrices[product._id]
+                    : product.discount
+                      ? round2(product.price * (1 - product.discount / 100))
+                      : undefined
+
+                return (
+                  <TableRow
+                    key={product._id}
+                    className='border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted'
+                  >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedProducts.includes(product._id)}
+                        onCheckedChange={() =>
+                          toggleProductSelection(product._id)
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>${product.price.toFixed(2)}</TableCell>
+                    <TableCell>
+                      {productDiscountedPrice !== undefined
+                        ? `$${productDiscountedPrice.toFixed(2)}`
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      {productDiscountedPrice !== undefined
+                        ? `$${(product.price - productDiscountedPrice).toFixed(
+                            2
+                          )}`
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      {productDiscountedPrice !== undefined
+                        ? `${(
+                            ((product.price - productDiscountedPrice) /
+                              product.price) *
+                            100
+                          ).toFixed(2)}%`
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell>{product.category}</TableCell>
+                  </TableRow>
+                )
+              })}
               {products.length === 0 && !loading && (
                 <TableRow>
                   <TableCell colSpan={7} className='text-center'>

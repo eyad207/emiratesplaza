@@ -49,7 +49,6 @@ export const ProductInputSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   isPublished: z.boolean(),
   price: Price('Price'),
-  listPrice: Price('List price'),
   tags: z.array(z.string()).default([]),
   colors: z.array(ColorSchema).default([]),
   avgRating: z.coerce

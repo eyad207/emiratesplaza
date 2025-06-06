@@ -7,7 +7,6 @@ const ProductPrice = ({
   price,
   discountedPrice,
   className,
-  listPrice = 0,
   isDeal = false,
   forListing = true,
   plain = false,
@@ -15,7 +14,6 @@ const ProductPrice = ({
   price: number
   discountedPrice?: number
   isDeal?: boolean
-  listPrice?: number
   className?: string
   forListing?: boolean
   plain?: boolean
@@ -23,14 +21,18 @@ const ProductPrice = ({
   const { getCurrency } = useSettingStore()
   const currency = getCurrency()
   const t = useTranslations()
-  const finalPrice = discountedPrice || price
+
+  const finalPrice = discountedPrice ?? price
   const convertedPrice = round2(currency.convertRate * finalPrice)
-  const convertedListPrice = round2(currency.convertRate * listPrice)
 
   const format = useFormatter()
-  const discountPercent = Math.round(
-    100 - (convertedPrice / convertedListPrice) * 100
-  )
+
+  const hasDiscount = discountedPrice !== undefined && discountedPrice < price
+
+  const discountPercent = hasDiscount
+    ? Math.round(100 - (discountedPrice! / price) * 100)
+    : 0
+
   const stringValue = convertedPrice.toString()
   const [intValue, floatValue] = stringValue.includes('.')
     ? stringValue.split('.')
@@ -42,12 +44,6 @@ const ProductPrice = ({
       currency: currency.code,
       currencyDisplay: 'narrowSymbol',
     })
-  ) : convertedListPrice == 0 ? (
-    <div className={cn('text-3xl', className)}>
-      <span className='text-xs align-super'>{currency.symbol}</span>
-      {intValue}
-      <span className='text-xs align-super'>{floatValue}</span>
-    </div>
   ) : isDeal ? (
     <div className='space-y-2'>
       <div className='flex justify-center items-center gap-2'>
@@ -66,38 +62,38 @@ const ProductPrice = ({
           {intValue}
           <span className='text-xs align-super'>{floatValue}</span>
         </div>
-        <div className='text-muted-foreground text-xs py-2'>
-          {t('Product.Was')}:{' '}
-          <span className='line-through'>
-            {format.number(convertedListPrice, {
+        {hasDiscount && (
+          <div className='text-muted-foreground text-xs py-2 line-through'>
+            {format.number(price * currency.convertRate, {
               style: 'currency',
               currency: currency.code,
               currencyDisplay: 'narrowSymbol',
             })}
-          </span>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   ) : (
     <div className=''>
       <div className='flex justify-center gap-3'>
-        <div className='text-3xl text-orange-700'>-{discountPercent}%</div>
+        {hasDiscount && (
+          <div className='text-3xl text-orange-700'>-{discountPercent}%</div>
+        )}
         <div className={cn('text-3xl', className)}>
           <span className='text-xs align-super'>{currency.symbol}</span>
           {intValue}
           <span className='text-xs align-super'>{floatValue}</span>
         </div>
       </div>
-      <div className='text-muted-foreground text-xs py-2'>
-        {t('Product.List price')}:{' '}
-        <span className='line-through'>
-          {format.number(convertedListPrice, {
+      {hasDiscount && (
+        <div className='text-muted-foreground text-xs py-2 line-through'>
+          {format.number(price * currency.convertRate, {
             style: 'currency',
             currency: currency.code,
             currencyDisplay: 'narrowSymbol',
           })}
-        </span>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

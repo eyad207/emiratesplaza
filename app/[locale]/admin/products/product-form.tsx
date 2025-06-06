@@ -27,44 +27,23 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { toSlug } from '@/lib/utils'
 import { IProductInput } from '@/types'
 
-const productDefaultValues: IProductInput =
-  process.env.NODE_ENV === 'development'
-    ? {
-        name: 'Sample Product',
-        slug: 'sample-product',
-        category: 'Sample Category',
-        images: ['/images/p11-1.jpg'],
-        brand: 'Sample Brand',
-        description: 'This is a sample description of the product.',
-        price: 99.99,
-        listPrice: 0,
-        numReviews: 0,
-        avgRating: 0,
-        numSales: 0,
-        isPublished: false,
-        tags: [],
-        colors: [],
-        ratingDistribution: [],
-        reviews: [],
-      }
-    : {
-        name: '',
-        slug: '',
-        category: '',
-        images: [],
-        brand: '',
-        description: '',
-        price: 0,
-        listPrice: 0,
-        numReviews: 0,
-        avgRating: 0,
-        numSales: 0,
-        isPublished: false,
-        tags: [],
-        colors: [],
-        ratingDistribution: [],
-        reviews: [],
-      }
+const productDefaultValues: IProductInput = {
+  name: '',
+  slug: '',
+  category: '',
+  images: [],
+  brand: '',
+  description: '',
+  price: 0,
+  numReviews: 0,
+  avgRating: 0,
+  numSales: 0,
+  isPublished: false,
+  tags: [],
+  colors: [],
+  ratingDistribution: [],
+  reviews: [],
+}
 
 const ProductForm = ({
   type,
@@ -84,7 +63,7 @@ const ProductForm = ({
     async function fetchTags() {
       const response = await fetch('/api/tags')
       const data = await response.json()
-      if (data.success) setAvailableTags(data.tags) // Fetch updated tags
+      if (data.success) setAvailableTags(data.tags)
     }
     fetchTags()
   }, [])
@@ -103,14 +82,9 @@ const ProductForm = ({
     if (type === 'Create') {
       const res = await createProduct(values)
       if (!res.success) {
-        toast({
-          variant: 'destructive',
-          description: res.message,
-        })
+        toast({ variant: 'destructive', description: res.message })
       } else {
-        toast({
-          description: res.message,
-        })
+        toast({ description: res.message })
         router.push(`/admin/products`)
       }
     }
@@ -121,15 +95,13 @@ const ProductForm = ({
       }
       const res = await updateProduct({ ...values, _id: productId })
       if (!res.success) {
-        toast({
-          variant: 'destructive',
-          description: res.message,
-        })
+        toast({ variant: 'destructive', description: res.message })
       } else {
         router.push(`/admin/products`)
       }
     }
   }
+
   const images = form.watch('images')
 
   const {
@@ -146,99 +118,86 @@ const ProductForm = ({
       <form
         method='post'
         onSubmit={form.handleSubmit(onSubmit)}
-        className='space-y-8'
+        className='space-y-10 max-w-4xl mx-auto'
       >
-        <div className='flex flex-col gap-5 md:flex-row'>
-          <FormField
-            control={form.control}
-            name='name'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder='Enter product name' {...field} />
-                </FormControl>
+        {/* General Info */}
+        <div className='space-y-5'>
+          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+            General Information
+          </h2>
+          <div className='flex flex-col gap-5 md:flex-row'>
+            <FormField
+              control={form.control}
+              name='name'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder='Enter product name' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='slug'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel>Slug</FormLabel>
+                  <FormControl>
+                    <div className='relative'>
+                      <Input
+                        placeholder='Enter product slug'
+                        className='pl-8'
+                        {...field}
+                      />
+                      <button
+                        type='button'
+                        onClick={() => {
+                          form.setValue('slug', toSlug(form.getValues('name')))
+                        }}
+                        className='absolute right-2 mt-2 bg-slate-500 hover:bg-slate-600 text-white rounded-md p-1'
+                      >
+                        Generate
+                      </button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className='flex flex-col gap-5 md:flex-row'>
+            <FormField
+              control={form.control}
+              name='category'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel>Category</FormLabel>
+                  <FormControl>
+                    <Input placeholder='Enter category' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='brand'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel>Brand</FormLabel>
+                  <FormControl>
+                    <Input placeholder='Enter product brand' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name='slug'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Slug</FormLabel>
-
-                <FormControl>
-                  <div className='relative'>
-                    <Input
-                      placeholder='Enter product slug'
-                      className='pl-8'
-                      {...field}
-                    />
-                    <button
-                      type='button'
-                      onClick={() => {
-                        form.setValue('slug', toSlug(form.getValues('name')))
-                      }}
-                      className='absolute right-2 mt-2 bg-slate-500 hover:bg-slate-600 dark: border-r-2 text-white rounded-md p-1'
-                    >
-                      Generate
-                    </button>
-                  </div>
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <div className='flex flex-col gap-5 md:flex-row'>
-          <FormField
-            control={form.control}
-            name='category'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Category</FormLabel>
-                <FormControl>
-                  <Input placeholder='Enter category' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name='brand'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Brand</FormLabel>
-                <FormControl>
-                  <Input placeholder='Enter product brand' {...field} />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <div className='flex flex-col gap-5 md:flex-row'>
-          <FormField
-            control={form.control}
-            name='listPrice'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>Price before discount (in $)</FormLabel>
-                <FormControl>
-                  <Input placeholder='Enter product list price' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name='price'
@@ -254,31 +213,34 @@ const ProductForm = ({
           />
         </div>
 
-        <div className='flex flex-col gap-5 md:flex-row'>
+        {/* Images */}
+        <div className='space-y-5'>
+          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+            Images
+          </h2>
           <FormField
             control={form.control}
             name='images'
             render={() => (
               <FormItem className='w-full'>
-                <FormLabel>Images</FormLabel>
                 <FormDescription>
-                  The first image will be used as the main product image and for
-                  category display.
+                  First image is the main product image.
                 </FormDescription>
                 <Card>
-                  <CardContent className='space-y-2 mt-2 min-h-48'>
-                    <div className='flex flex-wrap justify-start items-center space-x-2'>
+                  <CardContent className='space-y-4 mt-2'>
+                    <div className='flex flex-wrap gap-4'>
                       {images.map((image: string, index: number) => (
-                        <div key={index} className='relative mb-2'>
+                        <div key={index} className='relative w-24 h-24'>
                           <Image
                             src={image}
                             alt='product image'
-                            className={`w-20 h-20 object-cover object-center rounded-sm ${index === 0 ? 'border-2 border-primary' : ''}`}
-                            width={100}
-                            height={100}
+                            fill
+                            className={`rounded border object-cover ${
+                              index === 0 ? 'border-2 border-primary' : ''
+                            }`}
                           />
                           {index === 0 && (
-                            <span className='absolute bottom-0 left-0 bg-primary text-white text-xs px-1 rounded-sm'>
+                            <span className='absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded'>
                               Main
                             </span>
                           )}
@@ -290,50 +252,29 @@ const ProductForm = ({
                               )
                               form.setValue('images', updatedImages)
                             }}
-                            className='absolute top-0 right-0 bg-red-600 text-white rounded-full p-1 w-4 h-4 flex items-center justify-center'
+                            className='absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center'
                           >
-                            X
+                            ×
                           </button>
-                          {index > 0 && (
-                            <button
-                              type='button'
-                              onClick={() => {
-                                const updatedImages = [...images]
-                                ;[updatedImages[0], updatedImages[index]] = [
-                                  updatedImages[index],
-                                  updatedImages[0],
-                                ]
-                                form.setValue('images', updatedImages)
-                              }}
-                              className='absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-1 w-4 h-4 flex items-center justify-center'
-                              title='Make this the main image'
-                            >
-                              ↑
-                            </button>
-                          )}
                         </div>
                       ))}
-                      <FormControl>
-                        <UploadButton
-                          endpoint='imageUploader'
-                          onClientUploadComplete={(res: { url: string }[]) => {
-                            // If this is the first image, just add it
-                            // Otherwise, add it after the first image to maintain main image position
-                            if (images.length === 0) {
-                              form.setValue('images', [res[0].url])
-                            } else {
-                              form.setValue('images', [...images, res[0].url])
-                            }
-                          }}
-                          onUploadError={(error: Error) => {
-                            toast({
-                              variant: 'destructive',
-                              description: `ERROR! ${error.message}`,
-                            })
-                          }}
-                        />
-                      </FormControl>
                     </div>
+                    <UploadButton
+                      endpoint='imageUploader'
+                      onClientUploadComplete={(res: { url: string }[]) => {
+                        const newImages =
+                          images.length === 0
+                            ? [res[0].url]
+                            : [...images, res[0].url]
+                        form.setValue('images', newImages)
+                      }}
+                      onUploadError={(error: Error) => {
+                        toast({
+                          variant: 'destructive',
+                          description: `ERROR! ${error.message}`,
+                        })
+                      }}
+                    />
                   </CardContent>
                 </Card>
                 <FormMessage />
@@ -342,11 +283,17 @@ const ProductForm = ({
           />
         </div>
 
-        <div>
-          <FormLabel className='text-lg mr-10 '>Colors and Sizes</FormLabel>
+        {/* Colors and Sizes */}
+        <div className='space-y-5'>
+          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+            Colors and Sizes
+          </h2>
           {colorFields.map((colorField, colorIndex) => (
-            <div key={colorField.id} className='mb-4'>
-              <div className='flex items-center gap-2'>
+            <div
+              key={colorField.id}
+              className='border p-4 rounded space-y-4 bg-muted/10'
+            >
+              <div className='flex items-center gap-4'>
                 <FormField
                   control={form.control}
                   name={`colors.${colorIndex}.color`}
@@ -361,24 +308,25 @@ const ProductForm = ({
                   )}
                 />
                 <Button
-                  className='mt-8'
-                  type='button'
                   variant='destructive'
                   onClick={() => removeColor(colorIndex)}
                 >
                   Remove Color
                 </Button>
               </div>
-              <div className='ml-2'>
-                {/* Access sizes directly from the current color */}
+
+              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
                 {(form.watch(`colors.${colorIndex}.sizes`) || []).map(
                   (size, sizeIndex) => (
-                    <div key={sizeIndex} className='flex items-center gap-2'>
+                    <div
+                      key={sizeIndex}
+                      className='border p-3 rounded bg-white dark:bg-zinc-800 space-y-2'
+                    >
                       <FormField
                         control={form.control}
                         name={`colors.${colorIndex}.sizes.${sizeIndex}.size`}
                         render={({ field }) => (
-                          <FormItem className='w-full'>
+                          <FormItem>
                             <FormLabel>Size</FormLabel>
                             <FormControl>
                               <Input placeholder='Enter size' {...field} />
@@ -391,7 +339,7 @@ const ProductForm = ({
                         control={form.control}
                         name={`colors.${colorIndex}.sizes.${sizeIndex}.countInStock`}
                         render={({ field }) => (
-                          <FormItem className='w-full'>
+                          <FormItem>
                             <FormLabel>Count In Stock</FormLabel>
                             <FormControl>
                               <Input
@@ -411,9 +359,8 @@ const ProductForm = ({
                         )}
                       />
                       <Button
-                        className='mt-8'
                         type='button'
-                        variant='destructive'
+                        variant='outline'
                         onClick={() => {
                           const currentSizes = [
                             ...(form.getValues(`colors.${colorIndex}.sizes`) ||
@@ -431,20 +378,20 @@ const ProductForm = ({
                     </div>
                   )
                 )}
-                <Button
-                  className='mt-3'
-                  type='button'
-                  onClick={() => {
-                    const currentSizes = [
-                      ...(form.getValues(`colors.${colorIndex}.sizes`) || []),
-                    ]
-                    currentSizes.push({ size: '', countInStock: 0 })
-                    form.setValue(`colors.${colorIndex}.sizes`, currentSizes)
-                  }}
-                >
-                  Add Size
-                </Button>
               </div>
+
+              <Button
+                type='button'
+                onClick={() => {
+                  const currentSizes = [
+                    ...(form.getValues(`colors.${colorIndex}.sizes`) || []),
+                  ]
+                  currentSizes.push({ size: '', countInStock: 0 })
+                  form.setValue(`colors.${colorIndex}.sizes`, currentSizes)
+                }}
+              >
+                Add Size
+              </Button>
             </div>
           ))}
           <Button
@@ -457,19 +404,22 @@ const ProductForm = ({
           </Button>
         </div>
 
-        <div>
+        {/* Tags */}
+        <div className='space-y-5'>
+          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+            Tags
+          </h2>
           <FormField
             control={form.control}
             name='tags'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Tags</FormLabel>
                 <FormControl>
-                  <div className='flex flex-wrap gap-2'>
+                  <div className='flex flex-wrap gap-3'>
                     {availableTags.map((tag) => (
                       <label
                         key={tag._id}
-                        className='flex items-center space-x-2'
+                        className='flex items-center space-x-2 bg-muted/20 px-2 py-1 rounded'
                       >
                         <Checkbox
                           checked={field.value.includes(tag._id)}
@@ -491,56 +441,57 @@ const ProductForm = ({
           />
         </div>
 
-        <div>
+        {/* Description */}
+        <div className='space-y-5'>
+          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+            Description
+          </h2>
           <FormField
             control={form.control}
             name='description'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder='Tell us a little bit about yourself'
+                    placeholder='Enter product description'
                     className='resize-none'
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>
-                  You can <span>@mention</span> other users and organizations to
-                  link to them.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <div>
+
+        {/* Publish Toggle */}
+        <div className='space-y-5'>
           <FormField
             control={form.control}
             name='isPublished'
             render={({ field }) => (
-              <FormItem className='space-x-2 items-center justify-center'>
+              <FormItem className='flex items-center space-x-3'>
                 <FormControl>
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    className=''
                   />
                 </FormControl>
-                <FormLabel className=''>Is Published?</FormLabel>
+                <FormLabel>Is Published?</FormLabel>
               </FormItem>
             )}
           />
         </div>
 
+        {/* Submit */}
         <div>
           <Button
             type='submit'
             size='lg'
             disabled={form.formState.isSubmitting}
-            className='button col-span-2 w-full'
+            className='w-full text-lg font-bold'
           >
-            {form.formState.isSubmitting ? 'Submitting...' : `${type} Product `}
+            {form.formState.isSubmitting ? 'Submitting...' : `${type} Product`}
           </Button>
         </div>
       </form>

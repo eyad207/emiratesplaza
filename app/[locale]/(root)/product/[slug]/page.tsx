@@ -97,7 +97,7 @@ export default async function ProductDetails(props: {
                 <div className='flex gap-3'>
                   <ProductPrice
                     price={product.price}
-                    listPrice={product.listPrice}
+                    discountedPrice={product.discountedPrice ?? undefined}
                     isDeal={product.tags.includes('todays-deal')}
                     forListing={false}
                   />
@@ -124,8 +124,10 @@ export default async function ProductDetails(props: {
           <div>
             <Card>
               <CardContent className='p-4 flex flex-col  gap-4'>
-                <ProductPrice price={product.price} />
-
+                <ProductPrice
+                  price={product.price}
+                  discountedPrice={product.discountedPrice ?? undefined}
+                />
                 {getCountInStockForSelectedVariant() > 0 &&
                   getCountInStockForSelectedVariant() <= 3 && (
                     <div className='text-destructive font-bold'>

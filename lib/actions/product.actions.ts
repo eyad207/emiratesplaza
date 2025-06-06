@@ -214,8 +214,12 @@ export async function getProductsByTag({
 // GET ONE PRODUCT BY SLUG
 export async function getProductBySlug(slug: string) {
   await connectToDatabase()
-  const product = await Product.findOne({ slug, isPublished: true })
+  const product = await Product.findOne({ slug, isPublished: true }).select(
+    'name price discountedPrice discount category images brand avgRating numReviews slug colors tags description reviews ratingDistribution numSales'
+  )
+
   if (!product) throw new Error('Product not found')
+
   return JSON.parse(JSON.stringify(product)) as IProduct
 }
 
@@ -252,7 +256,6 @@ export async function getRelatedProductsByCategory({
     totalPages: Math.ceil(productsCount / limit),
   }
 }
-
 // GET ALL PRODUCTS
 export async function getAllProducts({
   query,
@@ -320,6 +323,7 @@ export async function getAllProducts({
             ? { avgRating: -1 }
             : { _id: -1 }
   const isPublished = { isPublished: true }
+
   const products = await Product.find({
     ...isPublished,
     ...queryFilter,
@@ -331,6 +335,9 @@ export async function getAllProducts({
     .sort(order)
     .skip(limit * (Number(page) - 1))
     .limit(limit)
+    .select(
+      'name price discountedPrice discount category images brand avgRating numReviews slug colors tags'
+    ) // <--- VERY important line!
     .lean()
 
   const countProducts = await Product.countDocuments({
@@ -340,6 +347,7 @@ export async function getAllProducts({
     ...priceFilter,
     ...ratingFilter,
   })
+
   return {
     products: JSON.parse(JSON.stringify(products)) as IProduct[],
     totalPages: Math.ceil(countProducts / limit),
