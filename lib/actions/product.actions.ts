@@ -427,17 +427,30 @@ export async function addItem(
 export async function applyDiscountToProducts({
   productIds,
   discount,
+  category,
+  tagId,
 }: {
-  productIds: string[]
+  productIds?: string[]
   discount: number
+  category?: string
+  tagId?: string
 }) {
   try {
     await connectToDatabase()
-    const products = await Product.find({ _id: { $in: productIds } })
+    let products = []
+    if (productIds && productIds.length > 0) {
+      products = await Product.find({ _id: { $in: productIds } })
+    } else if (category) {
+      products = await Product.find({ category })
+    } else if (tagId) {
+      products = await Product.find({ tags: tagId })
+    } else {
+      throw new Error('No products, category, or tag specified')
+    }
 
     for (const product of products) {
       const newPrice = product.price - (product.price * discount) / 100
-      product.discountedPrice = Math.max(newPrice, 0) // Update discounted price
+      product.discountedPrice = Math.max(newPrice, 0)
       product.discount = discount
       await product.save()
     }

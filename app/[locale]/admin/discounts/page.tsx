@@ -30,6 +30,10 @@ export default function DiscountsPage() {
   const [discountedPrices, setDiscountedPrices] = useState<
     Record<string, number>
   >({})
+  const [categories, setCategories] = useState<string[]>([])
+  const [tags, setTags] = useState<{ name: string; _id: string }[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchProducts() {
@@ -50,6 +54,30 @@ export default function DiscountsPage() {
     fetchProducts()
   }, [searchQuery])
 
+  // Fetch categories and tags
+  useEffect(() => {
+    async function fetchCategoriesAndTags() {
+      try {
+        const [categoriesResponse, tagsResponse] = await Promise.all([
+          fetch('/api/categories'),
+          fetch('/api/tags'),
+        ])
+        const categoriesData = await categoriesResponse.json()
+        const tagsData = await tagsResponse.json()
+
+        if (categoriesData.success) setCategories(categoriesData.categories)
+        if (tagsData.success) setTags(tagsData.tags)
+      } catch {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch categories or tags',
+          variant: 'destructive',
+        })
+      }
+    }
+    fetchCategoriesAndTags()
+  }, [])
+
   const toggleProductSelection = (productId: string) => {
     setSelectedProducts((prev) =>
       prev.includes(productId)
@@ -59,10 +87,14 @@ export default function DiscountsPage() {
   }
 
   const applyDiscount = async () => {
-    if (selectedProducts.length === 0 || discount <= 0) {
+    if (
+      discount <= 0 ||
+      (!selectedProducts.length && !selectedCategory && !selectedTag)
+    ) {
       toast({
         title: 'Warning',
-        description: 'Please select products and enter a valid discount.',
+        description:
+          'Please select products, a category, or a tag and enter a valid discount.',
         variant: 'default',
       })
       return
@@ -70,7 +102,20 @@ export default function DiscountsPage() {
 
     setLoading(true)
     try {
-      await applyDiscountToProducts({ productIds: selectedProducts, discount })
+      if (!selectedProducts.length) {
+        toast({
+          title: 'Warning',
+          description: 'Please select products to apply the discount.',
+          variant: 'default',
+        })
+        setLoading(false)
+        return
+      }
+
+      await applyDiscountToProducts({
+        productIds: selectedProducts,
+        discount,
+      })
       toast({
         title: 'Success',
         description: 'Discount applied successfully!',
@@ -89,6 +134,8 @@ export default function DiscountsPage() {
       setDiscountedPrices(updatedPrices)
 
       setSelectedProducts([])
+      setSelectedCategory(null)
+      setSelectedTag(null)
       setDiscount(0)
 
       // Refresh products to reflect updated discounts
@@ -98,6 +145,78 @@ export default function DiscountsPage() {
       toast({
         title: 'Error',
         description: 'Failed to apply discount',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const applyDiscountToCategory = async () => {
+    if (!selectedCategory || discount <= 0) {
+      toast({
+        title: 'Warning',
+        description: 'Please select a category and enter a valid discount.',
+        variant: 'default',
+      })
+      return
+    }
+    setLoading(true)
+    try {
+      await applyDiscountToProducts({
+        discount,
+        category: selectedCategory,
+      })
+      toast({
+        title: 'Success',
+        description: 'Discount applied to category successfully!',
+        variant: 'default',
+      })
+      setSelectedProducts([])
+      setSelectedCategory(null)
+      setDiscount(0)
+      const response = await getAllProductsForAdmin({ query: searchQuery })
+      setProducts(response.products)
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to apply discount to category',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const applyDiscountToTag = async () => {
+    if (!selectedTag || discount <= 0) {
+      toast({
+        title: 'Warning',
+        description: 'Please select a tag and enter a valid discount.',
+        variant: 'default',
+      })
+      return
+    }
+    setLoading(true)
+    try {
+      await applyDiscountToProducts({
+        discount,
+        tagId: selectedTag,
+      })
+      toast({
+        title: 'Success',
+        description: 'Discount applied to tag successfully!',
+        variant: 'default',
+      })
+      setSelectedProducts([])
+      setSelectedTag(null)
+      setDiscount(0)
+      const response = await getAllProductsForAdmin({ query: searchQuery })
+      setProducts(response.products)
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to apply discount to tag',
         variant: 'destructive',
       })
     } finally {
@@ -140,6 +259,118 @@ export default function DiscountsPage() {
       toast({
         title: 'Error',
         description: 'Failed to remove discount',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const removeDiscountFromCategory = async () => {
+    if (!selectedCategory) {
+      toast({
+        title: 'Warning',
+        description: 'Please select a category to remove the discount.',
+        variant: 'default',
+      })
+      return
+    }
+    setLoading(true)
+    try {
+      // Get all products in the selected category
+      const response = await getAllProductsForAdmin({
+        query: '',
+        sort: 'latest',
+        page: 1,
+        limit: 1000,
+      })
+      const categoryProducts = response.products.filter(
+        (product) => product.category === selectedCategory
+      )
+      const productIds = categoryProducts.map((p) => p._id)
+      if (productIds.length === 0) {
+        toast({
+          title: 'Info',
+          description: 'No products found in this category.',
+          variant: 'default',
+        })
+        setLoading(false)
+        return
+      }
+      await removeDiscountFromProducts({ productIds })
+      toast({
+        title: 'Success',
+        description: 'Discount removed from category successfully!',
+        variant: 'default',
+      })
+      setSelectedProducts([])
+      setSelectedCategory(null)
+      setDiscount(0)
+      const refreshed = await getAllProductsForAdmin({ query: searchQuery })
+      setProducts(refreshed.products)
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to remove discount from category',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const removeDiscountFromTag = async () => {
+    if (!selectedTag) {
+      toast({
+        title: 'Warning',
+        description: 'Please select a tag to remove the discount.',
+        variant: 'default',
+      })
+      return
+    }
+    setLoading(true)
+    try {
+      // Get all products with the selected tag
+      const response = await getAllProductsForAdmin({
+        query: '',
+        sort: 'latest',
+        page: 1,
+        limit: 1000,
+      })
+      const tagProducts = response.products.filter(
+        (product) =>
+          Array.isArray(product.tags) &&
+          product.tags.some((tag: string | { _id: string }) =>
+            typeof tag === 'string'
+              ? tag === selectedTag
+              : tag?._id === selectedTag
+          )
+      )
+      const productIds = tagProducts.map((p) => p._id)
+      if (productIds.length === 0) {
+        toast({
+          title: 'Info',
+          description: 'No products found with this tag.',
+          variant: 'default',
+        })
+        setLoading(false)
+        return
+      }
+      await removeDiscountFromProducts({ productIds })
+      toast({
+        title: 'Success',
+        description: 'Discount removed from tag successfully!',
+        variant: 'default',
+      })
+      setSelectedProducts([])
+      setSelectedTag(null)
+      setDiscount(0)
+      const refreshed = await getAllProductsForAdmin({ query: searchQuery })
+      setProducts(refreshed.products)
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to remove discount from tag',
         variant: 'destructive',
       })
     } finally {
@@ -241,27 +472,120 @@ export default function DiscountsPage() {
         </div>
 
         {/* Discount Section */}
-        <div className='mt-4 flex items-center gap-4'>
-          <Input
-            type='number'
-            value={discount}
-            onChange={(e) => setDiscount(Number(e.target.value))}
-            placeholder='Enter discount percentage'
-            className='w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
-          />
+        <div className='mt-4 flex flex-col sm:flex-row items-center gap-4'>
+          <div className='w-full sm:w-1/3'>
+            <Input
+              type='number'
+              value={discount}
+              onChange={(e) => setDiscount(Number(e.target.value))}
+              placeholder='Enter discount percentage'
+              className='w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
+            />
+          </div>
+          <div className='w-full sm:w-1/3'>
+            {/* Dropdown for selecting category */}
+            <label className='block text-gray-700 dark:text-gray-300 mb-2'>
+              Select Category
+            </label>
+            <select
+              value={selectedCategory || ''}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className='w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
+            >
+              <option value='' disabled>
+                Select a category
+              </option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className='w-full sm:w-1/3'>
+            {/* Dropdown for selecting tag */}
+            <label className='block text-gray-700 dark:text-gray-300 mb-2'>
+              Select Tag
+            </label>
+            <select
+              value={selectedTag || ''}
+              onChange={(e) => setSelectedTag(e.target.value)}
+              className='w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
+            >
+              <option value='' disabled>
+                Select a tag
+              </option>
+              {tags.map((tag) => (
+                <option key={tag._id} value={tag._id}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className='mt-4 flex items-center gap-4 flex-wrap'>
           <Button
             onClick={applyDiscount}
-            disabled={loading}
+            disabled={
+              loading ||
+              discount <= 0 ||
+              selectedProducts.length === 0
+            }
             className='bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 dark:hover:bg-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            {loading ? 'Applying...' : 'Apply Discount'}
+            {loading ? 'Applying...' : 'Apply Discount to Selected Products'}
+          </Button>
+          <Button
+            onClick={applyDiscountToCategory}
+            disabled={
+              loading ||
+              discount <= 0 ||
+              !selectedCategory
+            }
+            className='bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:hover:bg-blue-500 transition disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {loading ? 'Applying...' : 'Apply Discount to Category'}
+          </Button>
+          <Button
+            onClick={applyDiscountToTag}
+            disabled={
+              loading ||
+              discount <= 0 ||
+              !selectedTag
+            }
+            className='bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 dark:hover:bg-purple-500 transition disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {loading ? 'Applying...' : 'Apply Discount to Tag'}
           </Button>
           <Button
             onClick={removeDiscount}
-            disabled={loading}
+            disabled={
+              loading ||
+              selectedProducts.length === 0
+            }
             className='bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 dark:hover:bg-red-500 transition disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            {loading ? 'Removing...' : 'Remove Discount'}
+            {loading ? 'Removing...' : 'Remove Discount from Selected'}
+          </Button>
+          <Button
+            onClick={removeDiscountFromCategory}
+            disabled={
+              loading ||
+              !selectedCategory
+            }
+            className='bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800 dark:hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {loading ? 'Removing...' : 'Remove Discount from Category'}
+          </Button>
+          <Button
+            onClick={removeDiscountFromTag}
+            disabled={
+              loading ||
+              !selectedTag
+            }
+            className='bg-red-900 text-white px-4 py-2 rounded-md hover:bg-red-950 dark:hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {loading ? 'Removing...' : 'Remove Discount from Tag'}
           </Button>
         </div>
       </div>

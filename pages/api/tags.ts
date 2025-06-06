@@ -21,12 +21,10 @@ export default async function handler(
 
     // Check if the tag name is empty or not a string
     if (!name || typeof name !== 'string' || name.trim() === '') {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: 'Tag name must be a non-empty string',
-        })
+      return res.status(400).json({
+        success: false,
+        message: 'Tag name must be a non-empty string',
+      })
     }
 
     try {
