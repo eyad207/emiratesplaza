@@ -231,7 +231,7 @@ export const UserInputSchema = z.object({
 
 export const UserSignInSchema = z.object({
   email: Email,
-  password: Password,
+  password: z.string().min(1, 'Password is required'), // Simplified password validation for sign-in
 })
 export const UserSignUpSchema = z
   .object({
