@@ -1,6 +1,6 @@
 import { auth } from '@/auth'
 
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SignOut } from '@/lib/actions/user.actions'
-import { cn } from '@/lib/utils'
 import { ChevronDownIcon } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
@@ -82,25 +81,34 @@ export default async function UserButton() {
           </DropdownMenuContent>
         ) : (
           <DropdownMenuContent
-            className='w-56 bg-white text-black shadow-md rounded-lg p-2'
+            className='w-56 bg-white text-black shadow-lg rounded-xl p-2 border border-gray-200'
             align='end'
             forceMount
           >
+            {/* Main actions */}
             <DropdownMenuGroup>
-              <DropdownMenuItem className='hover:bg-primary/10 transition-colors'>
+              <DropdownMenuItem asChild className='p-0'>
                 <Link
-                  className={cn(buttonVariants(), 'w-full')}
+                  className='flex items-center justify-center w-full px-4 py-2 rounded-md text-sm font-semibold text-black bg-amber-400 cursor-pointer hover:bg-amber-500 hover:text-black transition-colors duration-200 ease-in-out'
                   href='/sign-in'
                 >
                   {t('Header.Sign in')}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuLabel>
-              <div className='font-normal'>
-                {t('Header.New Customer')}?{' '}
-                <Link href='/sign-up'>{t('Header.Sign up')}</Link>
-              </div>
+
+            {/* Separator */}
+            <div className='my-2 border-t border-gray-100' />
+
+            {/* New customer section */}
+            <DropdownMenuLabel className='text-center text-sm font-normal text-gray-500 px-2'>
+              {t('Header.New Customer')}?{' '}
+              <Link
+                href='/sign-up'
+                className='font-medium text-primary hover:text-primary/80 hover:underline ml-1 transition-colors duration-200'
+              >
+                {t('Header.Sign up')}
+              </Link>
             </DropdownMenuLabel>
           </DropdownMenuContent>
         )}
