@@ -9,6 +9,7 @@ import { notFound } from 'next/navigation'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { cookies } from 'next/headers'
 import CartSidebar from '@/components/shared/cart-sidebar'
+import { NextAuthProvider } from '@/components/providers/session-provider'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -64,7 +65,7 @@ export default async function AppLayout({
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ClientProviders setting={{ ...setting, currency }}>
-            {children}
+            <NextAuthProvider>{children}</NextAuthProvider>
           </ClientProviders>
           <CartSidebar />
         </NextIntlClientProvider>

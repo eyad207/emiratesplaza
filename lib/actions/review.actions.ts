@@ -77,7 +77,6 @@ export async function createUpdateReview({
 }
 
 const updateProductReview = async (productId: string) => {
-  // Calculate the new average rating, number of reviews, and rating distribution
   const result = await Review.aggregate([
     { $match: { product: new mongoose.Types.ObjectId(productId) } },
     {
@@ -87,24 +86,30 @@ const updateProductReview = async (productId: string) => {
       },
     },
   ])
+
   // Calculate the total number of reviews and average rating
   const totalReviews = result.reduce((sum, { count }) => sum + count, 0)
   const avgRating =
-    result.reduce((sum, { _id, count }) => sum + _id * count, 0) / totalReviews
+    totalReviews > 0
+      ? result.reduce((sum, { _id, count }) => sum + _id * count, 0) /
+        totalReviews
+      : 0 // Default to 0 if there are no reviews
 
   // Convert aggregation result to a map for easier lookup
   const ratingMap = result.reduce((map, { _id, count }) => {
     map[_id] = count
     return map
   }, {})
+
   // Ensure all ratings 1-5 are represented, with missing ones set to count: 0
   const ratingDistribution = []
   for (let i = 1; i <= 5; i++) {
     ratingDistribution.push({ rating: i, count: ratingMap[i] || 0 })
   }
+
   // Update product fields with calculated values
   await Product.findByIdAndUpdate(productId, {
-    avgRating: avgRating.toFixed(1),
+    avgRating: avgRating.toFixed(1), // Ensure avgRating is a valid number
     numReviews: totalReviews,
     ratingDistribution,
   })
@@ -153,4 +158,65 @@ export const getReviewByProductId = async ({
     user: session?.user?.id,
   })
   return review ? (JSON.parse(JSON.stringify(review)) as IReview) : null
+}
+
+export async function deleteReview(reviewId: string, productId: string) {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+    if (!session) {
+      throw new Error('User is not authenticated')
+    }
+
+    // Get the review
+    const review = await Review.findById(reviewId)
+    if (!review) {
+      throw new Error('Review not found')
+    }
+
+    // Check if user is admin or review owner
+    if (
+      session.user.role !== 'Admin' &&
+      review.user.toString() !== session.user.id
+    ) {
+      throw new Error('Not authorized')
+    }
+
+    await review.deleteOne()
+    await updateProductReview(productId)
+    revalidatePath(`/product/${productId}`)
+
+    return {
+      success: true,
+      message: 'Review deleted successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    }
+  }
+}
+export async function deleteAllReviews(productId: string) {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+    if (!session || session.user.role !== 'Admin') {
+      throw new Error('Not authorized')
+    }
+
+    await Review.deleteMany({ product: productId })
+    await updateProductReview(productId)
+    revalidatePath(`/product/${productId}`)
+
+    return {
+      success: true,
+      message: 'All reviews deleted successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    }
+  }
 }

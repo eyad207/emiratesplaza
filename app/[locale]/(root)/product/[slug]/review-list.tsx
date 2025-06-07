@@ -1,12 +1,13 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Calendar, Check, StarIcon, User } from 'lucide-react'
+import { Calendar, Check, StarIcon, Trash2, User } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useInView } from 'react-intersection-observer'
 import { z } from 'zod'
 import { useTranslations } from 'next-intl'
+import { useSession } from 'next-auth/react'
 
 import Rating from '@/components/shared/product/rating'
 import { Button } from '@/components/ui/button'
@@ -45,6 +46,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import {
   createUpdateReview,
+  deleteAllReviews,
+  deleteReview,
   getReviewByProductId,
   getReviews,
 } from '@/lib/actions/review.actions'
@@ -54,6 +57,16 @@ import { IProduct } from '@/lib/db/models/product.model'
 import { Separator } from '@/components/ui/separator'
 import { IReviewDetails } from '@/types'
 import { getMyOrders } from '@/lib/actions/order.actions'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 const reviewFormDefaultValues = {
   title: '',
@@ -69,6 +82,7 @@ export default function ReviewList({
   product: IProduct
 }) {
   const t = useTranslations('Product')
+  const { data: session } = useSession()
   const [page, setPage] = useState(2)
   const [totalPages, setTotalPages] = useState(0)
   const [reviews, setReviews] = useState<IReviewDetails[]>([])
@@ -166,6 +180,48 @@ export default function ReviewList({
     }
     checkPurchase()
   }, [userId, product._id])
+
+  const [reviewToDelete, setReviewToDelete] = useState<string | null>(null)
+
+  const handleDelete = (reviewId: string) => {
+    setReviewToDelete(reviewId)
+  }
+
+  const confirmDelete = async () => {
+    if (!reviewToDelete) return
+
+    const res = await deleteReview(reviewToDelete, product._id)
+    if (!res.success) {
+      return toast({
+        variant: 'destructive',
+        description: res.message,
+      })
+    }
+
+    toast({
+      description: res.message,
+    })
+    reload()
+    setReviewToDelete(null)
+  }
+
+  const [openDeleteAllDialog, setOpenDeleteAllDialog] = useState(false)
+
+  const confirmDeleteAll = async () => {
+    const res = await deleteAllReviews(product._id)
+    if (!res.success) {
+      return toast({
+        variant: 'destructive',
+        description: res.message,
+      })
+    }
+
+    toast({
+      description: res.message,
+    })
+    reload()
+    setOpenDeleteAllDialog(false)
+  }
 
   return (
     <div className='space-y-2 dark:bg-zinc-900 dark:text-white'>
@@ -326,13 +382,31 @@ export default function ReviewList({
           </div>
         </div>
         <div className='md:col-span-3 flex flex-col gap-3'>
-          {reviews.map((review: IReviewDetails) => (
+          {reviews.map((review) => (
             <Card key={review._id}>
               <CardHeader>
                 <div className='flex-between'>
                   <CardTitle>{review.title}</CardTitle>
-                  <div className='italic text-sm flex'>
-                    <Check className='h-4 w-4' /> {t('Verified Purchase')}
+                  <div className='flex items-center gap-4'>
+                    <div className='italic text-sm flex'>
+                      <Check className='h-4 w-4' /> {t('Verified Purchase')}
+                    </div>
+                    {(userId ===
+                      (typeof review.user === 'object' &&
+                      review.user !== null &&
+                      '_id' in review.user
+                        ? (review.user as { _id: string })._id
+                        : undefined) ||
+                      session?.user?.role === 'Admin') && (
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        onClick={() => handleDelete(review._id)}
+                        className='h-8 w-8 p-0'
+                      >
+                        <Trash2 className='h-4 w-4 text-destructive' />
+                      </Button>
+                    )}
                   </div>
                 </div>
                 <CardDescription>{review.comment}</CardDescription>
@@ -363,6 +437,66 @@ export default function ReviewList({
           </div>
         </div>
       </div>
+
+      {session?.user?.role === 'Admin' && reviews.length > 0 && (
+        <>
+          <Button
+            variant='destructive'
+            onClick={() => setOpenDeleteAllDialog(true)}
+            className='w-fit'
+          >
+            {t('Delete All Reviews')}
+          </Button>
+
+          <AlertDialog
+            open={openDeleteAllDialog}
+            onOpenChange={setOpenDeleteAllDialog}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t('Delete All Reviews')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t(
+                    'Are you sure you want to delete all reviews? This action cannot be undone'
+                  )}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={confirmDeleteAll}
+                  className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                >
+                  {t('Delete')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
+      )}
+
+      <AlertDialog
+        open={!!reviewToDelete}
+        onOpenChange={() => setReviewToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Review</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('Delete_Review_Message')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+            >
+              {t('Delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
