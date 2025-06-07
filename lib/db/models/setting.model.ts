@@ -84,7 +84,8 @@ const settingSchema = new Schema<ISetting>(
         commission: { type: Number, required: true, default: 0 },
       },
     ],
-    defaultPaymentMethod: { type: String, required: true },
+    // Add Vipps as a default payment method
+    defaultPaymentMethod: { type: String, required: true, default: 'Vipps' },
     availableDeliveryDates: [
       {
         name: { type: String, required: true },

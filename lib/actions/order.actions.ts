@@ -15,6 +15,7 @@ import User from '../db/models/user.model'
 import mongoose from 'mongoose'
 import { getSetting } from './setting.actions'
 import { sendEmail } from '@/lib/email'
+import { vipps } from '../vipps'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -386,6 +387,44 @@ export async function approvePayPalOrder(
     }
   } catch (err) {
     return { success: false, message: formatError(err) }
+  }
+}
+
+export const createVippsOrder = async (orderId: string, amount: number) => {
+  try {
+    const payment = await vipps.createPayment(orderId, amount)
+    return {
+      success: true,
+      data: payment,
+      message: 'Vipps payment created successfully.',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        typeof error === 'object' && error !== null && 'message' in error
+          ? (error as { message: string }).message
+          : 'Failed to create Vipps payment.',
+    }
+  }
+}
+
+export const approveVippsOrder = async (orderId: string) => {
+  try {
+    const payment = await vipps.capturePayment(orderId)
+    return {
+      success: true,
+      data: payment,
+      message: 'Vipps payment approved successfully.',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        typeof error === 'object' && error !== null && 'message' in error
+          ? (error as { message: string }).message
+          : 'Failed to approve Vipps payment.',
+    }
   }
 }
 

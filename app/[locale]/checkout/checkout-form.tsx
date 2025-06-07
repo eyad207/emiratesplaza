@@ -481,7 +481,7 @@ const CheckoutForm = () => {
                             className='font-bold pl-2 cursor-pointer'
                             htmlFor={`payment-${pm.name}`}
                           >
-                            {pm.name + ' / Credit Card'}
+                            {pm.name}
                           </Label>
                         </div>
                       ))}

@@ -1,8 +1,8 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import React from 'react'
 
 import { auth } from '@/auth'
-import { getOrderById } from '@/lib/actions/order.actions'
+import { getOrderById, approveVippsOrder } from '@/lib/actions/order.actions'
 import PaymentForm from './payment-form'
 import Stripe from 'stripe'
 
@@ -16,7 +16,6 @@ const CheckoutPaymentPage = async (props: {
   }>
 }) => {
   const params = await props.params
-
   const { id } = params
 
   const order = await getOrderById(id)
@@ -34,6 +33,15 @@ const CheckoutPaymentPage = async (props: {
     })
     client_secret = paymentIntent.client_secret
   }
+
+  // Automatically verify Vipps payment
+  if (order.paymentMethod === 'Vipps' && !order.isPaid) {
+    const res = await approveVippsOrder(order._id)
+    if (res.success) {
+      redirect(`/account/orders/${order._id}`)
+    }
+  }
+
   return (
     <PaymentForm
       order={order}

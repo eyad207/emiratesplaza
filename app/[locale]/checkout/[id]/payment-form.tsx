@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast'
 import {
   approvePayPalOrder,
   createPayPalOrder,
+  createVippsOrder,
 } from '@/lib/actions/order.actions'
 import { IOrder } from '@/lib/db/models/order.model'
 import { formatDateTime } from '@/lib/utils'
@@ -85,6 +86,16 @@ export default function OrderDetailsForm({
     }
   }
 
+  const handleCreateVippsOrder = async () => {
+    const res = await createVippsOrder(order._id, order.totalPrice)
+    if (!res.success)
+      return toast({
+        description: res.message,
+        variant: 'destructive',
+      })
+    window.location.href = res.data.url // Redirect to Vipps payment page
+  }
+
   const CheckoutSummary = () => (
     <Card>
       <CardContent className='p-4'>
@@ -158,6 +169,14 @@ export default function OrderDetailsForm({
                   orderId={order._id}
                 />
               </Elements>
+            )}
+            {!isPaid && paymentMethod === 'Vipps' && (
+              <Button
+                className='w-full rounded-full'
+                onClick={handleCreateVippsOrder}
+              >
+                Pay with Vipps
+              </Button>
             )}
 
             {!isPaid && paymentMethod === 'Cash On Delivery' && (
