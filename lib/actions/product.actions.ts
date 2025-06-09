@@ -97,16 +97,11 @@ export async function getAllProductsForAdmin({
         }
       : {}
 
-  const order: Record<string, 1 | -1> =
-    sort === 'best-selling'
-      ? { numSales: -1 }
-      : sort === 'price-low-to-high'
-        ? { price: 1 }
-        : sort === 'price-high-to-low'
-          ? { price: -1 }
-          : sort === 'avg-customer-review'
-            ? { avgRating: -1 }
-            : { _id: -1 }
+  const order: Record<string, 1 | -1> = sort
+    ? {
+        [sort.split('-')[0]]: sort.split('-')[1] === 'asc' ? 1 : -1,
+      }
+    : { _id: -1 }
   const products = await Product.find({
     ...queryFilter,
   })

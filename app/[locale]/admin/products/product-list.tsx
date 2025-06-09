@@ -45,6 +45,8 @@ const ProductList = () => {
   const [inputValue, setInputValue] = useState<string>('')
   const [data, setData] = useState<ProductListDataProps>()
   const [isPending, startTransition] = useTransition()
+  const [sortField, setSortField] = useState<string>('') // Field to sort by
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc') // Sort order
 
   const handlePageChange = (changeType: 'next' | 'prev') => {
     const newPage = changeType === 'next' ? page + 1 : page - 1
@@ -80,6 +82,23 @@ const ProductList = () => {
       })
     }
   }
+
+  const handleSort = (field: string) => {
+    const newSortOrder =
+      sortField === field && sortOrder === 'asc' ? 'desc' : 'asc'
+    setSortField(field)
+    setSortOrder(newSortOrder)
+
+    startTransition(async () => {
+      const data = await getAllProductsForAdmin({
+        query: inputValue,
+        page,
+        sort: `${field}-${newSortOrder}`,
+      })
+      setData(data)
+    })
+  }
+
   useEffect(() => {
     startTransition(async () => {
       const data = await getAllProductsForAdmin({ query: '' })
@@ -118,14 +137,61 @@ const ProductList = () => {
         <Table className='min-w-full'>
           <TableHeader>
             <TableRow>
-              <TableHead>Id</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead className='text-right'>Price</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead>Published</TableHead>
-              <TableHead>Last Update</TableHead>
+              <TableHead
+                onClick={() => handleSort('_id')}
+                className='cursor-pointer'
+              >
+                Id {sortField === '_id' && (sortOrder === 'asc' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead
+                onClick={() => handleSort('name')}
+                className='cursor-pointer'
+              >
+                Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead
+                onClick={() => handleSort('price')}
+                className='cursor-pointer text-right'
+              >
+                Price{' '}
+                {sortField === 'price' && (sortOrder === 'asc' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead
+                onClick={() => handleSort('category')}
+                className='cursor-pointer'
+              >
+                Category{' '}
+                {sortField === 'category' && (sortOrder === 'asc' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead
+                onClick={() => handleSort('stock')}
+                className='cursor-pointer'
+              >
+                Stock{' '}
+                {sortField === 'stock' && (sortOrder === 'asc' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead
+                onClick={() => handleSort('avgRating')}
+                className='cursor-pointer'
+              >
+                Rating{' '}
+                {sortField === 'avgRating' && (sortOrder === 'asc' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead
+                onClick={() => handleSort('isPublished')}
+                className='cursor-pointer'
+              >
+                Published{' '}
+                {sortField === 'isPublished' &&
+                  (sortOrder === 'asc' ? '↑' : '↓')}
+              </TableHead>
+              <TableHead
+                onClick={() => handleSort('updatedAt')}
+                className='cursor-pointer'
+              >
+                Last Update{' '}
+                {sortField === 'updatedAt' && (sortOrder === 'asc' ? '↑' : '↓')}
+              </TableHead>
               <TableHead className='w-[100px]'>Actions</TableHead>
             </TableRow>
           </TableHeader>
