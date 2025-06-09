@@ -37,45 +37,6 @@ export const paypal = {
 
     return handleResponse(response)
   },
-  verifyWebhookSignature: async function verifyWebhookSignature({
-    webhookId,
-    transmissionId,
-    timestamp,
-    certUrl,
-    authAlgo,
-    transmissionSig,
-    webhookEvent,
-  }: {
-    webhookId: string
-    transmissionId: string
-    timestamp: string
-    certUrl: string
-    authAlgo: string
-    transmissionSig: string
-    webhookEvent: string
-  }) {
-    const accessToken = await generateAccessToken()
-    const url = `${base}/v1/notifications/verify-webhook-signature`
-    const response = await fetch(url, {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        webhook_id: webhookId,
-        transmission_id: transmissionId,
-        transmission_time: timestamp,
-        cert_url: certUrl,
-        auth_algo: authAlgo,
-        transmission_sig: transmissionSig,
-        webhook_event: JSON.parse(webhookEvent),
-      }),
-    })
-
-    const result = await handleResponse(response)
-    return result.verification_status === 'SUCCESS'
-  },
 }
 
 async function generateAccessToken() {
