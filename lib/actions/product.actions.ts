@@ -75,11 +75,13 @@ export async function getAllProductsForAdmin({
   page = 1,
   sort = 'latest',
   limit,
+  category, // Add category to the parameter list
 }: {
   query: string
   page?: number
   sort?: string
   limit?: number
+  category?: string // Add category to the type definition
 }) {
   await connectToDatabase()
 
@@ -96,6 +98,7 @@ export async function getAllProductsForAdmin({
           },
         }
       : {}
+  const categoryFilter = category ? { category } : {} // Add category filter
 
   const order: Record<string, 1 | -1> = sort
     ? {
@@ -104,6 +107,7 @@ export async function getAllProductsForAdmin({
     : { _id: -1 }
   const products = await Product.find({
     ...queryFilter,
+    ...categoryFilter, // Apply category filter
   })
     .sort(order)
     .skip(limit * (Number(page) - 1))
@@ -112,6 +116,7 @@ export async function getAllProductsForAdmin({
 
   const countProducts = await Product.countDocuments({
     ...queryFilter,
+    ...categoryFilter, // Apply category filter
   })
   return {
     products: JSON.parse(JSON.stringify(products)) as IProduct[],
@@ -480,6 +485,43 @@ export async function removeDiscountFromProducts({
     return {
       success: true,
       message: 'Discount removed successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    }
+  }
+}
+
+export async function updateStockForProducts({
+  productIds,
+  quantity,
+}: {
+  productIds: string[]
+  quantity: number
+}) {
+  try {
+    await connectToDatabase()
+
+    const products = await Product.find({ _id: { $in: productIds } })
+
+    if (!products.length) {
+      throw new Error('No products found for the given IDs')
+    }
+
+    for (const product of products) {
+      product.colors.forEach((color) => {
+        color.sizes.forEach((size) => {
+          size.countInStock = Math.max(0, size.countInStock + quantity) // Ensure stock does not go below 0
+        })
+      })
+      await product.save() // Save changes for each product
+    }
+
+    return {
+      success: true,
+      message: 'Stock updated successfully for selected products',
     }
   } catch (error) {
     return {
