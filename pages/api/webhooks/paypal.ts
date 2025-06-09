@@ -1,7 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { paypal } from '@/lib/paypal'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' })
   }
@@ -9,7 +12,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const webhookId = process.env.PAYPAL_WEBHOOK_ID as string // Ensure this is a string
     if (!webhookId) {
-      throw new Error('PAYPAL_WEBHOOK_ID is not defined in the environment variables')
+      throw new Error(
+        'PAYPAL_WEBHOOK_ID is not defined in the environment variables'
+      )
     }
 
     const body = JSON.stringify(req.body)
