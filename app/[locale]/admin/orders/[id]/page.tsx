@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { auth } from '@/auth'
-import { getOrderById } from '@/lib/actions/order.actions'
+import { getOrderById, markOrderAsViewed } from '@/lib/actions/order.actions' // import the function!
 import OrderDetailsForm from '@/components/shared/order/order-details-form'
 import Link from 'next/link'
 
@@ -19,9 +19,11 @@ const AdminOrderDetailsPage = async (props: {
 
   const { id } = params
 
+  await markOrderAsViewed(id)
+
   const order = await getOrderById(id)
   if (!order || (!order.isPaid && order.paymentMethod !== 'Cash On Delivery')) {
-    notFound() // Redirect if order is not paid and not COD
+    notFound()
   }
 
   const session = await auth()

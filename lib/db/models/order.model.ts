@@ -7,6 +7,7 @@ export interface IOrder extends Document, IOrderInput {
   updatedAt: Date
   isShipped: boolean
   shippedAt?: Date
+  viewed: boolean
 }
 
 const sizeSchema = new Schema({
@@ -83,6 +84,7 @@ const orderSchema = new Schema<IOrder>(
     deliveredAt: { type: Date },
     isShipped: { type: Boolean, required: true, default: false },
     shippedAt: { type: Date },
+    viewed: { type: Boolean, required: true, default: false },
     createdAt: { type: Date, default: Date.now },
   },
   {

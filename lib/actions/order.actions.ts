@@ -16,6 +16,7 @@ import mongoose from 'mongoose'
 import { getSetting } from './setting.actions'
 import { sendEmail } from '@/lib/email'
 import { vipps } from '../vipps'
+import type { SortOrder } from 'mongoose'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -242,24 +243,30 @@ export async function deleteOrder(id: string) {
     return { success: false, message: formatError(error) }
   }
 }
-
 // GET ALL ORDERS
 
 export async function getAllOrders({
   limit,
   page,
   orderId,
+  sort = 'createdAt', // default sort field
+  order = 'desc', // default sort order
 }: {
   limit?: number
   page: number
   orderId?: string
+  sort?: string
+  order?: string
 }) {
   const {
     common: { pageSize },
   } = await getSetting()
   limit = limit || pageSize
+
   await connectToDatabase()
+
   const skipAmount = (Number(page) - 1) * limit
+
   const filter = {
     $or: [
       { isPaid: true }, // Include paid orders
@@ -269,17 +276,25 @@ export async function getAllOrders({
       ? { _id: orderId }
       : {}),
   }
+
+  // Prepare the sort object
+  const sortOrder: SortOrder = order === 'asc' ? 1 : -1
+  const sortObject: { [key: string]: SortOrder } = { [sort]: sortOrder }
+
   const orders = await Order.find(filter)
     .populate('user', 'name')
-    .sort({ createdAt: 'desc' })
+    .sort(sortObject) // use dynamic sort
     .skip(skipAmount)
     .limit(limit)
+
   const ordersCount = await Order.countDocuments(filter)
+
   return {
     data: JSON.parse(JSON.stringify(orders)) as IOrderList[],
     totalPages: Math.ceil(ordersCount / limit),
   }
 }
+
 export async function getMyOrders({
   limit,
   page,
@@ -742,5 +757,13 @@ export async function getRecentOrders(userId: string) {
   } catch (error) {
     console.error('Error fetching recent orders:', error)
     return []
+  }
+}
+
+export const markOrderAsViewed = async (orderId: string) => {
+  try {
+    await Order.findByIdAndUpdate(orderId, { viewed: true })
+  } catch (error) {
+    console.error('Failed to mark order as viewed:', error)
   }
 }

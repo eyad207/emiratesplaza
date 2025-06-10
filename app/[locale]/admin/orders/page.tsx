@@ -22,12 +22,23 @@ import FilterInput from './FilterInput'
 export const metadata: Metadata = {
   title: 'Admin Orders',
 }
+
 export default async function OrdersPage(props: {
-  searchParams: Promise<{ page: string; orderId: string }>
+  searchParams: Promise<{
+    page?: string
+    orderId?: string
+    sort?: string
+    order?: string
+  }>
 }) {
   const searchParams = await props.searchParams
 
-  const { page = '1', orderId = '' } = searchParams
+  const {
+    page = '1',
+    orderId = '',
+    sort = 'createdAt',
+    order = 'desc',
+  } = searchParams
 
   const session = await auth()
   if (session?.user.role !== 'Admin')
@@ -36,6 +47,8 @@ export default async function OrdersPage(props: {
   const orders = await getAllOrders({
     page: Number(page),
     orderId,
+    sort,
+    order,
   })
 
   return (
@@ -49,12 +62,82 @@ export default async function OrdersPage(props: {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Id</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>
+                  <Link
+                    href={{
+                      pathname: '/admin/orders',
+                      query: {
+                        page,
+                        orderId,
+                        sort: '_id',
+                        order:
+                          sort === '_id' && order === 'asc' ? 'desc' : 'asc',
+                      },
+                    }}
+                    className='cursor-pointer hover:underline'
+                  >
+                    Id {sort === '_id' && (order === 'asc' ? '↑' : '↓')}
+                  </Link>
+                </TableHead>
+                <TableHead>
+                  <Link
+                    href={{
+                      pathname: '/admin/orders',
+                      query: {
+                        page,
+                        orderId,
+                        sort: 'createdAt',
+                        order:
+                          sort === 'createdAt' && order === 'asc'
+                            ? 'desc'
+                            : 'asc',
+                      },
+                    }}
+                    className='cursor-pointer hover:underline'
+                  >
+                    Date {sort === 'createdAt' && (order === 'asc' ? '↑' : '↓')}
+                  </Link>
+                </TableHead>
                 <TableHead>Buyer</TableHead>
-                <TableHead>Total</TableHead>
+                <TableHead>
+                  <Link
+                    href={{
+                      pathname: '/admin/orders',
+                      query: {
+                        page,
+                        orderId,
+                        sort: 'totalPrice',
+                        order:
+                          sort === 'totalPrice' && order === 'asc'
+                            ? 'desc'
+                            : 'asc',
+                      },
+                    }}
+                    className='cursor-pointer hover:underline'
+                  >
+                    Total{' '}
+                    {sort === 'totalPrice' && (order === 'asc' ? '↑' : '↓')}
+                  </Link>
+                </TableHead>
                 <TableHead>Paid</TableHead>
                 <TableHead>Delivered</TableHead>
+                <TableHead>
+                  <Link
+                    href={{
+                      pathname: '/admin/orders',
+                      query: {
+                        page,
+                        orderId,
+                        sort: 'viewed',
+                        order:
+                          sort === 'viewed' && order === 'asc' ? 'desc' : 'asc',
+                      },
+                    }}
+                    className='cursor-pointer hover:underline'
+                  >
+                    Status {sort === 'viewed' && (order === 'asc' ? '↑' : '↓')}
+                  </Link>
+                </TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -69,7 +152,6 @@ export default async function OrdersPage(props: {
                     {order.user ? order.user.name : 'Deleted User'}
                   </TableCell>
                   <TableCell>
-                    {' '}
                     <ProductPrice price={order.totalPrice} plain />
                   </TableCell>
                   <TableCell>
@@ -81,6 +163,15 @@ export default async function OrdersPage(props: {
                     {order.isDelivered && order.deliveredAt
                       ? formatDateTime(order.deliveredAt).dateTime
                       : 'No'}
+                  </TableCell>
+                  <TableCell>
+                    {order.viewed ? (
+                      <span className='text-green-600 font-semibold'>
+                        Viewed
+                      </span>
+                    ) : (
+                      <span className='text-red-600 font-semibold'>New!</span>
+                    )}
                   </TableCell>
                   <TableCell className='flex gap-1'>
                     <Button asChild variant='outline' size='sm'>
