@@ -767,3 +767,8 @@ export const markOrderAsViewed = async (orderId: string) => {
     console.error('Failed to mark order as viewed:', error)
   }
 }
+
+export const deleteAllOrders = async () => {
+  await connectToDatabase()
+  await Order.deleteMany({})
+}

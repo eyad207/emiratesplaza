@@ -13,7 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { deleteOrder, getAllOrders } from '@/lib/actions/order.actions'
+import {
+  deleteAllOrders,
+  deleteOrder,
+  getAllOrders,
+} from '@/lib/actions/order.actions'
 import { formatDateTime } from '@/lib/utils'
 import { IOrderList } from '@/types'
 import ProductPrice from '@/components/shared/product/product-price'
@@ -53,7 +57,14 @@ export default async function OrdersPage(props: {
 
   return (
     <div className='space-y-2'>
-      <h1 className='h1-bold'>Orders</h1>
+      <div className='flex items-center justify-between mb-2'>
+        <h1 className='h1-bold'>Orders</h1>
+        <form action={deleteAllOrders}>
+          <Button variant='destructive' type='submit'>
+            Delete All Orders
+          </Button>
+        </form>
+      </div>
       <FilterInput defaultValue={orderId} />
       <div className='overflow-x-auto'>
         {orders.data.length === 0 ? (
