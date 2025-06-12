@@ -20,6 +20,10 @@ const links = [
     href: '/admin/tags',
   },
   {
+    title: 'Discounts',
+    href: '/admin/discounts',
+  },
+  {
     title: 'Orders',
     href: '/admin/orders',
   },
@@ -34,10 +38,6 @@ const links = [
   {
     title: 'Settings',
     href: '/admin/settings',
-  },
-  {
-    title: 'Discounts',
-    href: '/admin/discounts',
   },
 ]
 

@@ -4,7 +4,6 @@ import {
   Barcode,
   CreditCard,
   Users,
-  TrendingUp,
   ArrowUp,
   ArrowDown,
 } from 'lucide-react'
@@ -144,7 +143,7 @@ export default function OverviewReport() {
             {t('Dashboard')}
           </h1>
           <p className='text-muted-foreground mt-1'>
-            Analytics and reporting for your business
+            {t('Analytics and reporting for your business')}
           </p>
         </div>
         <CalendarDateRangePicker defaultDate={date} setDate={setDate} />
@@ -153,8 +152,8 @@ export default function OverviewReport() {
       {/* Stats Cards */}
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5'>
         <Card className='overflow-hidden transition-all hover:border-primary/40 hover:shadow-md'>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
+          <CardHeader className='flex flex-row items-center justify-between '>
+            <CardTitle className='font-extrabold'>
               {t('Total Revenue')}
             </CardTitle>
             <div className='h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center'>
@@ -169,30 +168,31 @@ export default function OverviewReport() {
               {percentChange.isPositive ? (
                 <div className='flex items-center text-emerald-500'>
                   <ArrowUp className='mr-1 h-3 w-3' />
-                  <span>{percentChange.value}% from last month</span>
+                  <span>
+                    {percentChange.value}% {t('from last month')}
+                  </span>
                 </div>
               ) : (
                 <div className='flex items-center text-rose-500'>
                   <ArrowDown className='mr-1 h-3 w-3' />
-                  <span>{percentChange.value}% from last month</span>
+                  <span>
+                    {percentChange.value}% {t('from last month')}
+                  </span>
                 </div>
               )}
             </div>
-            <div className='mt-3'>
-              <Link
-                href='/admin/orders'
-                className='text-xs text-primary hover:underline inline-flex items-center'
-              >
-                {t('View revenue')}
-                <TrendingUp className='ml-1 h-3 w-3' />
-              </Link>
+
+            {/* All Time Revenue */}
+            <div className='text-xs text-muted-foreground mt-2'>
+              {t('All Time Revenue:')}{' '}
+              <ProductPrice price={data.allTimeTotalSales} plain />
             </div>
           </CardContent>
         </Card>
 
         <Card className='overflow-hidden transition-all hover:border-primary/40 hover:shadow-md'>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>{t('Sales')}</CardTitle>
+          <CardHeader className='flex flex-row items-center justify-between'>
+            <CardTitle className='font-extrabold'>{t('Sales')}</CardTitle>
             <div className='h-8 w-8 rounded-md bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center'>
               <CreditCard className='h-5 w-5 text-blue-700 dark:text-blue-400' />
             </div>
@@ -202,25 +202,19 @@ export default function OverviewReport() {
               {formatNumber(data.ordersCount)}
             </div>
             <div className='flex items-center text-xs text-muted-foreground'>
-              <span>Total completed orders</span>
+              <span>{t('Total completed orders')}</span>
             </div>
-            <div className='mt-3'>
-              <Link
-                href='/admin/orders'
-                className='text-xs text-primary hover:underline inline-flex items-center'
-              >
-                {t('View orders')}
-                <TrendingUp className='ml-1 h-3 w-3' />
-              </Link>
+
+            {/* All Time Orders */}
+            <div className='text-xs text-muted-foreground mt-2'>
+              {t('All Time Orders:')} {formatNumber(data.allTimeOrdersCount)}
             </div>
           </CardContent>
         </Card>
 
         <Card className='overflow-hidden transition-all hover:border-primary/40 hover:shadow-md'>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
-              {t('Customers')}
-            </CardTitle>
+          <CardHeader className='flex flex-row items-center justify-between '>
+            <CardTitle className='font-extrabold'>{t('Customers')}</CardTitle>
             <div className='h-8 w-8 rounded-md bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center'>
               <Users className='h-5 w-5 text-violet-700 dark:text-violet-400' />
             </div>
@@ -228,25 +222,19 @@ export default function OverviewReport() {
           <CardContent>
             <div className='text-2xl font-bold mb-1'>{data.usersCount}</div>
             <div className='flex items-center text-xs text-muted-foreground'>
-              <span>Active user accounts</span>
+              <span>{t('Active user accounts')}</span>
             </div>
-            <div className='mt-3'>
-              <Link
-                href='/admin/users'
-                className='text-xs text-primary hover:underline inline-flex items-center'
-              >
-                {t('View customers')}
-                <TrendingUp className='ml-1 h-3 w-3' />
-              </Link>
+
+            {/* All Time Users */}
+            <div className='text-xs text-muted-foreground mt-2'>
+              {t('All Time Users:')} {formatNumber(data.allTimeUsersCount)}
             </div>
           </CardContent>
         </Card>
 
         <Card className='overflow-hidden transition-all hover:border-primary/40 hover:shadow-md'>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
-              {t('Products')}
-            </CardTitle>
+          <CardHeader className='flex flex-row items-center justify-between '>
+            <CardTitle className='font-extrabold'>{t('Products')}</CardTitle>
             <div className='h-8 w-8 rounded-md bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center'>
               <Barcode className='h-5 w-5 text-amber-700 dark:text-amber-400' />
             </div>
@@ -254,16 +242,13 @@ export default function OverviewReport() {
           <CardContent>
             <div className='text-2xl font-bold mb-1'>{data.productsCount}</div>
             <div className='flex items-center text-xs text-muted-foreground'>
-              <span>Active inventory items</span>
+              <span>{t('Active inventory items')}</span>
             </div>
-            <div className='mt-3'>
-              <Link
-                href='/admin/products'
-                className='text-xs text-primary hover:underline inline-flex items-center'
-              >
-                {t('View products')}
-                <TrendingUp className='ml-1 h-3 w-3' />
-              </Link>
+
+            {/* All Time Products */}
+            <div className='text-xs text-muted-foreground mt-2'>
+              {t('All Time Products:')}{' '}
+              {formatNumber(data.allTimeProductsCount)}
             </div>
           </CardContent>
         </Card>
@@ -275,7 +260,7 @@ export default function OverviewReport() {
           <CardHeader className='border-b bg-muted/40 py-4'>
             <CardTitle>{t('Sales Overview')}</CardTitle>
             <CardDescription>
-              {formatDateTime(date!.from!).dateOnly} to{' '}
+              {formatDateTime(date!.from!).dateOnly} {t('to')}{' '}
               {formatDateTime(date!.to!).dateOnly}
             </CardDescription>
           </CardHeader>
@@ -305,7 +290,7 @@ export default function OverviewReport() {
           <CardHeader className='border-b bg-muted/40 py-4'>
             <CardTitle>{t('Product Performance')}</CardTitle>
             <CardDescription>
-              Top selling products in selected period
+              {t('Top selling products in selected period')}
             </CardDescription>
           </CardHeader>
           <CardContent className='p-6'>

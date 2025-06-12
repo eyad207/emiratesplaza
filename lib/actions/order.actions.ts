@@ -494,6 +494,7 @@ export const calcDeliveryDateAndPrice = async ({
 export async function getOrderSummary(date: DateRange) {
   await connectToDatabase()
 
+  // Current date-filtered counts
   const ordersCount = await Order.countDocuments({
     createdAt: {
       $gte: date.from,
@@ -513,6 +514,7 @@ export async function getOrderSummary(date: DateRange) {
     },
   })
 
+  // Date-filtered total sales
   const totalSalesResult = await Order.aggregate([
     {
       $match: {
@@ -532,6 +534,25 @@ export async function getOrderSummary(date: DateRange) {
   ])
   const totalSales = totalSalesResult[0] ? totalSalesResult[0].totalSales : 0
 
+  // 🚀 ADD All-Time Totals 🚀
+  const allTimeOrdersCount = await Order.countDocuments()
+  const allTimeProductsCount = await Product.countDocuments()
+  const allTimeUsersCount = await User.countDocuments()
+
+  const allTimeSalesResult = await Order.aggregate([
+    {
+      $group: {
+        _id: null,
+        sales: { $sum: '$totalPrice' },
+      },
+    },
+    { $project: { totalSales: { $ifNull: ['$sales', 0] } } },
+  ])
+  const allTimeTotalSales = allTimeSalesResult[0]
+    ? allTimeSalesResult[0].totalSales
+    : 0
+
+  // The rest of your code unchanged
   const today = new Date()
   const sixMonthEarlierDate = new Date(
     today.getFullYear(),
@@ -559,7 +580,6 @@ export async function getOrderSummary(date: DateRange) {
         value: '$totalSales',
       },
     },
-
     { $sort: { label: -1 } },
   ])
   const topSalesCategories = await getTopSalesCategories(date)
@@ -573,11 +593,19 @@ export async function getOrderSummary(date: DateRange) {
     .populate('user', 'name')
     .sort({ createdAt: 'desc' })
     .limit(limit)
+
+  // 👉 Add your new values to the return:
   return {
     ordersCount,
     productsCount,
     usersCount,
     totalSales,
+
+    allTimeOrdersCount,
+    allTimeProductsCount,
+    allTimeUsersCount,
+    allTimeTotalSales,
+
     monthlySales: JSON.parse(JSON.stringify(monthlySales)),
     salesChartData: JSON.parse(JSON.stringify(await getSalesChartData(date))),
     topSalesCategories: JSON.parse(JSON.stringify(topSalesCategories)),

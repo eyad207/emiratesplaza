@@ -26,6 +26,7 @@ import { ProductInputSchema, ProductUpdateSchema } from '@/lib/validator'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toSlug } from '@/lib/utils'
 import { IProductInput } from '@/types'
+import { useTranslations } from 'next-intl'
 
 const productDefaultValues: IProductInput = {
   name: '',
@@ -54,6 +55,7 @@ const ProductForm = ({
   product?: IProduct
   productId?: string
 }) => {
+  const t = useTranslations('admin')
   const router = useRouter()
   const [availableTags, setAvailableTags] = useState<
     { name: string; _id: string }[]
@@ -123,7 +125,7 @@ const ProductForm = ({
         {/* General Info */}
         <div className='space-y-5'>
           <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            General Information
+            {t('generalInformation')}
           </h2>
           <div className='flex flex-col gap-5 md:flex-row'>
             <FormField
@@ -131,9 +133,9 @@ const ProductForm = ({
               name='name'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>{t('name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder='Enter product name' {...field} />
+                    <Input placeholder={t('enterProductName')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -144,11 +146,11 @@ const ProductForm = ({
               name='slug'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Slug</FormLabel>
+                  <FormLabel>{t('slug')}</FormLabel>
                   <FormControl>
                     <div className='relative'>
                       <Input
-                        placeholder='Enter product slug'
+                        placeholder={t('enterProductSlug')}
                         className='pl-8'
                         {...field}
                       />
@@ -159,7 +161,7 @@ const ProductForm = ({
                         }}
                         className='absolute right-2 mt-2 bg-slate-500 hover:bg-slate-600 text-white rounded-md p-1'
                       >
-                        Generate
+                        {t('generate')}
                       </button>
                     </div>
                   </FormControl>
@@ -175,9 +177,9 @@ const ProductForm = ({
               name='category'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>{t('category')}</FormLabel>
                   <FormControl>
-                    <Input placeholder='Enter category' {...field} />
+                    <Input placeholder={t('enterCategory')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -188,9 +190,9 @@ const ProductForm = ({
               name='brand'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Brand</FormLabel>
+                  <FormLabel>{t('brand')}</FormLabel>
                   <FormControl>
-                    <Input placeholder='Enter product brand' {...field} />
+                    <Input placeholder={t('enterProductBrand')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -203,9 +205,9 @@ const ProductForm = ({
             name='price'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Net Price (in $)</FormLabel>
+                <FormLabel>{t('netPrice')} (in $)</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter product price' {...field} />
+                  <Input placeholder={t('enterProductPrice')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -216,16 +218,14 @@ const ProductForm = ({
         {/* Images */}
         <div className='space-y-5'>
           <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            Images
+            {t('images')}
           </h2>
           <FormField
             control={form.control}
             name='images'
             render={() => (
               <FormItem className='w-full'>
-                <FormDescription>
-                  First image is the main product image.
-                </FormDescription>
+                <FormDescription>{t('firstImageIsMain')}</FormDescription>
                 <Card>
                   <CardContent className='space-y-4 mt-2'>
                     <div className='flex flex-wrap gap-4'>
@@ -241,7 +241,7 @@ const ProductForm = ({
                           />
                           {index === 0 && (
                             <span className='absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded'>
-                              Main
+                              {t('main')}
                             </span>
                           )}
                           <button
@@ -286,7 +286,7 @@ const ProductForm = ({
         {/* Colors and Sizes */}
         <div className='space-y-5'>
           <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            Colors and Sizes
+            {t('colorsAndSizes')}
           </h2>
           {colorFields.map((colorField, colorIndex) => (
             <div
@@ -299,9 +299,9 @@ const ProductForm = ({
                   name={`colors.${colorIndex}.color`}
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel>Color</FormLabel>
+                      <FormLabel>{t('color')}</FormLabel>
                       <FormControl>
-                        <Input placeholder='Enter color' {...field} />
+                        <Input placeholder={t('enterColor')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -311,7 +311,7 @@ const ProductForm = ({
                   variant='destructive'
                   onClick={() => removeColor(colorIndex)}
                 >
-                  Remove Color
+                  {t('removeColor')}
                 </Button>
               </div>
 
@@ -327,9 +327,9 @@ const ProductForm = ({
                         name={`colors.${colorIndex}.sizes.${sizeIndex}.size`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Size</FormLabel>
+                            <FormLabel>{t('size')}</FormLabel>
                             <FormControl>
-                              <Input placeholder='Enter size' {...field} />
+                              <Input placeholder={t('enterSize')} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -340,11 +340,11 @@ const ProductForm = ({
                         name={`colors.${colorIndex}.sizes.${sizeIndex}.countInStock`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Count In Stock</FormLabel>
+                            <FormLabel>{t('countInStock')}</FormLabel>
                             <FormControl>
                               <Input
                                 type='number'
-                                placeholder='Enter count in stock'
+                                placeholder={t('enterCountInStock')}
                                 {...field}
                                 onChange={(e) => {
                                   const value = parseInt(e.target.value, 10)
@@ -373,7 +373,7 @@ const ProductForm = ({
                           )
                         }}
                       >
-                        Remove Size
+                        {t('removeSize')}
                       </Button>
                     </div>
                   )
@@ -390,7 +390,7 @@ const ProductForm = ({
                   form.setValue(`colors.${colorIndex}.sizes`, currentSizes)
                 }}
               >
-                Add Size
+                {t('addSize')}
               </Button>
             </div>
           ))}
@@ -400,14 +400,14 @@ const ProductForm = ({
               appendColor({ color: '', sizes: [{ size: '', countInStock: 0 }] })
             }
           >
-            Add Color
+            {t('addColor')}
           </Button>
         </div>
 
         {/* Tags */}
         <div className='space-y-5'>
           <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            Tags
+            {t('tags')}
           </h2>
           <FormField
             control={form.control}
@@ -444,7 +444,7 @@ const ProductForm = ({
         {/* Description */}
         <div className='space-y-5'>
           <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            Description
+            {t('description')}
           </h2>
           <FormField
             control={form.control}
@@ -453,7 +453,7 @@ const ProductForm = ({
               <FormItem className='w-full'>
                 <FormControl>
                   <Textarea
-                    placeholder='Enter product description'
+                    placeholder={t('enterProductDescription')}
                     className='resize-none'
                     {...field}
                   />
@@ -477,7 +477,7 @@ const ProductForm = ({
                     onCheckedChange={field.onChange}
                   />
                 </FormControl>
-                <FormLabel>Is Published?</FormLabel>
+                <FormLabel>{t('isPublished')}</FormLabel>
               </FormItem>
             )}
           />
@@ -491,7 +491,9 @@ const ProductForm = ({
             disabled={form.formState.isSubmitting}
             className='w-full text-lg font-bold'
           >
-            {form.formState.isSubmitting ? 'Submitting...' : `${type} Product`}
+            {form.formState.isSubmitting
+              ? t('submitting')
+              : `${type === 'Create' ? t('createProduct') : t('updateProduct')}`}
           </Button>
         </div>
       </form>
