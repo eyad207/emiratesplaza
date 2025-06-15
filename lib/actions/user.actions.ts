@@ -17,6 +17,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { getSetting } from './setting.actions'
 import { sendEmail } from '@/lib/email'
+import { generateToken } from '@/lib/token-utils'
 
 // CREATE
 export async function registerUser(userSignUp: IUserSignUp) {
@@ -251,21 +252,19 @@ export async function getUserById(userId: string) {
 
 export async function sendResetPasswordEmail(email: string) {
   try {
-    const response = await fetch('/api/send-reset-password-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
+    const token = generateToken(email)
+    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`
+
+    await sendEmail({
+      to: email,
+      subject: 'Reset Your Password',
+      text: `Click the link below to reset your password:\n\n${resetLink}\n\nThis link will expire in 15 minutes.`,
     })
 
-    if (!response.ok) {
-      throw new Error('Failed to send reset password email')
-    }
-
-    return { success: true, message: 'Password reset email sent successfully' }
+    return { success: true, message: 'Password reset email sent successfully.' }
   } catch (error) {
-    return { success: false, message: formatError(error) }
+    console.error('Error sending reset password email:', error)
+    return { success: false, message: 'Failed to send reset password email.' }
   }
 }
 

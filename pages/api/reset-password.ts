@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { connectToDatabase } from '@/lib/db'
 import User from '@/lib/db/models/user.model'
 import { ResetPasswordSchema } from '@/lib/validator'
+import { verifyToken } from '@/lib/token-utils'
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,11 +14,16 @@ export default async function handler(
   }
 
   try {
-    const { email, password } = req.body
+    const { token, password } = req.body
     await ResetPasswordSchema.parseAsync({
       password,
       confirmPassword: password,
     })
+
+    const email = verifyToken(token) // Verifiser token og hent e-post
+    if (!email) {
+      return res.status(400).json({ message: 'Invalid or expired token' })
+    }
 
     await connectToDatabase()
     const user = await User.findOne({ email })
@@ -30,10 +36,9 @@ export default async function handler(
 
     res.status(200).json({ message: 'Password reset successfully' })
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({ message: error.message })
-    } else {
-      res.status(400).json({ message: 'An unknown error occurred' })
-    }
+    res.status(400).json({
+      message:
+        error instanceof Error ? error.message : 'An unknown error occurred',
+    })
   }
 }
