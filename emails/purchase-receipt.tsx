@@ -13,8 +13,6 @@ import {
   Tailwind,
   Text,
 } from '@react-email/components'
-
-import { formatCurrency } from '@/lib/utils'
 import { IOrder } from '@/lib/db/models/order.model'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { SENDER_EMAIL } from '@/lib/constants'
@@ -67,12 +65,29 @@ PurchaseReceiptEmail.PreviewProps = {
     updatedAt: new Date(),
   } as unknown as IOrder,
 } satisfies OrderInformationProps
+
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
+
+function formatCurrency(amount: number, rate: number, code: string) {
+  return new Intl.NumberFormat('nb-NO', {
+    style: 'currency',
+    currency: code,
+  }).format(amount * rate)
+}
 
 export default async function PurchaseReceiptEmail({
   order,
 }: OrderInformationProps) {
-  const { site } = await getSetting()
+  const { site, availableCurrencies, defaultCurrency } = await getSetting()
+
+  const activeCurrency = availableCurrencies?.find(
+    (c) => c.code === defaultCurrency
+  ) ?? {
+    code: 'USD',
+    symbol: '$',
+    convertRate: 1,
+  }
+
   return (
     <Html>
       <Preview>View order receipt</Preview>
@@ -102,7 +117,11 @@ export default async function PurchaseReceiptEmail({
                     Price Paid
                   </Text>
                   <Text className='mt-0 mr-4'>
-                    {formatCurrency(order.totalPrice)}
+                    {formatCurrency(
+                      order.totalPrice,
+                      activeCurrency.convertRate,
+                      activeCurrency.code
+                    )}
                   </Text>
                 </Column>
               </Row>
@@ -136,7 +155,13 @@ export default async function PurchaseReceiptEmail({
                     </Link>
                   </Column>
                   <Column align='right' className='align-top'>
-                    <Text className='m-0 '>{formatCurrency(item.price)}</Text>
+                    <Text className='m-0'>
+                      {formatCurrency(
+                        item.price,
+                        activeCurrency.convertRate,
+                        activeCurrency.code
+                      )}
+                    </Text>
                   </Column>
                 </Row>
               ))}
@@ -149,7 +174,13 @@ export default async function PurchaseReceiptEmail({
                 <Row key={name} className='py-1'>
                   <Column align='right'>{name}:</Column>
                   <Column align='right' width={70} className='align-top'>
-                    <Text className='m-0'>{formatCurrency(price)}</Text>
+                    <Text className='m-0'>
+                      {formatCurrency(
+                        price,
+                        activeCurrency.convertRate,
+                        activeCurrency.code
+                      )}
+                    </Text>
                   </Column>
                 </Row>
               ))}
