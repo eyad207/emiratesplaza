@@ -1,5 +1,6 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+
+import React, { useEffect, useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { checkEmailRegistered } from '@/lib/actions/user.actions'
 import { toast } from '@/hooks/use-toast'
@@ -9,10 +10,12 @@ import { useRouter } from 'next/navigation'
 const EmailButton = ({ email }: { email: string }) => {
   const [currentEmail, setCurrentEmail] = useState(email)
   const [codeSent, setCodeSent] = useState(false)
-  const [code, setCode] = useState('')
-  const [generatedCode, setGeneratedCode] = useState('')
+  const [codeInput, setCodeInput] = useState('')
   const [countdown, setCountdown] = useState(0)
-  const [isSubmitting, setIsSubmitting] = useState(false) // Add a loading state for the submit button
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const generatedCodeRef = useRef('')
+  const codeExpiryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -21,36 +24,41 @@ const EmailButton = ({ email }: { email: string }) => {
 
   useEffect(() => {
     if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+      const timer = setTimeout(() => setCountdown((prev) => prev - 1), 1000)
       return () => clearTimeout(timer)
     }
   }, [countdown])
 
   const generateCode = () => {
-    const code = Math.floor(100000 + Math.random() * 900000).toString()
-    setGeneratedCode(code)
-    setTimeout(() => setGeneratedCode(''), 15 * 60 * 1000) // Code expires in 15 minutes
-    return code
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString()
+    generatedCodeRef.current = newCode
+
+    if (codeExpiryTimeoutRef.current) {
+      clearTimeout(codeExpiryTimeoutRef.current)
+    }
+
+    codeExpiryTimeoutRef.current = setTimeout(
+      () => {
+        generatedCodeRef.current = ''
+      },
+      15 * 60 * 1000
+    ) // 15 minutes
   }
 
   const getUserFirstName = async (email: string): Promise<string> => {
     try {
-      const response = await fetch('/api/getUserFirstName', {
+      const res = await fetch('/api/getUserFirstName', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch user first name')
-      }
+      if (!res.ok) throw new Error('Could not fetch first name')
 
-      const data = await response.json()
-      return data.firstName
-    } catch (error) {
-      console.error('Failed to fetch user first name:', error)
+      const { firstName } = await res.json()
+      return firstName || 'User'
+    } catch (err) {
+      console.error(err)
       return 'User'
     }
   }
@@ -61,22 +69,18 @@ const EmailButton = ({ email }: { email: string }) => {
     firstName: string
   ) => {
     try {
-      const response = await fetch('/api/sendVerificationCode', {
+      const res = await fetch('/api/sendVerificationCode', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code, firstName }),
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to send email')
-      }
-    } catch (error) {
-      console.error('Failed to send email:', error)
+      if (!res.ok) throw new Error('Failed to send code')
+    } catch (err) {
+      console.error(err)
       toast({
         title: 'Error',
-        description: 'Failed to send email. Please try again later.',
+        description: 'Could not send the verification email.',
         variant: 'destructive',
       })
     }
@@ -85,58 +89,76 @@ const EmailButton = ({ email }: { email: string }) => {
   const handleSubmit = async () => {
     if (!currentEmail) {
       toast({
-        title: 'Error',
-        description: 'Please enter an email address',
+        title: 'Missing Email',
+        description: 'Please provide an email address.',
         variant: 'destructive',
       })
       return
     }
-
-    // Show a toast message immediately
-    toast({
-      title: 'Sending Code',
-      description: 'The verification code is being sent to your email.',
-      variant: 'default',
-    })
 
     const isRegistered = await checkEmailRegistered(currentEmail)
     if (!isRegistered) {
       toast({
-        title: 'Error',
-        description: 'Email is not registered',
+        title: 'Not Registered',
+        description: 'This email is not registered.',
         variant: 'destructive',
       })
       return
     }
 
-    const code = generateCode()
-    const firstName = await getUserFirstName(currentEmail) // Get the user's first name
-    await sendVerificationCode(currentEmail, code, firstName)
+    toast({
+      title: 'Sending Code',
+      description: 'Please wait while we send the code.',
+    })
 
-    setCodeSent(true)
-    setCountdown(60) // Set countdown to 60 seconds
+    const [firstName] = await Promise.all([getUserFirstName(currentEmail)])
+    generateCode()
+    setCodeSent(true) // Vis input med en gang!
+    await sendVerificationCode(
+      currentEmail,
+      generatedCodeRef.current,
+      firstName
+    )
+
     toast({
       title: 'Success',
-      description: 'Email sent successfully',
-      variant: 'default',
+      description: 'Verification code sent!',
     })
+    setCountdown(60)
   }
 
   const handleCodeSubmit = async () => {
-    setIsSubmitting(true) // Set loading state to true immediately
-    try {
-      if (code === generatedCode) {
-        router.push(`/reset-password?email=${currentEmail}`)
-      } else {
+    setIsSubmitting(true)
+
+    if (codeInput === generatedCodeRef.current) {
+      try {
+        const res = await fetch('/api/createResetToken', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentEmail }),
+        })
+
+        if (!res.ok) throw new Error('Failed to get token')
+
+        const { token } = await res.json()
+        router.push(`/reset-password?token=${token}`)
+      } catch (err) {
+        console.error(err)
         toast({
           title: 'Error',
-          description: 'The code you entered is incorrect',
+          description: 'Something went wrong while creating reset token.',
           variant: 'destructive',
         })
       }
-    } finally {
-      setIsSubmitting(false) // Reset loading state after submission
+    } else {
+      toast({
+        title: 'Invalid Code',
+        description: 'The code you entered is incorrect.',
+        variant: 'destructive',
+      })
     }
+
+    setIsSubmitting(false)
   }
 
   return (
@@ -151,10 +173,11 @@ const EmailButton = ({ email }: { email: string }) => {
         </Button>
         {countdown > 0 && (
           <span className='ml-2 text-sm text-gray-600'>
-            Resend in {countdown} seconds
+            Resend in {countdown}s
           </span>
         )}
       </div>
+
       {codeSent && (
         <div className='mt-4'>
           <label
@@ -165,19 +188,17 @@ const EmailButton = ({ email }: { email: string }) => {
           </label>
           <Input
             id='code'
-            name='code'
             type='text'
             placeholder='Enter code'
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
+            value={codeInput}
+            onChange={(e) => setCodeInput(e.target.value)}
           />
           <Button
             onClick={handleCodeSubmit}
             className='mt-2'
-            disabled={isSubmitting} // Disable the button while submitting
+            disabled={isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Code'}{' '}
-            {/* Show loading text */}
+            {isSubmitting ? 'Submitting...' : 'Submit Code'}
           </Button>
         </div>
       )}
