@@ -1,3 +1,2 @@
 use Select-varient to remove size quantity.
 use headers/index to add remove links from under header
-NEXT_PUBLIC_APP_URL=http://localhost:3000
