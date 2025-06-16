@@ -154,8 +154,7 @@
     "Total": "Total",
     "Order Summary": "Order Summary",
     "Continue shopping": "Continue shopping"
-  },
-  "Search": {
+  },  "Search": {
     "for": "for",
     "Search": "Search",
     "Results": "Results",
@@ -172,15 +171,23 @@
     "results": "results",
     "up": "up",
     "Clear": "Clear",
+    "Clear All": "Clear All",
     "Filters": "Filters",
     "All": "All",
     "Customer Review": "Customer Review",
     "& Up": "& Up",
     "Check each product page for other buying options": "Check each product page for other buying options.",
     "No product found": "No product found",
+    "No products found": "No products found",
+    "Try adjusting your search terms or filters": "Try adjusting your search terms or filters",
     "Next": "Next",
     "Previous": "Previous",
-    "Page": "Page"
+    "Page": "Page",
+    "Search for products": "Search for products",
+    "Did you mean": "Did you mean",
+    "Suggestions": "Suggestions",
+    "Popular": "Popular searches",
+    "Query": "Search"
   },
   "Footer": {
     "Select a currency": "Select a currency",

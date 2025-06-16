@@ -39,8 +39,13 @@ export default function AddToCart({
     const sizeObj = colorObj?.sizes.find((s) => s.size === selectedSize)
     return sizeObj ? sizeObj.countInStock : 0
   }
+  const handleAddToCart = (e?: React.MouseEvent) => {
+    // Prevent link navigation when button is clicked
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
 
-  const handleAddToCart = () => {
     const countInStock = getCountInStockForSelectedSize()
     if (countInStock === 0) {
       toast({
@@ -87,6 +92,47 @@ export default function AddToCart({
       })
     }
   }
+  const handleBuyNow = (e?: React.MouseEvent) => {
+    // Prevent link navigation when button is clicked
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    const countInStock = getCountInStockForSelectedSize()
+    if (countInStock === 0) {
+      toast({
+        variant: 'destructive',
+        description: t('Product.You cant add it to cart, change color or size'),
+      })
+      return
+    }
+
+    if (quantity > countInStock) {
+      toast({
+        variant: 'destructive',
+        description: t('Product.Only X left in stock - order soon', {
+          count: countInStock,
+        }),
+      })
+      return
+    }
+
+    try {
+      // Always use discountedPrice if present
+      const itemToAdd = {
+        ...item,
+        price: item.discountedPrice ?? item.price,
+      }
+      addItem(itemToAdd, quantity)
+      router.push(`/checkout`)
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        description: error.message,
+      })
+    }
+  }
 
   return minimal ? (
     <Button
@@ -116,53 +162,16 @@ export default function AddToCart({
           )}
         </SelectContent>
       </Select>
-
       <Button
         className='rounded-full w-full'
         type='button'
         onClick={handleAddToCart}
       >
         {t('Product.Add to Cart')}
-      </Button>
+      </Button>{' '}
       <Button
         variant='secondary'
-        onClick={() => {
-          const countInStock = getCountInStockForSelectedSize()
-          if (countInStock === 0) {
-            toast({
-              variant: 'destructive',
-              description: t(
-                'Product.You cant add it to cart, change color or size'
-              ),
-            })
-            return
-          }
-
-          if (quantity > countInStock) {
-            toast({
-              variant: 'destructive',
-              description: t('Product.Only X left in stock - order soon', {
-                count: countInStock,
-              }),
-            })
-            return
-          }
-
-          try {
-            // Always use discountedPrice if present
-            const itemToAdd = {
-              ...item,
-              price: item.discountedPrice ?? item.price,
-            }
-            addItem(itemToAdd, quantity)
-            router.push(`/checkout`)
-          } catch (error: any) {
-            toast({
-              variant: 'destructive',
-              description: error.message,
-            })
-          }
-        }}
+        onClick={handleBuyNow}
         className='w-full rounded-full '
       >
         {t('Product.Buy Now')}

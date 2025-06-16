@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getAllCategories } from '@/lib/actions/product.actions'
 import Menu from './menu'
-import Search from './search'
+import HeaderSearch from './header-search'
 import Sidebar from './sidebar'
 import HeaderWrapper from './header-wrapper'
 import { getSetting } from '@/lib/actions/setting.actions'
@@ -47,18 +47,15 @@ export default async function Header() {
                   {site.name}
                 </span>
               </Link>
-            </div>
-
+            </div>{' '}
             {/* Center section with search - conditionally styled for different screen sizes */}
             <div className='flex-1 px-2 max-w-xl mx-auto'>
-              <Search compact={true} />
+              <HeaderSearch compact={true} categories={categories} />
             </div>
-
             {/* Menu with user controls */}
             <div className='flex-shrink-0 hidden nav:flex'>
               <Menu />
             </div>
-
             {/* Mobile menu button */}
             <div className='nav:hidden flex items-center'>
               <Menu />

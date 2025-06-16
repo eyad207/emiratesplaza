@@ -150,8 +150,7 @@
     "Update": "تحديث",
     "Checkout": "الدفع النهائي",
     "Total": "الإجمالي"
-  },
-  "Search": {
+  },  "Search": {
     "for": "لـ",
     "Search": "بحث",
     "Results": "النتائج",
@@ -168,15 +167,23 @@
     "results": "النتائج",
     "up": "وما فوق",
     "Clear": "مسح",
+    "Clear All": "مسح الكل",
     "Filters": "الفلاتر",
     "All": "الكل",
     "Customer Review": "مراجعة العملاء",
     "& Up": "وما فوق",
     "Check each product page for other buying options": "تحقق من صفحة كل منتج لمعرفة خيارات الشراء الأخرى.",
     "No product found": "لم يتم العثور على منتج",
+    "No products found": "لم يتم العثور على منتجات",
+    "Try adjusting your search terms or filters": "حاول تعديل مصطلحات البحث أو الفلاتر",
     "Next": "التالي",
     "Previous": "السابق",
-    "Page": "الصفحة"
+    "Page": "الصفحة",
+    "Search for products": "ابحث عن المنتجات...",
+    "Did you mean": "هل تقصد",
+    "Suggestions": "اقتراحات",
+    "Popular": "البحث الشائع",
+    "Query": "بحث"
   },
   "Footer": {
     "Select a currency": "حدد عملة",

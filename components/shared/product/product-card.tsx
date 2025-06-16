@@ -11,6 +11,7 @@ import ProductPrice from './product-price'
 import ImageHover from './image-hover'
 import AddToCart from './add-to-cart'
 import { useTranslations } from 'next-intl'
+import { useProductNameTranslation } from '@/hooks/use-product-translation'
 
 const ProductCard = ({
   product,
@@ -36,7 +37,8 @@ const ProductCard = ({
       className={cn(
         'relative transform transition-transform duration-700 ease-out hover:scale-105',
         {
-          'h-44 sm:h-60': isInInfiniteList, // Mobil: mindre høyde
+          // More responsive heights for infinite list
+          'h-32 sm:h-40 md:h-48 lg:h-52 xl:h-56': isInInfiniteList,
           'h-52': !isInInfiniteList,
         }
       )}
@@ -50,7 +52,7 @@ const ProductCard = ({
       ) : (
         <div
           className={cn('relative', {
-            'h-40': isInInfiniteList,
+            'h-32 sm:h-40 md:h-48 lg:h-52 xl:h-56': isInInfiniteList,
             'h-52': !isInInfiniteList,
           })}
         >
@@ -67,40 +69,57 @@ const ProductCard = ({
   )
 
   const discountedPrice = product.discountedPrice ?? undefined
-
   const ProductDetails = () => {
     const tags = product?.tags || [] // Ensure tags is always an array
+    const { translatedText: translatedName, isLoading: isTranslatingName } =
+      useProductNameTranslation(product.name)
 
     return (
-      <div className='flex-1 space-y-2 flex flex-col'>
+      <div
+        className={cn('flex-1 space-y-1 sm:space-y-2 flex flex-col', {
+          'p-1 sm:p-2': isInInfiniteList, // Tighter padding for infinite list
+          'p-2 sm:p-3': !isInInfiniteList,
+        })}
+      >
         <p
-          className={cn('font-bold text-foreground dark:text-foreground/90', {
-            'hidden sm:block': hideBrandOnMobile,
-          })}
+          className={cn(
+            'font-bold text-foreground dark:text-foreground/90 text-xs sm:text-sm',
+            {
+              block: !hideBrandOnMobile, // Always show if not hidden
+              'hidden sm:block': hideBrandOnMobile,
+            }
+          )}
         >
           {product.brand}
         </p>
         <p
-          className='overflow-hidden text-ellipsis font-medium hover:text-primary transition-colors duration-300 dark:text-foreground/80 dark:hover:text-primary'
+          className={cn(
+            'overflow-hidden text-ellipsis font-medium hover:text-primary transition-colors duration-300 dark:text-foreground/80 dark:hover:text-primary text-xs sm:text-sm md:text-base',
+            {
+              'opacity-50': isTranslatingName,
+            }
+          )}
           style={{
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: isInInfiniteList ? 2 : 3,
             WebkitBoxOrient: 'vertical',
           }}
         >
-          {product.name}
-        </p>
+          {translatedName}
+        </p>{' '}
         <div
-          className={cn('flex gap-2 justify-center', {
-            'hidden sm:flex': isInInfiniteList,
-          })}
+          className={cn(
+            'flex gap-1 sm:gap-2 justify-center items-center text-xs sm:text-sm',
+            {
+              flex: isInInfiniteList, // Always show ratings in infinite list
+            }
+          )}
         >
-          <Rating rating={product.avgRating} />
-          <span className='font-medium'>
+          <Rating rating={product.avgRating} size={isInInfiniteList ? 4 : 6} />
+          <span className='font-medium text-xs sm:text-sm'>
             ({formatNumber(product.numReviews)})
           </span>
         </div>
-
         <div className='mt-auto pt-2'>
           <ProductPrice
             isDeal={tags.includes('todays-deal')}
@@ -108,15 +127,24 @@ const ProductCard = ({
             discountedPrice={discountedPrice} // <--- add this
             forListing
           />
-        </div>
+        </div>{' '}
       </div>
     )
   }
 
   const AddButton = () => (
-    <div className='w-full text-center transform transition-all duration-300 hover:scale-105 pb-1 lg:block'>
+    <div
+      className={cn('w-full text-center transition-all duration-300', {
+        'px-2 py-1': isInInfiniteList, // Professional padding for infinite list
+        'pb-1 lg:block': !isInInfiniteList,
+      })}
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+      }}
+    >
       <AddToCart
-        minimal
+        minimal={isInInfiniteList}
         item={{
           clientId: generateId(),
           product: product._id,
@@ -181,7 +209,7 @@ const ProductCard = ({
               <ProductDetails />
             </CardContent>
             <CardFooter className='p-2 pt-1 pb-2 sm:p-3 sm:pt-2 sm:pb-3 flex-shrink-0 mt-auto border-t border-border/10 dark:border-zinc-800'>
-              {!hideAddToCart && !hideAddToCartButton && <AddButton />}
+              {!hideAddToCart && !hideAddToCartButton}
             </CardFooter>
           </>
         )}

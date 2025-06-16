@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator'
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import RatingSummary from '@/components/shared/product/rating-summary'
 import ProductSlider from '@/components/shared/product/product-slider'
+import TranslatedText from '@/components/shared/translated-text'
 import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata(props: {
@@ -84,7 +85,13 @@ export default async function ProductDetails(props: {
               <p className='p-medium-16 rounded-full bg-grey-500/10   text-grey-500'>
                 {t('Product.Brand')} {product.brand} {product.category}
               </p>
-              <h1 className='font-bold text-lg lg:text-xl'>{product.name}</h1>
+              <h1 className='font-bold text-lg lg:text-xl'>
+                <TranslatedText
+                  text={product.name}
+                  fallback={product.name}
+                  enableTranslation={true}
+                />
+              </h1>
 
               <RatingSummary
                 avgRating={product.avgRating}
@@ -111,14 +118,18 @@ export default async function ProductDetails(props: {
                 color={selectedColor}
               />
             </div>
-            <Separator className='my-2' />
+            <Separator className='my-2' />{' '}
             <div className='flex flex-col gap-2'>
               <p className='p-bold-20 text-grey-600'>
                 {t('Product.Description')}:
-              </p>
-              <p className='p-medium-16 lg:p-regular-18'>
-                {product.description}
-              </p>
+              </p>{' '}
+              <div className='p-medium-16 lg:p-regular-18'>
+                <TranslatedText
+                  text={product.description}
+                  fallback={product.description}
+                  enableTranslation={true}
+                />
+              </div>
             </div>
           </div>
           <div>

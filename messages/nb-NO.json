@@ -154,8 +154,7 @@
     "Total": "Totalt",
     "Order Summary": "Bestillingsoversikt",
     "Continue shopping": "Fortsett å handle"
-  },
-  "Search": {
+  },  "Search": {
     "for": "for",
     "Search": "Søk",
     "Results": "Resultater",
@@ -172,15 +171,23 @@
     "results": "resultater",
     "up": "opp",
     "Clear": "Tøm",
+    "Clear All": "Tøm alle",
     "Filters": "Filtre",
     "All": "Alle",
     "Customer Review": "Kundeanmeldelse",
     "& Up": "& Opp",
     "Check each product page for other buying options": "Sjekk hver produktside for andre kjøpsalternativer.",
     "No product found": "Ingen produkt funnet",
+    "No products found": "Ingen produkter funnet",
+    "Try adjusting your search terms or filters": "Prøv å justere søkeordene eller filtrene dine",
     "Next": "Neste",
     "Previous": "Forrige",
-    "Page": "Side"
+    "Page": "Side",
+    "Search for products": "Søk etter produkter...",
+    "Did you mean": "Mente du",
+    "Suggestions": "Forslag",
+    "Popular": "Populære søk",
+    "Query": "Søk"
   },
   "Footer": {
     "Select a currency": "Velg en valuta",

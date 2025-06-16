@@ -46,24 +46,33 @@ const InfiniteProductList = () => {
   }, [page])
 
   return (
-    <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-3 gap-4 lg:gap-7'>
+    <div
+      className='grid gap-3 sm:gap-4 lg:gap-6 
+                    grid-cols-2 
+                    sm:grid-cols-4 
+                    md:grid-cols-4 
+                    lg:grid-cols-4 
+                    xl:grid-cols-4
+                    2xl:grid-cols-4'
+    >
       {allProducts.map((product, index) => (
         <div
           key={`${product._id}-${index}`} // Ensure unique keys
           ref={index === allProducts.length - 1 ? lastProductElementRef : null}
-          className='transition-transform duration-300 hover:scale-105'
+          className='transition-all duration-300 hover:scale-105 hover:shadow-lg'
         >
+          {' '}
           <ProductCard
             product={product}
             hideAddToCartButton={false}
-            hideBrandOnMobile={true}
+            hideBrandOnMobile={false} // Show brand on mobile for better context
             isInInfiniteList={true}
-            className='lg:w-[30vw] lg:h-[73vh] md:w-[30vw] md:h-[50vh] sm:w-[50vw] sm:h-[60vh] space-y-4' // Adjusted height and added spacing
+            className='h-full w-full max-w-sm mx-auto' // Responsive sizing
           />
         </div>
-      ))}
+      ))}{' '}
       {isPending && (
-        <div role='status'>
+        <div role='status' className='col-span-full flex justify-center py-8'>
           <svg
             aria-hidden='true'
             className='inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600'

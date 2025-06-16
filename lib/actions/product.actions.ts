@@ -11,6 +11,10 @@ import { IProductInput } from '@/types'
 import { z } from 'zod'
 import { getSetting } from './setting.actions'
 import mongoose from 'mongoose' // Add this import
+import {
+  processMultilingualSearch,
+  createMultilingualSearchFilter,
+} from '../multilingual-search'
 
 // CREATE
 export async function createProduct(data: IProductInput) {
@@ -256,7 +260,7 @@ export async function getRelatedProductsByCategory({
     totalPages: Math.ceil(productsCount / limit),
   }
 }
-// GET ALL PRODUCTS
+// GET ALL PRODUCTS WITH MULTILINGUAL SEARCH
 export async function getAllProducts({
   query,
   limit,
@@ -266,6 +270,7 @@ export async function getAllProducts({
   price,
   rating,
   sort,
+  locale = 'en-US',
 }: {
   query: string
   category: string
@@ -275,23 +280,23 @@ export async function getAllProducts({
   price?: string
   rating?: string
   sort?: string
+  locale?: 'ar' | 'en-US' | 'nb-NO'
 }) {
   const {
     common: { pageSize },
   } = await getSetting()
   limit = limit || pageSize
   await connectToDatabase()
+  // Process multilingual search terms
+  const searchTerms = await processMultilingualSearch({
+    query,
+    category,
+    targetLanguage: locale,
+  })
+  // Create multilingual search filter
+  const multilingualFilter = await createMultilingualSearchFilter(searchTerms)
 
-  const queryFilter =
-    query && query !== 'all'
-      ? {
-          name: {
-            $regex: query,
-            $options: 'i',
-          },
-        }
-      : {}
-  const categoryFilter = category && category !== 'all' ? { category } : {}
+  // Traditional filters (non-multilingual)
   const tagFilter = tag && tag !== 'all' ? { tags: tag } : {}
 
   const ratingFilter =
@@ -302,7 +307,8 @@ export async function getAllProducts({
           },
         }
       : {}
-  // 10-50
+
+  // Price filter (10-50)
   const priceFilter =
     price && price !== 'all'
       ? {
@@ -312,6 +318,7 @@ export async function getAllProducts({
           },
         }
       : {}
+
   const order: Record<string, 1 | -1> =
     sort === 'best-selling'
       ? { numSales: -1 }
@@ -322,31 +329,28 @@ export async function getAllProducts({
           : sort === 'avg-customer-review'
             ? { avgRating: -1 }
             : { _id: -1 }
+
   const isPublished = { isPublished: true }
 
-  const products = await Product.find({
+  // Combine all filters
+  const finalFilter = {
     ...isPublished,
-    ...queryFilter,
+    ...multilingualFilter,
     ...tagFilter,
-    ...categoryFilter,
     ...priceFilter,
     ...ratingFilter,
-  })
+  }
+
+  const products = await Product.find(finalFilter)
     .sort(order)
     .skip(limit * (Number(page) - 1))
     .limit(limit)
     .select(
-      'name price discountedPrice discount category images brand avgRating numReviews slug colors tags'
-    ) // <--- VERY important line!
+      'name price discountedPrice discount category images brand avgRating numReviews slug colors tags description'
+    )
     .lean()
 
-  const countProducts = await Product.countDocuments({
-    ...queryFilter,
-    ...tagFilter,
-    ...categoryFilter,
-    ...priceFilter,
-    ...ratingFilter,
-  })
+  const countProducts = await Product.countDocuments(finalFilter)
 
   return {
     products: JSON.parse(JSON.stringify(products)) as IProduct[],
@@ -354,6 +358,7 @@ export async function getAllProducts({
     totalProducts: countProducts,
     from: limit * (Number(page) - 1) + 1,
     to: limit * (Number(page) - 1) + products.length,
+    searchTerms, // Include processed search terms for debugging
   }
 }
 
@@ -539,4 +544,37 @@ async function resolveTagIds(tagNamesOrIds: string[]): Promise<string[]> {
   return tags.map((tag) =>
     new mongoose.Types.ObjectId(tag._id as mongoose.Types.ObjectId).toString()
   ) // Convert _id to string
+}
+
+// GET ALL CATEGORIES WITH MULTILINGUAL SUPPORT
+export async function getAllCategoriesWithTranslation(
+  locale: 'ar' | 'en-US' | 'nb-NO' = 'en-US'
+) {
+  await connectToDatabase()
+  const categories = await Product.find({ isPublished: true }).distinct(
+    'category'
+  )
+
+  // Import here to avoid circular dependency
+  const { translateCategoriesForDisplay } = await import(
+    '../multilingual-search'
+  )
+
+  try {
+    const translatedCategories = await translateCategoriesForDisplay(
+      categories,
+      locale
+    )
+    return translatedCategories
+  } catch (error) {
+    console.warn(
+      'Category translation failed, returning original categories:',
+      error
+    )
+    // Fallback to original categories if translation fails
+    return categories.map((category) => ({
+      original: category,
+      translated: category,
+    }))
+  }
 }
