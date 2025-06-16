@@ -25,9 +25,12 @@ const EmailButton = ({ email }: { email: string }) => {
       return () => clearTimeout(timer)
     }
   }, [countdown])
-
   const generateCode = () => {
-    const code = Math.floor(100000 + Math.random() * 900000).toString()
+    // Use crypto.getRandomValues for cryptographically secure random numbers
+    const array = new Uint32Array(1)
+    crypto.getRandomValues(array)
+    // Generate 6-digit code with better randomness
+    const code = (100000 + (array[0] % 900000)).toString()
     setGeneratedCode(code)
     setTimeout(() => setGeneratedCode(''), 15 * 60 * 1000) // Code expires in 15 minutes
     return code
@@ -125,7 +128,22 @@ const EmailButton = ({ email }: { email: string }) => {
     setIsSubmitting(true) // Set loading state to true immediately
     try {
       if (code === generatedCode) {
-        router.push(`/reset-password?email=${currentEmail}`)
+        const response = await fetch('/api/create-reset-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: currentEmail }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error('Error from API:', errorData)
+          throw new Error(errorData.error || 'Failed to create reset token')
+        }
+
+        const { token } = await response.json()
+        router.push(`/reset-password?token=${token}`)
       } else {
         toast({
           title: 'Error',
@@ -133,6 +151,16 @@ const EmailButton = ({ email }: { email: string }) => {
           variant: 'destructive',
         })
       }
+    } catch (error) {
+      console.error('Error submitting code:', error)
+      toast({
+        title: 'Error',
+        description:
+          typeof error === 'object' && error !== null && 'message' in error
+            ? (error as { message: string }).message
+            : 'An error occurred. Please try again.',
+        variant: 'destructive',
+      })
     } finally {
       setIsSubmitting(false) // Reset loading state after submission
     }

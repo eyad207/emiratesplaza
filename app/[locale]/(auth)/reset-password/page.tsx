@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button'
 export default function ResetPasswordPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const email = searchParams ? searchParams.get('email') : null
+  const token = searchParams ? searchParams.get('token') : null
 
   const form = useForm({
     resolver: zodResolver(ResetPasswordSchema),
@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password: data.password }),
+        body: JSON.stringify({ token, password: data.password }),
       })
 
       if (!response.ok) {
