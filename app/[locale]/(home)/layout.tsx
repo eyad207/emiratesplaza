@@ -1,4 +1,5 @@
 import Header from '@/components/shared/header'
+import HeaderSpacer from '@/components/shared/header/header-spacer'
 import Footer from '@/components/shared/footer'
 
 export default async function HomeLayout({
@@ -8,9 +9,8 @@ export default async function HomeLayout({
 }) {
   return (
     <div className='flex flex-col min-h-screen bg-border '>
-      <div className='sticky top-0 z-50 bg-header-darker border-b border-white/10'>
-        <Header />
-      </div>
+      <Header />
+      <HeaderSpacer />
       <main className='flex-1 flex flex-col bg-border'>{children}</main>
       <Footer />
     </div>
