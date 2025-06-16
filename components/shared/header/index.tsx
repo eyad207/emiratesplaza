@@ -140,7 +140,7 @@ export default async function Header() {
                   asChild
                   className='cursor-pointer focus:bg-primary/10'
                 >
-                  <Link href='/page/about' className='w-full py-1.5'>
+                  <Link href='/page/about-us' className='w-full py-1.5'>
                     {t('Header.About Us')}
                   </Link>
                 </DropdownMenuItem>
@@ -148,7 +148,7 @@ export default async function Header() {
                   asChild
                   className='cursor-pointer focus:bg-primary/10'
                 >
-                  <Link href='/page/contact' className='w-full py-1.5'>
+                  <Link href='/page/contact-us' className='w-full py-1.5'>
                     {t('Header.Contact Us')}
                   </Link>
                 </DropdownMenuItem>
