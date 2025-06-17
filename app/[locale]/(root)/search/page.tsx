@@ -148,7 +148,7 @@ export default async function SearchPage(props: {
                       <span className='text-blue-600 dark:text-blue-400 font-medium'>
                         {t('Search.Did you mean')}
                       </span>
-                      {': '}
+                      {': '}{' '}
                       <Button
                         variant='link'
                         className='p-0 h-auto text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline-offset-2'
@@ -156,10 +156,9 @@ export default async function SearchPage(props: {
                       >
                         <Link
                           href={`/search?q=${encodeURIComponent(spellCheckResult.correctedQuery)}`}
+                          className='text-lg'
                         >
-                          <span className='text-lg'>
-                            {spellCheckResult.correctedQuery}
-                          </span>
+                          {spellCheckResult.correctedQuery}
                         </Link>
                       </Button>
                       <span className='text-blue-600 dark:text-blue-400'>
@@ -172,9 +171,9 @@ export default async function SearchPage(props: {
                   </div>
                 </div>
               </div>
-            </div>
+            </div>{' '}
           </div>
-        )}{' '}
+        )}
       {/* Results and Filters Section */}
       <div className='container mx-auto px-4 py-6'>
         <div className='max-w-7xl mx-auto'>
@@ -283,13 +282,12 @@ export default async function SearchPage(props: {
                       </Badge>
                     )}
                   </div>{' '}
-                  {/* Clear all filters */}
+                  {/* Clear all filters */}{' '}
                   {((q !== 'all' && q !== '') ||
                     (category !== 'all' && category !== '') ||
                     price !== 'all' ||
                     rating !== 'all') && (
                     <Button variant='outline' size='sm' asChild>
-                      {' '}
                       <Link
                         href={getFilterUrl({
                           category: 'all',
