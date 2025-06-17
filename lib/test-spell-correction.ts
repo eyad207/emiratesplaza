@@ -28,8 +28,8 @@ export async function testSpellCorrection() {
         `${status} | Input: "${testCase.input}" | Expected: "${testCase.expected}" | Got: "${result.correctedQuery || 'none'}" | Misspelled: ${result.isLikelyMisspelled}`
       )
 
-      if (result.suggestions.length > 0) {
-        console.log(`   📝 Suggestions: [${result.suggestions.join(', ')}]`)
+      if (result.correctedQuery) {
+        console.log(`   📝 Correction: ${result.correctedQuery}`)
       }
       console.log('')
     } catch (error) {

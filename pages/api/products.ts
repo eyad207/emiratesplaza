@@ -40,13 +40,11 @@ export default async function handler(
       try {
         // Detect the language of the query
         const detectedLanguage = await detectQueryLanguage(query as string)
-        console.log('Detected language:', detectedLanguage)
-
-        // Process the search terms for multilingual search
+        console.log('Detected language:', detectedLanguage) // Process the search terms for multilingual search
         const searchTerms = await processMultilingualSearch({
           query: query as string,
           category: '', // No specific category filter for general search
-          targetLanguage: detectedLanguage,
+          targetLanguage: detectedLanguage as 'ar' | 'en-US' | 'nb-NO',
           sourceLanguage: detectedLanguage,
         })
 

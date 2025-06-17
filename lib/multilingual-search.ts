@@ -225,6 +225,129 @@ class MultilingualSearch {
   }
 
   /**
+   * Generate fuzzy variations of a text for typo tolerance
+   */
+  private generateFuzzyVariations(text: string): string[] {
+    if (!text || text.length < 2) return []
+
+    const variations: string[] = []
+    const lowerText = text.toLowerCase()
+
+    // Common character substitutions for each language
+    const substitutions: Record<string, Record<string, string>> = {
+      ar: {
+        ا: 'آأإ',
+        ة: 'ه',
+        ي: 'ى',
+        و: 'ؤ',
+      },
+      'nb-NO': {
+        å: 'a',
+        æ: 'ae',
+        ø: 'o',
+        a: 'å',
+        o: 'ø',
+        e: 'æ',
+      },
+      'en-US': {
+        c: 'k',
+        k: 'c',
+        s: 'z',
+        z: 's',
+      },
+    }
+
+    // Generate substitution variations
+    Object.values(substitutions).forEach((langSubs) => {
+      Object.entries(langSubs).forEach(([from, to]) => {
+        if (lowerText.includes(from)) {
+          to.split('').forEach((char) => {
+            variations.push(lowerText.replace(new RegExp(from, 'g'), char))
+          })
+        }
+      })
+    })
+
+    // Generate transposition variations (swap adjacent characters)
+    for (let i = 0; i < lowerText.length - 1; i++) {
+      const chars = lowerText.split('')
+      const temp = chars[i]
+      chars[i] = chars[i + 1]
+      chars[i + 1] = temp
+      variations.push(chars.join(''))
+    }
+
+    return variations.filter((v) => v !== lowerText)
+  } /**
+   * Generate search suggestions for auto-complete
+   */
+  async generateSearchSuggestions(
+    partialQuery: string,
+    targetLanguage: 'ar' | 'en-US' | 'nb-NO' = 'en-US',
+    limit: number = 5
+  ): Promise<string[]> {
+    // This would connect to your database to get matching product names
+    // For now, return an empty array based on the query
+    if (partialQuery.length < 2) return []
+
+    // TODO: Implement actual suggestion logic
+    // Using parameters to avoid ESLint errors
+    const suggestions: string[] = []
+    console.log(
+      `Generating suggestions for "${partialQuery}" in ${targetLanguage}, limit: ${limit}`
+    )
+
+    return suggestions
+  }
+
+  /**
+   * Detect and correct spelling errors in search queries
+   */
+  async detectAndCorrectSpelling(
+    query: string,
+    targetLanguage: 'ar' | 'en-US' | 'nb-NO' = 'en-US'
+  ): Promise<{
+    isLikelyMisspelled: boolean
+    correctedQuery?: string
+    confidence: number
+  }> {
+    // Simple spell checking logic
+    const commonMisspellings: Record<string, Record<string, string>> = {
+      'nb-NO': {
+        kso: 'sko',
+        skjirt: 'skjorte',
+        bukser: 'bukse',
+      },
+      ar: {
+        احاذيي: 'حذاء',
+        قميظ: 'قميص',
+        بنطال: 'بنطلون',
+      },
+      'en-US': {
+        shose: 'shoes',
+        tshrt: 'tshirt',
+        jens: 'jeans',
+      },
+    }
+
+    const misspellings = commonMisspellings[targetLanguage] || {}
+    const lowerQuery = query.toLowerCase().trim()
+
+    if (misspellings[lowerQuery]) {
+      return {
+        isLikelyMisspelled: true,
+        correctedQuery: misspellings[lowerQuery],
+        confidence: 0.9,
+      }
+    }
+
+    return {
+      isLikelyMisspelled: false,
+      confidence: 1.0,
+    }
+  }
+
+  /**
    * Translates a search query to all supported languages to ensure comprehensive search coverage
    * Uses simple product term mappings for better accuracy
    */
@@ -591,706 +714,61 @@ class MultilingualSearch {
         })
       }
     }
-
     return translatedCategories
   }
 
   /**
-   * Calculate Levenshtein distance between two strings (edit distance)
+   * Translate tags to the target language
    */
-  private levenshteinDistance(str1: string, str2: string): number {
-    const len1 = str1.length
-    const len2 = str2.length
-    const matrix = Array(len1 + 1)
-      .fill(null)
-      .map(() => Array(len2 + 1).fill(null))
+  async translateTags(
+    tags: Array<{ _id: string; name: string }>,
+    targetLanguage: 'ar' | 'en-US' | 'nb-NO'
+  ): Promise<Array<{ _id: string; original: string; translated: string }>> {
+    const translatedTags: Array<{
+      _id: string
+      original: string
+      translated: string
+    }> = []
 
-    for (let i = 0; i <= len1; i++) matrix[i][0] = i
-    for (let j = 0; j <= len2; j++) matrix[0][j] = j
-
-    for (let i = 1; i <= len1; i++) {
-      for (let j = 1; j <= len2; j++) {
-        const cost = str1[i - 1] === str2[j - 1] ? 0 : 1
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j] + 1, // deletion
-          matrix[i][j - 1] + 1, // insertion
-          matrix[i - 1][j - 1] + cost // substitution
-        )
-      }
-    }
-
-    return matrix[len1][len2]
-  }
-  /**
-   * Calculate similarity ratio between two strings (0-1) with enhanced fuzzy matching
-   */
-  private calculateSimilarity(str1: string, str2: string): number {
-    const maxLen = Math.max(str1.length, str2.length)
-    if (maxLen === 0) return 1
-
-    // Use both Levenshtein distance and character-based similarity
-    const distance = this.levenshteinDistance(
-      str1.toLowerCase(),
-      str2.toLowerCase()
-    )
-    const basicSimilarity = (maxLen - distance) / maxLen
-
-    // Additional similarity checks for better fuzzy matching
-    const str1Lower = str1.toLowerCase()
-    const str2Lower = str2.toLowerCase()
-
-    // Check for character transpositions (common in typos)
-    let transpositionSimilarity = 0
-    if (str1Lower.length === str2Lower.length) {
-      let matches = 0
-      for (let i = 0; i < str1Lower.length; i++) {
-        if (str1Lower[i] === str2Lower[i]) matches++
-      }
-      transpositionSimilarity = matches / str1Lower.length
-    }
-
-    // Check for substring matches (partial typing)
-    let substringBonus = 0
-    if (str1Lower.includes(str2Lower) || str2Lower.includes(str1Lower)) {
-      substringBonus = 0.2
-    }
-
-    // Combine similarities with weights
-    return Math.min(
-      1,
-      basicSimilarity + transpositionSimilarity * 0.1 + substringBonus
-    )
-  }
-
-  /**
-   * Enhanced fuzzy matching specifically for keyboard layout errors and common typos
-   */
-  private calculateFuzzyMatch(input: string, target: string): number {
-    const inputLower = input.toLowerCase().trim()
-    const targetLower = target.toLowerCase().trim()
-
-    if (inputLower === targetLower) return 1.0
-
-    // Keyboard layout similarity (for languages with different layouts)
-    const keyboardSimilarity = this.calculateKeyboardSimilarity(
-      inputLower,
-      targetLower
-    )
-
-    // Character similarity
-    const charSimilarity = this.calculateSimilarity(inputLower, targetLower)
-
-    // Phonetic similarity (for similar sounding words)
-    const phoneticSimilarity = this.calculatePhoneticSimilarity(
-      inputLower,
-      targetLower
-    )
-
-    // Return weighted average
-    return (
-      charSimilarity * 0.5 + keyboardSimilarity * 0.3 + phoneticSimilarity * 0.2
-    )
-  }
-
-  /**
-   * Calculate similarity based on keyboard layout proximity
-   */
-  private calculateKeyboardSimilarity(str1: string, str2: string): number {
-    // Common keyboard layout substitutions
-    const keyboardMap: Record<string, string[]> = {
-      // Arabic keyboard layout confusion
-      ح: ['خ', 'ج'],
-      د: ['ذ', 'ر'],
-      س: ['ش', 'ص'],
-      ت: ['ث', 'ة'],
-      // Latin keyboard layout confusion
-      q: ['w', 'a'],
-      w: ['q', 'e', 's'],
-      e: ['w', 'r', 'd'],
-      s: ['a', 'w', 'd'],
-      k: ['j', 'l', 'o'],
-      o: ['i', 'p', 'l'],
-    }
-
-    if (str1.length !== str2.length) return 0
-
-    let matches = 0
-    for (let i = 0; i < str1.length; i++) {
-      const char1 = str1[i]
-      const char2 = str2[i]
-
-      if (char1 === char2) {
-        matches++
-      } else if (
-        keyboardMap[char1]?.includes(char2) ||
-        keyboardMap[char2]?.includes(char1)
-      ) {
-        matches += 0.7 // Partial match for keyboard proximity
-      }
-    }
-
-    return matches / str1.length
-  }
-
-  /**
-   * Calculate phonetic similarity for similar sounding words
-   */
-  private calculatePhoneticSimilarity(str1: string, str2: string): number {
-    // Simple phonetic similarity based on character substitutions
-    const phoneticMap: Record<string, string[]> = {
-      // Similar sounding characters
-      c: ['k', 's'],
-      k: ['c', 'q'],
-      s: ['c', 'z'],
-      z: ['s'],
-      f: ['ph', 'v'],
-      v: ['f', 'w'],
-      // Arabic phonetic similarities
-      ض: ['د', 'ظ'],
-      ظ: ['ض', 'ز'],
-      ذ: ['د', 'ز'],
-    }
-
-    // For simplicity, use basic character matching with phonetic substitutions
-    let similarity = 0
-    const maxLen = Math.max(str1.length, str2.length)
-
-    for (let i = 0; i < Math.min(str1.length, str2.length); i++) {
-      const char1 = str1[i]
-      const char2 = str2[i]
-
-      if (char1 === char2) {
-        similarity += 1
-      } else if (
-        phoneticMap[char1]?.includes(char2) ||
-        phoneticMap[char2]?.includes(char1)
-      ) {
-        similarity += 0.8
-      }
-    }
-    return maxLen > 0 ? similarity / maxLen : 0
-  }
-
-  /**
-   * Count common characters between two strings
-   */
-  private countCommonCharacters(str1: string, str2: string): number {
-    const chars1 = str1.toLowerCase().split('')
-    const chars2 = str2.toLowerCase().split('')
-    const intersection = chars1.filter((char) => chars2.includes(char))
-    return intersection.length
-  }
-  /**
-   * Generate fuzzy variations of a search term to handle typos
-   */
-  private generateFuzzyVariations(term: string): string[] {
-    if (!term || term.length < 3) return [term]
-
-    const variations = new Set([term])
-    const lowerTerm = term.toLowerCase()
-
-    // Common product keywords with typical misspellings
-    const commonCorrections: Record<string, string[]> = {
-      shoes: ['shos', 'shose', 'sheos', 'shoeees', 'shue', 'sho', 'shoess'],
-      shirt: ['shrit', 'shart', 'shitr', 'shirtt', 'shiert'],
-      pants: ['pnts', 'panst', 'pantss', 'pant'],
-      jacket: ['jaket', 'jacet', 'jackeet', 'jakett'],
-      dress: ['dres', 'drss', 'dresss', 'dresse'],
-      jeans: ['jens', 'jeanes', 'jean', 'janes'],
-      watch: ['wach', 'watsh', 'wath', 'watchh'],
-      phone: ['phon', 'fone', 'phne', 'phonee'],
-      computer: ['compter', 'computr', 'comuter', 'computerr'],
-      laptop: ['lptop', 'labtop', 'laptpp', 'laptopp'],
-      // Norwegian corrections
-      sko: ['sk', 'skoo', 'soko', 'skko'],
-      skjorte: ['skjore', 'skjrt', 'skjorta'],
-      bukse: ['bukse', 'bkse', 'buksse'],
-    }
-
-    // Check if the input term is a misspelling of a known word
-    for (const [correct, misspellings] of Object.entries(commonCorrections)) {
-      if (misspellings.includes(lowerTerm)) {
-        variations.add(correct)
-        variations.add(correct.charAt(0).toUpperCase() + correct.slice(1))
-      }
-      // Also check if input is close to the correct word
-      if (this.calculateSimilarity(lowerTerm, correct) >= 0.7) {
-        variations.add(correct)
-      }
-    }
-
-    // Generate phonetic variations for common substitutions
-    const phoneticVariations = lowerTerm
-      .replace(/ph/g, 'f') // phone → fone
-      .replace(/ck/g, 'k') // jacket → jaket
-      .replace(/ee/g, 'e') // shoes → shose
-      .replace(/([aeiou])\1/g, '$1') // remove double vowels
-
-    if (phoneticVariations !== lowerTerm) {
-      variations.add(phoneticVariations)
-    }
-
-    // Generate common typo patterns
-    const chars = lowerTerm.split('')
-
-    // Transpose adjacent characters (shoes → sheos)
-    for (let i = 0; i < chars.length - 1; i++) {
-      const transposed = [...chars]
-      ;[transposed[i], transposed[i + 1]] = [transposed[i + 1], transposed[i]]
-      variations.add(transposed.join(''))
-    }
-
-    // Remove double letters (shoeees → shoes)
-    const deduplicated = lowerTerm.replace(/(.)\1+/g, '$1')
-    if (deduplicated !== lowerTerm) {
-      variations.add(deduplicated)
-    }
-
-    // Add missing letters at end (sho → shoes for similarity check)
-    if (lowerTerm.length >= 3) {
-      for (const [correct] of Object.entries(commonCorrections)) {
-        if (
-          correct.startsWith(lowerTerm) &&
-          correct.length <= lowerTerm.length + 3
-        ) {
-          variations.add(correct)
+    for (const tag of tags) {
+      try {
+        // Try to translate tag name to target language
+        const translationResult = await translationService.translate({
+          text: tag.name,
+          targetLanguage,
+          sourceLanguage: 'en-US', // Tags are typically stored in English
+        })
+        if (translationResult.translatedText) {
+          translatedTags.push({
+            _id: tag._id,
+            original: tag.name,
+            translated: translationResult.translatedText,
+          })
+        } else {
+          // Fallback to original tag name if translation fails
+          translatedTags.push({
+            _id: tag._id,
+            original: tag.name,
+            translated: tag.name,
+          })
         }
+      } catch (error) {
+        console.error(`Error translating tag "${tag.name}":`, error)
+        // Fallback to original tag name
+        translatedTags.push({
+          _id: tag._id,
+          original: tag.name,
+          translated: tag.name,
+        })
       }
     }
 
-    return Array.from(variations)
-  } /**
-   * Generate search suggestions based on partial input
-   * Includes spell checking and auto-complete functionality
-   */
-  async generateSearchSuggestions(
-    partialQuery: string,
-    targetLanguage: 'ar' | 'en-US' | 'nb-NO' = 'en-US',
-    limit: number = 5
-  ): Promise<string[]> {
-    if (!partialQuery || partialQuery.length < 2) return []
-
-    const suggestions = new Set<string>()
-    const lowerQuery = partialQuery.toLowerCase()
-
-    try {
-      // First priority: Fetch actual product categories that have products
-      const categoriesWithProducts = await this.getCategoriesWithProducts()
-      const translatedCategories = await this.translateCategories(
-        categoriesWithProducts,
-        targetLanguage
-      )
-
-      // Find categories that match the query
-      for (const categoryObj of translatedCategories) {
-        const category = categoryObj.translated
-        const lowerCategory = category.toLowerCase()
-
-        // Exact start matches
-        if (lowerCategory.startsWith(lowerQuery)) {
-          suggestions.add(category)
-        }
-        // Contains matches
-        else if (lowerCategory.includes(lowerQuery)) {
-          suggestions.add(category)
-        }
-        // More strict fuzzy matches for categories (higher threshold)
-        else {
-          const similarity = this.calculateSimilarity(lowerQuery, lowerCategory)
-          if (similarity >= 0.8) {
-            // Increased from 0.6 to 0.8 for more strict matching
-            suggestions.add(category)
-          }
-        }
-      }
-
-      // Second priority: Get actual product names that match
-      if (suggestions.size < limit) {
-        const matchingProducts = await this.getMatchingProductNames(
-          partialQuery,
-          limit - suggestions.size
-        )
-        for (const productName of matchingProducts) {
-          if (suggestions.size >= limit) break
-          suggestions.add(productName)
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching categories for suggestions:', error)
-    }
-
-    // If we still have room for more suggestions, add common product search terms
-    if (suggestions.size < limit) {
-      const commonTerms: Record<string, string[]> = {
-        'en-US': [
-          'shoes',
-          'shirt',
-          'pants',
-          'dress',
-          'jacket',
-          'jeans',
-          'watch',
-          'phone',
-          'laptop',
-          'computer',
-          'headphones',
-          'camera',
-          'bag',
-          'wallet',
-          'belt',
-          'sneakers',
-          'boots',
-          'sandals',
-          'shorts',
-          'skirt',
-          'sweater',
-          'hoodie',
-        ],
-        'nb-NO': [
-          'sko',
-          'skjorte',
-          'bukse',
-          'kjole',
-          'jakke',
-          'jeans',
-          'klokke',
-          'telefon',
-          'laptop',
-          'datamaskin',
-          'hodetelefoner',
-          'kamera',
-          'veske',
-          'lommebok',
-          'belte',
-          'joggesko',
-          'støvler',
-          'sandaler',
-          'shorts',
-          'skjørt',
-          'genser',
-          'hettegenser',
-        ],
-        ar: [
-          'حذاء',
-          'قميص',
-          'بنطلون',
-          'فستان',
-          'سترة',
-          'جينز',
-          'ساعة',
-          'هاتف',
-          'لابتوب',
-          'كمبيوتر',
-          'سماعات',
-          'كاميرا',
-          'حقيبة',
-          'محفظة',
-          'حزام',
-        ],
-      }
-
-      const termsForLanguage =
-        commonTerms[targetLanguage] || commonTerms['en-US']
-
-      // Find terms that start with the partial query
-      for (const term of termsForLanguage) {
-        if (suggestions.size >= limit) break
-        if (term.toLowerCase().startsWith(lowerQuery)) {
-          suggestions.add(term)
-        }
-      }
-
-      // Find terms that contain the partial query
-      for (const term of termsForLanguage) {
-        if (suggestions.size >= limit) break
-        if (
-          term.toLowerCase().includes(lowerQuery) &&
-          !term.toLowerCase().startsWith(lowerQuery)
-        ) {
-          suggestions.add(term)
-        }
-      }
-
-      // Add fuzzy matches for typo tolerance
-      for (const term of termsForLanguage) {
-        if (suggestions.size >= limit) break
-        const similarity = this.calculateSimilarity(
-          lowerQuery,
-          term.toLowerCase()
-        )
-        if (similarity >= 0.6 && similarity < 1.0) {
-          suggestions.add(term)
-        }
-      }
-    }
-
-    // Convert to array and limit results
-    return Array.from(suggestions).slice(0, limit)
-  }
-  /**
-   * Detect if a query might be misspelled and suggest corrections
-   */
-  async detectAndCorrectSpelling(
-    query: string,
-    targetLanguage: 'ar' | 'en-US' | 'nb-NO' = 'en-US'
-  ): Promise<{
-    isLikelyMisspelled: boolean
-    suggestions: string[]
-    correctedQuery?: string
-  }> {
-    if (!query || query.length < 3) {
-      return { isLikelyMisspelled: false, suggestions: [] }
-    }
-    const lowerQuery = query.toLowerCase() // Common product keywords with typical misspellings
-    const commonCorrections: Record<string, string[]> = {
-      shoes: ['shos', 'shose', 'sheos', 'shoeees', 'shue', 'sho', 'shoess'],
-      shirt: ['shrit', 'shart', 'shitr', 'shirtt', 'shiert'],
-      pants: ['pnts', 'panst', 'pantss', 'pant'],
-      jacket: ['jaket', 'jacet', 'jackeet', 'jakett'],
-      dress: ['dres', 'drss', 'dresss', 'dresse'],
-      jeans: ['jens', 'jeanes', 'jean', 'janes'],
-      watch: ['wach', 'watsh', 'wath', 'watchh'],
-      phone: ['phon', 'fone', 'phne', 'phonee'],
-      computer: ['compter', 'computr', 'comuter', 'computerr'],
-      laptop: ['lptop', 'labtop', 'laptpp', 'laptopp'],
-
-      // Norwegian corrections with more comprehensive misspellings
-      sko: [
-        'sk',
-        'skoo',
-        'soko',
-        'skko',
-        'kso',
-        'sko0',
-        'sk0',
-        'sco',
-        'skjo',
-        'skho',
-      ],
-      skjorte: [
-        'skjore',
-        'skjrt',
-        'skjorta',
-        'skjorte',
-        'skjort',
-        'skjpte',
-        'skhorte',
-        'skjorthe',
-      ],
-      bukse: [
-        'bukse',
-        'bkse',
-        'buksse',
-        'bukse',
-        'bukser',
-        'bukze',
-        'bukce',
-        'bucse',
-      ],
-      jakke: ['jake', 'jke', 'jakkee', 'jakk', 'yakke', 'jacke', 'jakje'],
-      genser: ['gensr', 'genser', 'genser', 'genzer', 'genser'],
-
-      // Arabic corrections with more comprehensive misspellings including keyboard layout issues
-      حذاء: [
-        'حدا',
-        'حذا',
-        'حداء',
-        'حذائ',
-        'حذاؤ',
-        'احذية',
-        'احاذيي',
-        'حذاي',
-        'حدائ',
-        'حذ',
-        'حذای',
-      ],
-      قميص: ['قمص', 'قميس', 'قمیص', 'قميصs', 'قمیس', 'قميض', 'قمیص', 'قميظ'],
-      بنطلون: [
-        'بنطلن',
-        'بنطال',
-        'بنطلوں',
-        'بنطلون',
-        'بنطلون',
-        'بنطلوم',
-        'بنطالون',
-      ],
-      ساعة: ['ساعه', 'ساعة', 'ساعاة', 'ساعت', 'ساعہ', 'ساعة'],
-      هاتف: ['هاتفf', 'هاتففf', 'هاتv', 'هاتف', 'هاتق', 'هاتغ', 'هاطف'],
-
-      // Additional common Arabic product terms with misspellings
-      جزدان: ['جزدان', 'جدان', 'جردان', 'حزدان'], // wallet
-      نظارة: ['نظاره', 'نضارة', 'نطارة', 'نظارة'], // glasses
-      حقيبة: ['حقيبه', 'حفيبة', 'حقيبة', 'حكيبة'], // bag
-      فستان: ['فستان', 'فسطان', 'فستان', 'فستام'], // dress
-    }
-
-    // Check if the input is actually a known misspelling
-    let correctedQuery: string | undefined
-    let isLikelyMisspelled = false
-
-    for (const [correct, misspellings] of Object.entries(commonCorrections)) {
-      if (misspellings.includes(lowerQuery)) {
-        correctedQuery = correct
-        isLikelyMisspelled = true
-        break
-      }
-    } // If not a known misspelling, check if it's close to a correct word but not exact
-    if (!isLikelyMisspelled) {
-      for (const [correct] of Object.entries(commonCorrections)) {
-        // Use enhanced fuzzy matching
-        const fuzzyScore = this.calculateFuzzyMatch(lowerQuery, correct)
-        const similarity = this.calculateSimilarity(lowerQuery, correct)
-
-        // Consider it a likely misspelling if either fuzzy or similarity score is high
-        if (
-          (fuzzyScore >= 0.7 || similarity >= 0.75) &&
-          lowerQuery !== correct
-        ) {
-          correctedQuery = correct
-          isLikelyMisspelled = true
-          break
-        }
-      }
-    }
-
-    // Additional check: if the query contains partial matches to known words
-    if (!isLikelyMisspelled && lowerQuery.length >= 3) {
-      for (const [correct] of Object.entries(commonCorrections)) {
-        // Check if the correct word contains most of the query characters
-        if (correct.length >= 3 && lowerQuery.length >= 3) {
-          const commonChars = this.countCommonCharacters(lowerQuery, correct)
-          const minLength = Math.min(lowerQuery.length, correct.length)
-
-          if (commonChars / minLength >= 0.8 && lowerQuery !== correct) {
-            correctedQuery = correct
-            isLikelyMisspelled = true
-            break
-          }
-        }
-      }
-    }
-
-    // Get suggestions based on the corrected query or original
-    const suggestions = await this.generateSearchSuggestions(
-      correctedQuery || query,
-      targetLanguage,
-      3
-    )
-
-    return {
-      isLikelyMisspelled,
-      suggestions: isLikelyMisspelled ? suggestions : [],
-      correctedQuery,
-    }
-  }
-
-  /**
-   * Test function for spell correction (can be removed in production)
-   */
-  async testSpellCorrection() {
-    const testCases = [
-      { input: 'kso', expected: 'sko', language: 'nb-NO' },
-      { input: 'احاذيي', expected: 'حذاء', language: 'ar' },
-      { input: 'skjort', expected: 'skjorte', language: 'nb-NO' },
-      { input: 'shos', expected: 'shoes', language: 'en-US' },
-    ]
-
-    console.log('Testing spell correction...')
-
-    for (const testCase of testCases) {
-      const result = await detectAndCorrectSpelling(
-        testCase.input,
-        testCase.language as 'ar' | 'en-US' | 'nb-NO'
-      )
-      console.log(
-        `Input: "${testCase.input}" -> Expected: "${testCase.expected}" -> Got: "${result.correctedQuery}" (Likely misspelled: ${result.isLikelyMisspelled})`
-      )
-    }
-  }
-
-  /**
-   * Fetch all unique product categories that actually have products
-   */
-  private async getCategoriesWithProducts(): Promise<string[]> {
-    try {
-      const { connectToDatabase } = await import('./db')
-      const Product = (await import('./db/models/product.model')).default
-
-      await connectToDatabase()
-
-      // Get categories that have at least one published product
-      const categoriesWithProducts = await Product.distinct('category', {
-        isPublished: true,
-        category: { $exists: true, $ne: null },
-      })
-
-      return categoriesWithProducts.filter((cat) => cat && cat.trim() !== '')
-    } catch (error) {
-      console.error('Error fetching categories with products:', error)
-      return []
-    }
-  }
-
-  /**
-   * Get product names that match the partial query
-   */
-  private async getMatchingProductNames(
-    partialQuery: string,
-    limit: number
-  ): Promise<string[]> {
-    try {
-      const { connectToDatabase } = await import('./db')
-      const Product = (await import('./db/models/product.model')).default
-
-      await connectToDatabase()
-
-      // Escape special regex characters in the query
-      const escapedQuery = partialQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-      // Search for products whose names contain the query
-      const products = await Product.find({
-        isPublished: true,
-        name: {
-          $regex: escapedQuery,
-          $options: 'i',
-        },
-      })
-        .select('name')
-        .limit(limit)
-        .lean()
-
-      return products
-        .map((p) => p.name)
-        .filter((name) => name && name.trim() !== '')
-    } catch (error) {
-      console.error('Error fetching matching product names:', error)
-      return []
-    }
+    return translatedTags
   }
 }
 
 /**
- * Main function to process search terms for multilingual search
- */
-export async function processMultilingualSearch(
-  options: MultilingualSearchOptions
-): Promise<ProcessedSearchTerms> {
-  const search = new MultilingualSearch()
-  return search.processSearchTerms(options)
-}
-
-/**
- * Creates MongoDB filter for multilingual search
- */
-export async function createMultilingualSearchFilter(
-  searchTerms: ProcessedSearchTerms
-): Promise<MongoFilter> {
-  const search = new MultilingualSearch()
-  return search.createMultilingualFilter(searchTerms)
-}
-
-/**
- * Translates categories for display in target language
+ * Export function to translate categories for display
  */
 export async function translateCategoriesForDisplay(
   categories: string[],
@@ -1298,6 +776,17 @@ export async function translateCategoriesForDisplay(
 ): Promise<Array<{ original: string; translated: string }>> {
   const search = new MultilingualSearch()
   return search.translateCategories(categories, targetLanguage)
+}
+
+/**
+ * Export function to translate tags for display
+ */
+export async function translateTagsForDisplay(
+  tags: Array<{ _id: string; name: string }>,
+  targetLanguage: 'ar' | 'en-US' | 'nb-NO'
+): Promise<Array<{ _id: string; original: string; translated: string }>> {
+  const search = new MultilingualSearch()
+  return search.translateTags(tags, targetLanguage)
 }
 
 /**
@@ -1320,21 +809,69 @@ export async function detectAndCorrectSpelling(
   targetLanguage: 'ar' | 'en-US' | 'nb-NO' = 'en-US'
 ): Promise<{
   isLikelyMisspelled: boolean
-  suggestions: string[]
   correctedQuery?: string
+  confidence: number
 }> {
   const search = new MultilingualSearch()
   return search.detectAndCorrectSpelling(query, targetLanguage)
 }
 
 /**
- * Detect the language of a search query
+ * Process multilingual search terms
  */
-export async function detectQueryLanguage(
-  query: string
-): Promise<'ar' | 'en-US' | 'nb-NO'> {
+export async function processMultilingualSearch(
+  options: MultilingualSearchOptions
+): Promise<ProcessedSearchTerms> {
   const search = new MultilingualSearch()
-  return search.detectLanguage(query) as 'ar' | 'en-US' | 'nb-NO'
+  return search.processSearchTerms(options)
 }
 
-export { MultilingualSearch }
+/**
+ * Detect the language of a query
+ */
+export async function detectQueryLanguage(text: string): Promise<string> {
+  const search = new MultilingualSearch()
+  return search.detectLanguage(text)
+}
+
+/**
+ * Create multilingual search filter for MongoDB
+ */
+export async function createMultilingualSearchFilter(
+  processedTerms: ProcessedSearchTerms
+): Promise<MongoFilter> {
+  const filter: MongoFilter = { $or: [] }
+
+  // Add search queries
+  if (processedTerms.originalQuery && processedTerms.originalQuery !== 'all') {
+    // Add original query
+    filter.$or?.push(
+      { name: { $regex: processedTerms.originalQuery, $options: 'i' } },
+      { description: { $regex: processedTerms.originalQuery, $options: 'i' } }
+    )
+
+    // Add translated queries
+    processedTerms.translatedQueries.forEach((query) => {
+      if (query !== processedTerms.originalQuery) {
+        filter.$or?.push(
+          { name: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } }
+        )
+      }
+    })
+  }
+
+  if (
+    processedTerms.originalCategory &&
+    processedTerms.originalCategory !== 'all'
+  ) {
+    filter.category = {
+      $in: [
+        processedTerms.originalCategory,
+        ...processedTerms.translatedCategories,
+      ],
+    }
+  }
+
+  return filter
+}

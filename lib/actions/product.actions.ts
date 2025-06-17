@@ -578,3 +578,28 @@ export async function getAllCategoriesWithTranslation(
     }))
   }
 }
+
+export async function getAllTagsWithTranslation(
+  locale: 'ar' | 'en-US' | 'nb-NO' = 'en-US'
+) {
+  await connectToDatabase()
+  const tags = await Tag.find().sort({ name: 1 }).lean()
+
+  // Import here to avoid circular dependency
+  const { translateTagsForDisplay } = await import('../multilingual-search')
+
+  try {
+    const translatedTags = await translateTagsForDisplay(
+      tags.map((tag) => ({ _id: tag._id.toString(), name: tag.name })),
+      locale
+    )
+    return translatedTags
+  } catch (error) {
+    console.warn('Translation failed, falling back to original tags:', error)
+    return tags.map((tag) => ({
+      _id: tag._id.toString(),
+      original: tag.name,
+      translated: tag.name,
+    }))
+  }
+}

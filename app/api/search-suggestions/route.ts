@@ -15,12 +15,14 @@ export async function GET(request: NextRequest) {
 
     if (!query || query.length < 2) {
       return NextResponse.json({ suggestions: [], spellCheck: null })
-    } // Auto-detect language if not provided or if query doesn't match the provided locale
+    }
+
+    // Auto-detect language if not provided or if query doesn't match the provided locale
     const detectedLanguage = await detectQueryLanguage(query)
 
     // Use detected language if it's different from provided locale
     if (detectedLanguage !== locale) {
-      locale = detectedLanguage
+      locale = detectedLanguage as 'ar' | 'en-US' | 'nb-NO'
     }
 
     // Generate suggestions and spell check in parallel

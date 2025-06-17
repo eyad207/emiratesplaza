@@ -19,7 +19,7 @@ import { getDirection } from '@/i18n-config'
 export default async function Sidebar({
   categories,
 }: {
-  categories: string[]
+  categories: Array<{ original: string; translated: string }>
 }) {
   const session = await auth()
 
@@ -78,12 +78,12 @@ export default async function Sidebar({
             </div>{' '}
             <nav className='flex flex-col'>
               {categories.map((category) => (
-                <DrawerClose asChild key={category}>
+                <DrawerClose asChild key={category.original}>
                   <Link
-                    href={`/search?category=${category}&q=all`}
+                    href={`/search?category=${category.original}&q=all`}
                     className='flex items-center justify-between py-2 px-4 hover:bg-primary/10 transition-colors rounded-md'
                   >
-                    <span>{category}</span>
+                    <span>{category.translated}</span>
                     <ChevronRight className='h-4 w-4' />
                   </Link>
                 </DrawerClose>

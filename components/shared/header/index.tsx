@@ -1,14 +1,15 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { getAllCategories } from '@/lib/actions/product.actions'
+import {
+  getAllCategoriesWithTranslation,
+  getAllTagsWithTranslation,
+} from '@/lib/actions/product.actions'
 import Menu from './menu'
 import HeaderSearch from './header-search'
 import Sidebar from './sidebar'
 import HeaderWrapper from './header-wrapper'
 import { getSetting } from '@/lib/actions/setting.actions'
-import Tag from '@/lib/db/models/tag.model'
-import { connectToDatabase } from '@/lib/db'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,9 +19,9 @@ import {
 import { EllipsisVerticalIcon } from 'lucide-react'
 
 export default async function Header() {
-  await connectToDatabase()
-  const tags = await Tag.find().sort({ name: 1 }).lean()
-  const categories = await getAllCategories()
+  const locale = (await getLocale()) as 'ar' | 'en-US' | 'nb-NO'
+  const translatedTags = await getAllTagsWithTranslation(locale)
+  const translatedCategories = await getAllCategoriesWithTranslation(locale)
   const { site } = await getSetting()
   const t = await getTranslations()
   return (
@@ -50,7 +51,10 @@ export default async function Header() {
             </div>{' '}
             {/* Center section with search - conditionally styled for different screen sizes */}
             <div className='flex-1 px-2 max-w-xl mx-auto'>
-              <HeaderSearch compact={true} categories={categories} />
+              <HeaderSearch
+                compact={true}
+                categories={translatedCategories.map((c) => c.original)}
+              />
             </div>
             {/* Menu with user controls */}
             <div className='flex-shrink-0 hidden nav:flex'>
@@ -66,20 +70,19 @@ export default async function Header() {
         {/* Navigation bar - Full width */}
         <div className='w-full bg-header-darker border-t border-white/10'>
           <div className='flex items-center justify-between py-2 px-3 sm:px-6 lg:px-8 max-w-[2000px] mx-auto'>
-            {/* Sidebar trigger (categories) */}
+            {/* Sidebar trigger (categories) */}{' '}
             <div className='flex-shrink-0'>
-              <Sidebar categories={categories} />
+              <Sidebar categories={translatedCategories} />
             </div>
-
             {/* Desktop nav links */}
             <div className='hidden nav:flex items-center flex-wrap gap-x-6 overflow-hidden px-4'>
-              {tags.map((tag) => (
+              {translatedTags.map((tag) => (
                 <Link
-                  href={`/search?tag=${tag._id}`}
+                  href={`/search?tag=${tag._id}&q=all`}
                   key={String(tag._id)}
                   className='text-sm font-medium whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary hover:text-primary transition-all duration-200'
                 >
-                  {tag.name}
+                  {tag.translated}
                 </Link>
               ))}
               <Link
@@ -101,7 +104,6 @@ export default async function Header() {
                 {t('Header.Contact Us')}
               </Link>
             </div>
-
             {/* Mobile/tablet menu dropdown */}
             <div className='nav:hidden flex items-center'>
               <DropdownMenu>
@@ -112,17 +114,17 @@ export default async function Header() {
                   align='end'
                   className='min-w-[200px] z-50 rounded-md'
                 >
-                  {tags.map((tag) => (
+                  {translatedTags.map((tag) => (
                     <DropdownMenuItem
                       key={String(tag._id)}
                       asChild
                       className='cursor-pointer focus:bg-primary/10'
                     >
                       <Link
-                        href={`/search?tag=${tag._id}`}
+                        href={`/search?tag=${tag._id}&q=all`}
                         className='w-full py-1.5'
                       >
-                        {tag.name}
+                        {tag.translated}
                       </Link>
                     </DropdownMenuItem>
                   ))}
