@@ -75,12 +75,12 @@ export default async function Sidebar({
               <h2 className='text-lg font-semibold'>
                 {t('Header.Shop By Department')}
               </h2>
-            </div>
+            </div>{' '}
             <nav className='flex flex-col'>
               {categories.map((category) => (
                 <DrawerClose asChild key={category}>
                   <Link
-                    href={`/search?category=${category}`}
+                    href={`/search?category=${category}&q=all`}
                     className='flex items-center justify-between py-2 px-4 hover:bg-primary/10 transition-colors rounded-md'
                   >
                     <span>{category}</span>

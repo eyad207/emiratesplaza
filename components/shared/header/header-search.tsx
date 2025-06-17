@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, X } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import {
@@ -228,24 +227,6 @@ export default function HeaderSearch({
               }
             }}
           />
-
-          {/* Clear button */}
-          {query && (
-            <Button
-              type='button'
-              variant='ghost'
-              size='sm'
-              onClick={() => {
-                setQuery('')
-                setSuggestions([])
-                setShowSuggestions(false)
-                inputRef.current?.focus()
-              }}
-              className='absolute right-12 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-gray-200'
-            >
-              <X className='h-3 w-3' />
-            </Button>
-          )}
         </div>
 
         {/* Search Button */}

@@ -45,7 +45,7 @@ export default async function HomePage() {
       items: categoriesWithImages.map((category) => ({
         name: category.name,
         image: category.image,
-        href: `/search?category=${category.name}`,
+        href: `/search?category=${category.name}&q=all`,
         className: 'transition-transform duration-300 hover:scale-105',
       })),
     },

@@ -59,7 +59,7 @@ const InfiniteProductList = () => {
         <div
           key={`${product._id}-${index}`} // Ensure unique keys
           ref={index === allProducts.length - 1 ? lastProductElementRef : null}
-          className='transition-all duration-300 hover:scale-105 hover:shadow-lg'
+          className='transition-all duration-300 hover:shadow-lg' // Removed hover:scale-105 to prevent overlap
         >
           {' '}
           <ProductCard

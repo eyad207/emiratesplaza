@@ -132,28 +132,44 @@ export default async function SearchPage(props: {
 
   return (
     <div className='min-h-screen bg-gray-50 dark:bg-zinc-900'>
-      {/* Spell Check Suggestion */}
+      {' '}
+      {/* Enhanced Spell Check Suggestion */}
       {spellCheckResult?.isLikelyMisspelled &&
         spellCheckResult.correctedQuery && (
-          <div className='bg-white dark:bg-zinc-800 border-b shadow-sm'>
-            <div className='container mx-auto px-4 py-3'>
+          <div className='bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b shadow-sm'>
+            <div className='container mx-auto px-4 py-4'>
               <div className='max-w-4xl mx-auto'>
-                <div className='p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
-                  <p className='text-sm text-blue-700 dark:text-blue-300'>
-                    {t('Search.Did you mean')}:{' '}
-                    <Button
-                      variant='link'
-                      className='p-0 h-auto text-blue-600 dark:text-blue-400 font-semibold'
-                      asChild
-                    >
-                      <Link
-                        href={`/search?q=${encodeURIComponent(spellCheckResult.correctedQuery)}`}
+                <div className='flex items-center gap-3 p-4 bg-white dark:bg-zinc-800 border border-blue-200 dark:border-blue-700 rounded-lg shadow-sm'>
+                  <div className='flex-shrink-0'>
+                    <SearchIcon className='h-5 w-5 text-blue-600 dark:text-blue-400' />
+                  </div>
+                  <div className='flex-1'>
+                    <p className='text-sm text-gray-700 dark:text-gray-300'>
+                      <span className='text-blue-600 dark:text-blue-400 font-medium'>
+                        {t('Search.Did you mean')}
+                      </span>
+                      {': '}
+                      <Button
+                        variant='link'
+                        className='p-0 h-auto text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline-offset-2'
+                        asChild
                       >
-                        {spellCheckResult.correctedQuery}
-                      </Link>
-                    </Button>
-                    ?
-                  </p>
+                        <Link
+                          href={`/search?q=${encodeURIComponent(spellCheckResult.correctedQuery)}`}
+                        >
+                          <span className='text-lg'>
+                            {spellCheckResult.correctedQuery}
+                          </span>
+                        </Link>
+                      </Button>
+                      <span className='text-blue-600 dark:text-blue-400'>
+                        ?
+                      </span>
+                    </p>{' '}
+                    <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
+                      Showing results for &quot;{q}&quot; instead
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -173,7 +189,6 @@ export default async function SearchPage(props: {
                       : `${data.from}-${data.to} ${t('Search.of')} ${data.totalProducts}`}{' '}
                     {t('Search.results')}
                   </span>
-
                   {/* Active Filters */}
                   <div className='flex flex-wrap gap-2'>
                     {q !== 'all' && q !== '' && (
@@ -267,15 +282,24 @@ export default async function SearchPage(props: {
                         </Button>
                       </Badge>
                     )}
-                  </div>
-
+                  </div>{' '}
                   {/* Clear all filters */}
                   {((q !== 'all' && q !== '') ||
                     (category !== 'all' && category !== '') ||
                     price !== 'all' ||
                     rating !== 'all') && (
                     <Button variant='outline' size='sm' asChild>
-                      <Link href='/search'>{t('Search.Clear All')}</Link>
+                      {' '}
+                      <Link
+                        href={getFilterUrl({
+                          category: 'all',
+                          price: 'all',
+                          rating: 'all',
+                          params: { ...searchParamsObj, q: 'all' },
+                        })}
+                      >
+                        {t('Search.Clear All')}
+                      </Link>
                     </Button>
                   )}
                 </div>
@@ -305,7 +329,7 @@ export default async function SearchPage(props: {
                       <span className='font-semibold'>
                         {t('Search.Filters')}
                       </span>
-                    </div>
+                    </div>{' '}
                     {/* Department Filter */}
                     <div>
                       <h3 className='font-semibold text-gray-900 dark:text-white mb-3'>
@@ -319,7 +343,7 @@ export default async function SearchPage(props: {
                           }`}
                           href={getFilterUrl({
                             category: 'all',
-                            params: searchParamsObj,
+                            params: { ...searchParamsObj, q: 'all' }, // Clear search query when viewing all categories
                           })}
                         >
                           {t('Search.All')}
@@ -333,7 +357,7 @@ export default async function SearchPage(props: {
                             }`}
                             href={getFilterUrl({
                               category: categoryItem.original,
-                              params: searchParamsObj,
+                              params: { ...searchParamsObj, q: 'all' }, // Clear search query when selecting a specific category
                             })}
                           >
                             {categoryItem.translated}
@@ -341,9 +365,7 @@ export default async function SearchPage(props: {
                         ))}
                       </div>
                     </div>
-
                     <Separator />
-
                     {/* Price Filter */}
                     <div>
                       <h3 className='font-semibold text-gray-900 dark:text-white mb-3'>
@@ -377,9 +399,7 @@ export default async function SearchPage(props: {
                         ))}
                       </div>
                     </div>
-
                     <Separator />
-
                     {/* Rating Filter */}
                     <div>
                       <h3 className='font-semibold text-gray-900 dark:text-white mb-3'>

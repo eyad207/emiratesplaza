@@ -1,7 +1,6 @@
 'use server'
 
 import { translationService } from './translation-new'
-import { cache } from 'react'
 
 export interface MultilingualSearchOptions {
   query: string
@@ -622,18 +621,164 @@ class MultilingualSearch {
 
     return matrix[len1][len2]
   }
-
   /**
-   * Calculate similarity ratio between two strings (0-1)
+   * Calculate similarity ratio between two strings (0-1) with enhanced fuzzy matching
    */
   private calculateSimilarity(str1: string, str2: string): number {
     const maxLen = Math.max(str1.length, str2.length)
     if (maxLen === 0) return 1
+
+    // Use both Levenshtein distance and character-based similarity
     const distance = this.levenshteinDistance(
       str1.toLowerCase(),
       str2.toLowerCase()
     )
-    return (maxLen - distance) / maxLen
+    const basicSimilarity = (maxLen - distance) / maxLen
+
+    // Additional similarity checks for better fuzzy matching
+    const str1Lower = str1.toLowerCase()
+    const str2Lower = str2.toLowerCase()
+
+    // Check for character transpositions (common in typos)
+    let transpositionSimilarity = 0
+    if (str1Lower.length === str2Lower.length) {
+      let matches = 0
+      for (let i = 0; i < str1Lower.length; i++) {
+        if (str1Lower[i] === str2Lower[i]) matches++
+      }
+      transpositionSimilarity = matches / str1Lower.length
+    }
+
+    // Check for substring matches (partial typing)
+    let substringBonus = 0
+    if (str1Lower.includes(str2Lower) || str2Lower.includes(str1Lower)) {
+      substringBonus = 0.2
+    }
+
+    // Combine similarities with weights
+    return Math.min(
+      1,
+      basicSimilarity + transpositionSimilarity * 0.1 + substringBonus
+    )
+  }
+
+  /**
+   * Enhanced fuzzy matching specifically for keyboard layout errors and common typos
+   */
+  private calculateFuzzyMatch(input: string, target: string): number {
+    const inputLower = input.toLowerCase().trim()
+    const targetLower = target.toLowerCase().trim()
+
+    if (inputLower === targetLower) return 1.0
+
+    // Keyboard layout similarity (for languages with different layouts)
+    const keyboardSimilarity = this.calculateKeyboardSimilarity(
+      inputLower,
+      targetLower
+    )
+
+    // Character similarity
+    const charSimilarity = this.calculateSimilarity(inputLower, targetLower)
+
+    // Phonetic similarity (for similar sounding words)
+    const phoneticSimilarity = this.calculatePhoneticSimilarity(
+      inputLower,
+      targetLower
+    )
+
+    // Return weighted average
+    return (
+      charSimilarity * 0.5 + keyboardSimilarity * 0.3 + phoneticSimilarity * 0.2
+    )
+  }
+
+  /**
+   * Calculate similarity based on keyboard layout proximity
+   */
+  private calculateKeyboardSimilarity(str1: string, str2: string): number {
+    // Common keyboard layout substitutions
+    const keyboardMap: Record<string, string[]> = {
+      // Arabic keyboard layout confusion
+      ح: ['خ', 'ج'],
+      د: ['ذ', 'ر'],
+      س: ['ش', 'ص'],
+      ت: ['ث', 'ة'],
+      // Latin keyboard layout confusion
+      q: ['w', 'a'],
+      w: ['q', 'e', 's'],
+      e: ['w', 'r', 'd'],
+      s: ['a', 'w', 'd'],
+      k: ['j', 'l', 'o'],
+      o: ['i', 'p', 'l'],
+    }
+
+    if (str1.length !== str2.length) return 0
+
+    let matches = 0
+    for (let i = 0; i < str1.length; i++) {
+      const char1 = str1[i]
+      const char2 = str2[i]
+
+      if (char1 === char2) {
+        matches++
+      } else if (
+        keyboardMap[char1]?.includes(char2) ||
+        keyboardMap[char2]?.includes(char1)
+      ) {
+        matches += 0.7 // Partial match for keyboard proximity
+      }
+    }
+
+    return matches / str1.length
+  }
+
+  /**
+   * Calculate phonetic similarity for similar sounding words
+   */
+  private calculatePhoneticSimilarity(str1: string, str2: string): number {
+    // Simple phonetic similarity based on character substitutions
+    const phoneticMap: Record<string, string[]> = {
+      // Similar sounding characters
+      c: ['k', 's'],
+      k: ['c', 'q'],
+      s: ['c', 'z'],
+      z: ['s'],
+      f: ['ph', 'v'],
+      v: ['f', 'w'],
+      // Arabic phonetic similarities
+      ض: ['د', 'ظ'],
+      ظ: ['ض', 'ز'],
+      ذ: ['د', 'ز'],
+    }
+
+    // For simplicity, use basic character matching with phonetic substitutions
+    let similarity = 0
+    const maxLen = Math.max(str1.length, str2.length)
+
+    for (let i = 0; i < Math.min(str1.length, str2.length); i++) {
+      const char1 = str1[i]
+      const char2 = str2[i]
+
+      if (char1 === char2) {
+        similarity += 1
+      } else if (
+        phoneticMap[char1]?.includes(char2) ||
+        phoneticMap[char2]?.includes(char1)
+      ) {
+        similarity += 0.8
+      }
+    }
+    return maxLen > 0 ? similarity / maxLen : 0
+  }
+
+  /**
+   * Count common characters between two strings
+   */
+  private countCommonCharacters(str1: string, str2: string): number {
+    const chars1 = str1.toLowerCase().split('')
+    const chars2 = str2.toLowerCase().split('')
+    const intersection = chars1.filter((char) => chars2.includes(char))
+    return intersection.length
   }
   /**
    * Generate fuzzy variations of a search term to handle typos
@@ -896,9 +1041,7 @@ class MultilingualSearch {
     if (!query || query.length < 3) {
       return { isLikelyMisspelled: false, suggestions: [] }
     }
-    const lowerQuery = query.toLowerCase()
-
-    // Common product keywords with typical misspellings
+    const lowerQuery = query.toLowerCase() // Common product keywords with typical misspellings
     const commonCorrections: Record<string, string[]> = {
       shoes: ['shos', 'shose', 'sheos', 'shoeees', 'shue', 'sho', 'shoess'],
       shirt: ['shrit', 'shart', 'shitr', 'shirtt', 'shiert'],
@@ -910,20 +1053,75 @@ class MultilingualSearch {
       phone: ['phon', 'fone', 'phne', 'phonee'],
       computer: ['compter', 'computr', 'comuter', 'computerr'],
       laptop: ['lptop', 'labtop', 'laptpp', 'laptopp'],
-      // Norwegian corrections
-      sko: ['sk', 'skoo', 'soko', 'skko'],
-      skjorte: ['skjore', 'skjrt', 'skjorta'],
-      bukse: ['bukse', 'bkse', 'buksse'],
-      // Arabic corrections (shoes = حذاء)
-      حذاء: ['حدا', 'حذا', 'حداء', 'حذائ', 'حذاؤ'],
-      // Arabic corrections (shirt = قميص)
-      قميص: ['قمص', 'قميس', 'قمیص', 'قميصs'],
-      // Arabic corrections (pants = بنطلون)
-      بنطلون: ['بنطلن', 'بنطال', 'بنطلوں'],
-      // Arabic corrections (watch = ساعة)
-      ساعة: ['ساعه', 'ساعة', 'ساعاة'],
-      // Arabic corrections (phone = هاتف)
-      هاتف: ['هاتفf', 'هاتففf', 'هاتv'],
+
+      // Norwegian corrections with more comprehensive misspellings
+      sko: [
+        'sk',
+        'skoo',
+        'soko',
+        'skko',
+        'kso',
+        'sko0',
+        'sk0',
+        'sco',
+        'skjo',
+        'skho',
+      ],
+      skjorte: [
+        'skjore',
+        'skjrt',
+        'skjorta',
+        'skjorte',
+        'skjort',
+        'skjpte',
+        'skhorte',
+        'skjorthe',
+      ],
+      bukse: [
+        'bukse',
+        'bkse',
+        'buksse',
+        'bukse',
+        'bukser',
+        'bukze',
+        'bukce',
+        'bucse',
+      ],
+      jakke: ['jake', 'jke', 'jakkee', 'jakk', 'yakke', 'jacke', 'jakje'],
+      genser: ['gensr', 'genser', 'genser', 'genzer', 'genser'],
+
+      // Arabic corrections with more comprehensive misspellings including keyboard layout issues
+      حذاء: [
+        'حدا',
+        'حذا',
+        'حداء',
+        'حذائ',
+        'حذاؤ',
+        'احذية',
+        'احاذيي',
+        'حذاي',
+        'حدائ',
+        'حذ',
+        'حذای',
+      ],
+      قميص: ['قمص', 'قميس', 'قمیص', 'قميصs', 'قمیس', 'قميض', 'قمیص', 'قميظ'],
+      بنطلون: [
+        'بنطلن',
+        'بنطال',
+        'بنطلوں',
+        'بنطلون',
+        'بنطلون',
+        'بنطلوم',
+        'بنطالون',
+      ],
+      ساعة: ['ساعه', 'ساعة', 'ساعاة', 'ساعت', 'ساعہ', 'ساعة'],
+      هاتف: ['هاتفf', 'هاتففf', 'هاتv', 'هاتف', 'هاتق', 'هاتغ', 'هاطف'],
+
+      // Additional common Arabic product terms with misspellings
+      جزدان: ['جزدان', 'جدان', 'جردان', 'حزدان'], // wallet
+      نظارة: ['نظاره', 'نضارة', 'نطارة', 'نظارة'], // glasses
+      حقيبة: ['حقيبه', 'حفيبة', 'حقيبة', 'حكيبة'], // bag
+      فستان: ['فستان', 'فسطان', 'فستان', 'فستام'], // dress
     }
 
     // Check if the input is actually a known misspelling
@@ -936,17 +1134,38 @@ class MultilingualSearch {
         isLikelyMisspelled = true
         break
       }
-    }
-
-    // If not a known misspelling, check if it's close to a correct word but not exact
+    } // If not a known misspelling, check if it's close to a correct word but not exact
     if (!isLikelyMisspelled) {
       for (const [correct] of Object.entries(commonCorrections)) {
+        // Use enhanced fuzzy matching
+        const fuzzyScore = this.calculateFuzzyMatch(lowerQuery, correct)
         const similarity = this.calculateSimilarity(lowerQuery, correct)
-        // Only suggest if it's similar but not exact, and similarity is high
-        if (similarity >= 0.8 && similarity < 1.0 && lowerQuery !== correct) {
+
+        // Consider it a likely misspelling if either fuzzy or similarity score is high
+        if (
+          (fuzzyScore >= 0.7 || similarity >= 0.75) &&
+          lowerQuery !== correct
+        ) {
           correctedQuery = correct
           isLikelyMisspelled = true
           break
+        }
+      }
+    }
+
+    // Additional check: if the query contains partial matches to known words
+    if (!isLikelyMisspelled && lowerQuery.length >= 3) {
+      for (const [correct] of Object.entries(commonCorrections)) {
+        // Check if the correct word contains most of the query characters
+        if (correct.length >= 3 && lowerQuery.length >= 3) {
+          const commonChars = this.countCommonCharacters(lowerQuery, correct)
+          const minLength = Math.min(lowerQuery.length, correct.length)
+
+          if (commonChars / minLength >= 0.8 && lowerQuery !== correct) {
+            correctedQuery = correct
+            isLikelyMisspelled = true
+            break
+          }
         }
       }
     }
@@ -962,6 +1181,30 @@ class MultilingualSearch {
       isLikelyMisspelled,
       suggestions: isLikelyMisspelled ? suggestions : [],
       correctedQuery,
+    }
+  }
+
+  /**
+   * Test function for spell correction (can be removed in production)
+   */
+  async testSpellCorrection() {
+    const testCases = [
+      { input: 'kso', expected: 'sko', language: 'nb-NO' },
+      { input: 'احاذيي', expected: 'حذاء', language: 'ar' },
+      { input: 'skjort', expected: 'skjorte', language: 'nb-NO' },
+      { input: 'shos', expected: 'shoes', language: 'en-US' },
+    ]
+
+    console.log('Testing spell correction...')
+
+    for (const testCase of testCases) {
+      const result = await detectAndCorrectSpelling(
+        testCase.input,
+        testCase.language as 'ar' | 'en-US' | 'nb-NO'
+      )
+      console.log(
+        `Input: "${testCase.input}" -> Expected: "${testCase.expected}" -> Got: "${result.correctedQuery}" (Likely misspelled: ${result.isLikelyMisspelled})`
+      )
     }
   }
 
@@ -987,6 +1230,7 @@ class MultilingualSearch {
       return []
     }
   }
+
   /**
    * Get product names that match the partial query
    */
@@ -1000,11 +1244,14 @@ class MultilingualSearch {
 
       await connectToDatabase()
 
+      // Escape special regex characters in the query
+      const escapedQuery = partialQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
       // Search for products whose names contain the query
       const products = await Product.find({
         isPublished: true,
         name: {
-          $regex: partialQuery,
+          $regex: escapedQuery,
           $options: 'i',
         },
       })
@@ -1022,16 +1269,13 @@ class MultilingualSearch {
   }
 }
 
-// Cache the multilingual search instance
-const getMultilingualSearchInstance = cache(() => new MultilingualSearch())
-
 /**
  * Main function to process search terms for multilingual search
  */
 export async function processMultilingualSearch(
   options: MultilingualSearchOptions
 ): Promise<ProcessedSearchTerms> {
-  const search = getMultilingualSearchInstance()
+  const search = new MultilingualSearch()
   return search.processSearchTerms(options)
 }
 
@@ -1041,7 +1285,7 @@ export async function processMultilingualSearch(
 export async function createMultilingualSearchFilter(
   searchTerms: ProcessedSearchTerms
 ): Promise<MongoFilter> {
-  const search = getMultilingualSearchInstance()
+  const search = new MultilingualSearch()
   return search.createMultilingualFilter(searchTerms)
 }
 
@@ -1052,7 +1296,7 @@ export async function translateCategoriesForDisplay(
   categories: string[],
   targetLanguage: 'ar' | 'en-US' | 'nb-NO'
 ): Promise<Array<{ original: string; translated: string }>> {
-  const search = getMultilingualSearchInstance()
+  const search = new MultilingualSearch()
   return search.translateCategories(categories, targetLanguage)
 }
 
@@ -1064,7 +1308,7 @@ export async function generateSearchSuggestions(
   targetLanguage: 'ar' | 'en-US' | 'nb-NO' = 'en-US',
   limit: number = 5
 ): Promise<string[]> {
-  const search = getMultilingualSearchInstance()
+  const search = new MultilingualSearch()
   return search.generateSearchSuggestions(partialQuery, targetLanguage, limit)
 }
 
@@ -1079,7 +1323,7 @@ export async function detectAndCorrectSpelling(
   suggestions: string[]
   correctedQuery?: string
 }> {
-  const search = getMultilingualSearchInstance()
+  const search = new MultilingualSearch()
   return search.detectAndCorrectSpelling(query, targetLanguage)
 }
 
@@ -1089,7 +1333,7 @@ export async function detectAndCorrectSpelling(
 export async function detectQueryLanguage(
   query: string
 ): Promise<'ar' | 'en-US' | 'nb-NO'> {
-  const search = getMultilingualSearchInstance()
+  const search = new MultilingualSearch()
   return search.detectLanguage(query) as 'ar' | 'en-US' | 'nb-NO'
 }
 

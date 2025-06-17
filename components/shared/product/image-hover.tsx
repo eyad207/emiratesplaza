@@ -22,10 +22,9 @@ const ImageHover = ({
     clearTimeout(hoverTimeout)
     setIsHovered(false)
   }
-
   return (
     <div
-      className='relative h-52'
+      className='relative w-full h-full'
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
