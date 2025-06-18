@@ -22,13 +22,12 @@ const CheckoutPaymentPage = async (props: {
   if (!order) notFound()
 
   const session = await auth()
-
   let client_secret = null
   if (order.paymentMethod === 'Stripe' && !order.isPaid) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(order.totalPrice * 100),
-      currency: 'USD',
+      currency: 'NOK',
       metadata: { orderId: order._id },
     })
     client_secret = paymentIntent.client_secret

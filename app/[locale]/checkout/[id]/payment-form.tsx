@@ -144,15 +144,35 @@ export default function OrderDetailsForm({
                   {item.name} x {item.quantity} = {item.price}
                 </li>
               ))}
-            </ul>
-
+            </ul>{' '}
             {!isPaid && paymentMethod === 'PayPal' && (
               <div>
-                <PayPalScriptProvider options={{ clientId: paypalClientId }}>
+                <PayPalScriptProvider
+                  options={{
+                    clientId: paypalClientId,
+                    currency: 'NOK',
+                    intent: 'capture',
+                    components: 'buttons',
+                  }}
+                >
                   <PrintLoadingState />
                   <PayPalButtons
                     createOrder={handleCreatePayPalOrder}
                     onApprove={handleApprovePayPalOrder}
+                    onError={(err) => {
+                      console.error('PayPal Error:', err)
+                      toast({
+                        description:
+                          'PayPal payment failed. Please try again or use a different payment method.',
+                        variant: 'destructive',
+                      })
+                    }}
+                    onCancel={() => {
+                      toast({
+                        description: 'PayPal payment was cancelled.',
+                        variant: 'default',
+                      })
+                    }}
                   />
                 </PayPalScriptProvider>
               </div>
@@ -178,7 +198,6 @@ export default function OrderDetailsForm({
                 Pay with Vipps
               </Button>
             )}
-
             {!isPaid && paymentMethod === 'Cash On Delivery' && (
               <Button
                 className='w-full rounded-full'

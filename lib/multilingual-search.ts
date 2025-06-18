@@ -278,24 +278,22 @@ class MultilingualSearch {
     }
 
     return variations.filter((v) => v !== lowerText)
-  } /**
+  }
+  /**
    * Generate search suggestions for auto-complete
-   */
-  async generateSearchSuggestions(
+   */ async generateSearchSuggestions(
     partialQuery: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     targetLanguage: 'ar' | 'en-US' | 'nb-NO' = 'en-US',
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit: number = 5
   ): Promise<string[]> {
-    // This would connect to your database to get matching product names
-    // For now, return an empty array based on the query
+    // This would connect to your database to get matching product names    // For now, return an empty array based on the query
     if (partialQuery.length < 2) return []
 
     // TODO: Implement actual suggestion logic
-    // Using parameters to avoid ESLint errors
     const suggestions: string[] = []
-    console.log(
-      `Generating suggestions for "${partialQuery}" in ${targetLanguage}, limit: ${limit}`
-    )
 
     return suggestions
   }

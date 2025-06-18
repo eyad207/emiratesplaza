@@ -1,27 +1,34 @@
 const base = process.env.PAYPAL_API_URL || 'https://api-m.sandbox.paypal.com'
 
 export const paypal = {
-  createOrder: async function createOrder(price: number) {
+  createOrder: async function createOrder(
+    price: number,
+    currency: string = 'NOK'
+  ) {
     const accessToken = await generateAccessToken()
     const url = `${base}/v2/checkout/orders`
+
+    const orderData = {
+      intent: 'CAPTURE',
+      purchase_units: [
+        {
+          amount: {
+            currency_code: currency,
+            value: price.toFixed(2),
+          },
+        },
+      ],
+    }
+
     const response = await fetch(url, {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({
-        intent: 'CAPTURE',
-        purchase_units: [
-          {
-            amount: {
-              currency_code: 'USD',
-              value: price,
-            },
-          },
-        ],
-      }),
+      body: JSON.stringify(orderData),
     })
+
     return handleResponse(response)
   },
   capturePayment: async function capturePayment(orderId: string) {
@@ -63,5 +70,5 @@ async function handleResponse(response: any) {
   }
 
   const errorMessage = await response.text()
-  throw new Error(errorMessage)
+  throw new Error(`PayPal API Error: ${response.status} - ${errorMessage}`)
 }

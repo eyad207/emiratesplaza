@@ -121,15 +121,16 @@ export default async function PaymentsPage() {
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='currency'>Preferred Currency</Label>
-            <Select defaultValue='AED'>
+            <Label htmlFor='currency'>Preferred Currency</Label>{' '}
+            <Select defaultValue='NOK'>
               <SelectTrigger className='w-full sm:w-[200px]'>
                 <SelectValue placeholder='Select Currency' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='AED'>AED - UAE Dirham</SelectItem>
+                <SelectItem value='NOK'>NOK - Norwegian Kroner</SelectItem>
                 <SelectItem value='USD'>USD - US Dollar</SelectItem>
                 <SelectItem value='EUR'>EUR - Euro</SelectItem>
+                <SelectItem value='AED'>AED - UAE Dirham</SelectItem>
                 <SelectItem value='GBP'>GBP - British Pound</SelectItem>
               </SelectContent>
             </Select>

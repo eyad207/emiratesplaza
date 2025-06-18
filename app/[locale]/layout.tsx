@@ -44,7 +44,7 @@ export default async function AppLayout({
 }) {
   const setting = await getSetting()
   const currencyCookie = (await cookies()).get('currency')
-  const currency = currencyCookie ? currencyCookie.value : 'USD'
+  const currency = currencyCookie ? currencyCookie.value : 'NOK'
 
   const { locale } = await params
   // Ensure that the incoming `locale` is valid

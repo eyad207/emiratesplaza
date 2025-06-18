@@ -44,8 +44,8 @@ export const toSlug = (text: string): string =>
     .replace(/^-+|-+$/g, '')
     .replace(/-+/g, '-')
 
-const CURRENCY_FORMATTER = new Intl.NumberFormat('en-US', {
-  currency: 'USD',
+const CURRENCY_FORMATTER = new Intl.NumberFormat('nb-NO', {
+  currency: 'NOK',
   style: 'currency',
   minimumFractionDigits: 2,
 })
@@ -54,9 +54,9 @@ export function formatCurrency(amount: number) {
 }
 
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('nb-NO', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'NOK',
   }).format(price)
 }
 

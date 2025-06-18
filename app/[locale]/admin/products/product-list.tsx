@@ -58,14 +58,13 @@ const ProductList = () => {
   const {
     setting: { currency, availableCurrencies },
   } = useSettingStore()
-
   const formatPrice = (price: number) => {
     const selectedCurrency = availableCurrencies.find(
       (c) => c.code === currency
     )
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('nb-NO', {
       style: 'currency',
-      currency: selectedCurrency?.code || 'USD',
+      currency: selectedCurrency?.code || 'NOK',
     }).format(price)
   }
 

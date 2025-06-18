@@ -79,12 +79,11 @@ export default async function PurchaseReceiptEmail({
   order,
 }: OrderInformationProps) {
   const { site, availableCurrencies, defaultCurrency } = await getSetting()
-
   const activeCurrency = availableCurrencies?.find(
     (c) => c.code === defaultCurrency
   ) ?? {
-    code: 'USD',
-    symbol: '$',
+    code: 'NOK',
+    symbol: 'kr',
     convertRate: 1,
   }
 
