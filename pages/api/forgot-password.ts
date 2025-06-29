@@ -42,8 +42,8 @@ export default async function handler(
     })
 
     res.status(200).json({ message: 'Password reset email sent' })
-  } catch (error) {
-    console.error('Error in forgot-password API:', error)
+  } catch {
+    
     res.status(500).json({ message: 'Internal server error' })
   }
 }

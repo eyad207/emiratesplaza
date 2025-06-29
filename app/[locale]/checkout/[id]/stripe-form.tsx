@@ -13,9 +13,11 @@ import useSettingStore from '@/hooks/use-setting-store'
 export default function StripeForm({
   priceInCents,
   orderId,
+  convertedPrice,
 }: {
   priceInCents: number
   orderId: string
+  convertedPrice?: number
 }) {
   const {
     setting: { site },
@@ -26,6 +28,9 @@ export default function StripeForm({
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>()
   const [email, setEmail] = useState<string>()
+
+  // Use converted price for display if available, otherwise fall back to original price
+  const displayPrice = convertedPrice ?? priceInCents / 100
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -67,7 +72,7 @@ export default function StripeForm({
           'Purchasing...'
         ) : (
           <div>
-            Purchase - <ProductPrice price={priceInCents / 100} plain />
+            Purchase - <ProductPrice price={displayPrice} plain />
           </div>
         )}
       </Button>

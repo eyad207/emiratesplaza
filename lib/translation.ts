@@ -231,9 +231,8 @@ class TranslationService {
           data.detectedLanguage?.language || data.detected_language,
         confidence: data.detectedLanguage?.confidence || data.confidence || 0.8,
       }
-    } catch (error) {
-      console.error('LibreTranslate error:', error)
-      throw error
+    } catch {
+      throw new Error('Translation failed')
     }
   }
 
@@ -310,12 +309,8 @@ class TranslationService {
             request.targetLanguage
           )
         }
-      } catch (error) {
+      } catch {
         // If primary provider fails, try fallback
-        console.warn(
-          'Primary translation provider failed, trying fallback:',
-          error
-        )
 
         try {
           if (process.env.OPENAI_API_KEY) {
@@ -331,8 +326,7 @@ class TranslationService {
               request.targetLanguage
             )
           }
-        } catch (fallbackError) {
-          console.warn('Fallback translation also failed:', fallbackError)
+        } catch {
           // Return original text as final fallback
           result = {
             translatedText: request.text,
@@ -345,9 +339,8 @@ class TranslationService {
       this.setCachedTranslation(cacheKey, result)
 
       return result
-    } catch (error) {
-      console.error('Translation error:', error)
-      throw error instanceof Error ? error : new Error('Translation failed')
+    } catch {
+      throw new Error('Translation failed')
     }
   }
 }
@@ -371,8 +364,7 @@ export const translateText = cache(
         clientId
       )
       return result.translatedText
-    } catch (error) {
-      console.error('Translation failed:', error)
+    } catch {
       // Return original text if translation fails
       return text
     }

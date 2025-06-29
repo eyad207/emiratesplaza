@@ -431,12 +431,12 @@ class MultilingualSearch {
               translations.add(simplifiedTranslation)
               translations.add(simplifiedTranslation.toLowerCase())
             }
-          } catch (error) {
-            console.warn(`Translation failed for ${targetLang}:`, error)
+          } catch {
+            // Silently handle translation errors
           }
         }
-      } catch (error) {
-        console.warn('Translation service error:', error)
+      } catch {
+        // Silently handle translation service errors
       }
     }
 
@@ -665,8 +665,7 @@ class MultilingualSearch {
       const { getAllCategories } = await import('./actions/product.actions')
       const categories = await getAllCategories()
       return categories || []
-    } catch (error) {
-      console.error('Error fetching product categories:', error)
+    } catch {
       return []
     }
   }
@@ -703,8 +702,7 @@ class MultilingualSearch {
             translated: category,
           })
         }
-      } catch (error) {
-        console.error(`Error translating category "${category}":`, error)
+      } catch {
         // Fallback to original category
         translatedCategories.push({
           original: category,
@@ -750,8 +748,7 @@ class MultilingualSearch {
             translated: tag.name,
           })
         }
-      } catch (error) {
-        console.error(`Error translating tag "${tag.name}":`, error)
+      } catch {
         // Fallback to original tag name
         translatedTags.push({
           _id: tag._id,

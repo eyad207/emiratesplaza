@@ -41,8 +41,8 @@ export default async function handler(
       success: true,
       message: 'Products removed from tag successfully',
     })
-  } catch (error) {
-    console.error('Error removing products from tag:', error)
+  } catch {
+    
     res.status(500).json({ success: false, message: 'Internal server error' })
   }
 }

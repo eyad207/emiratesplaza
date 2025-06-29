@@ -27,8 +27,8 @@ export default async function handler(
     }
 
     res.status(200).json({ message: 'Token is valid' })
-  } catch (error) {
-    console.error('Error verifying reset token:', error)
+  } catch {
+    
     res.status(500).json({ error: 'Internal server error' })
   }
 }

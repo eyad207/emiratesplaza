@@ -28,8 +28,7 @@ export async function batchTranslate(
       )
 
       results[text] = result.translatedText
-    } catch (error) {
-      console.warn(`Failed to translate text "${text}":`, error)
+    } catch {
       results[text] = text // Fallback to original
     }
 
@@ -59,12 +58,7 @@ export async function preloadProductTranslations(
 
   try {
     await batchTranslate(textsToTranslate, targetLanguage, 'preload')
-    console.log(
-      `Preloaded ${textsToTranslate.length} translations for ${targetLanguage}`
-    )
-  } catch (error) {
-    console.warn('Failed to preload translations:', error)
-  }
+  } catch {}
 }
 
 /**
@@ -73,5 +67,4 @@ export async function preloadProductTranslations(
 export function clearTranslationCache(): void {
   // This would require access to the translation service internals
   // For now, we'll just log the action
-  console.log('Translation cache clear requested')
 }

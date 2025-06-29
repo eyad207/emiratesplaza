@@ -354,6 +354,9 @@
   "Checkout": {
     "shipToThisAddress": "الشحن إلى هذا العنوان",
     "chooseShippingAddressAndPayment": "اختر عنوان الشحن وطريقة الدفع لحساب الشحن والمناولة والضرائب.",
+    "chooseShippingAddressFirst": "اختر عنوان الشحن للمتابعة إلى الخطوة التالية.",
+    "continueToItems": "المتابعة إلى العناصر والشحن",
+    "continueToPayment": "المتابعة إلى الدفع",
     "useThisPaymentMethod": "استخدم طريقة الدفع هذه",
     "choosePaymentMethodToContinue": "اختر طريقة دفع للمتابعة. لا يزال بإمكانك مراجعة وتعديل طلبك قبل أن يصبح نهائيًا.",
     "placeYourOrder": "قم بتقديم طلبك",
@@ -394,6 +397,7 @@
     "orderInNext": "إذا طلبت خلال {hours} ساعات و {minutes} دقائق.",
     "qty": "الكمية: {quantity}",
     "delete": "حذف",
+    "removeItem": "إزالة العنصر",
     "chooseShippingSpeed": "اختر سرعة الشحن",
     "Please remove items with zero quantity before placing your order": "يرجى إزالة العناصر ذات الكمية صفر قبل تقديم طلبك.",
     "freeShipping": "شحن مجاني",

@@ -3,7 +3,7 @@ import { ISettingInput } from '@/types'
 import data from '../data'
 import Setting from '../db/models/setting.model'
 import { connectToDatabase } from '../db'
-import { formatError } from '../utils'
+import {} from '../utils'
 import { cookies } from 'next/headers'
 
 const globalForSettings = global as unknown as {
@@ -40,8 +40,8 @@ export const updateSetting = async (newSetting: ISettingInput) => {
       success: true,
       message: 'Setting updated successfully',
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 

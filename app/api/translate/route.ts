@@ -54,8 +54,6 @@ export async function POST(request: NextRequest) {
       confidence: result.confidence,
     })
   } catch (error) {
-    console.error('Translation API error:', error)
-
     if (error instanceof Error) {
       if (error.message.includes('Rate limit')) {
         return NextResponse.json(

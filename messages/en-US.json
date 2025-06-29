@@ -392,6 +392,9 @@
   "Checkout": {
     "shipToThisAddress": "Ship to this address",
     "chooseShippingAddressAndPayment": "Choose a shipping address and payment method to calculate shipping, handling, and tax.",
+    "chooseShippingAddressFirst": "Choose a shipping address to continue to the next step.",
+    "continueToItems": "Continue to Items & Shipping",
+    "continueToPayment": "Continue to Payment",
     "useThisPaymentMethod": "Use this payment method",
     "choosePaymentMethodToContinue": "Choose a payment method to continue checking out. You'll still have a chance to review and edit your order before it's final.",
     "placeYourOrder": "Place Your Order",
@@ -432,6 +435,7 @@
     "back": "Back to cart",
     "next": "Next",
     "delete": "Delete",
+    "removeItem": "Remove item",
     "chooseShippingSpeed": "Choose a shipping speed",
     "freeShipping": "FREE Shipping",
     "privacyPolicy": "privacy notice",

@@ -28,7 +28,7 @@ const main = async () => {
     const createdUser = await User.insertMany(users)
 
     await Setting.deleteMany()
-    const createdSetting = await Setting.insertMany(settings)
+    await Setting.insertMany(settings)
 
     await WebPage.deleteMany()
     await WebPage.insertMany(webPages)
@@ -59,7 +59,7 @@ const main = async () => {
         }
       }
     }
-    const createdReviews = await Review.insertMany(rws)
+    await Review.insertMany(rws)
 
     await Order.deleteMany()
     const orders = []
@@ -72,18 +72,10 @@ const main = async () => {
         )
       )
     }
-    const createdOrders = await Order.insertMany(orders)
-    console.log({
-      createdUser,
-      createdProducts,
-      createdReviews,
-      createdOrders,
-      createdSetting,
-      message: 'Seeded database successfully',
-    })
+    await Order.insertMany(orders)
+
     process.exit(0)
-  } catch (error) {
-    console.error(error)
+  } catch {
     throw new Error('Failed to seed database')
   }
 }

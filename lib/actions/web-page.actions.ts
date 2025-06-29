@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 
 import { connectToDatabase } from '@/lib/db'
 import WebPage, { IWebPage } from '@/lib/db/models/web-page.model'
-import { formatError } from '@/lib/utils'
+import {} from '@/lib/utils'
 
 import { WebPageInputSchema, WebPageUpdateSchema } from '../validator'
 import { z } from 'zod'
@@ -20,8 +20,8 @@ export async function createWebPage(data: z.infer<typeof WebPageInputSchema>) {
       success: true,
       message: 'WebPage created successfully',
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -36,8 +36,8 @@ export async function updateWebPage(data: z.infer<typeof WebPageUpdateSchema>) {
       success: true,
       message: 'WebPage updated successfully',
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 // DELETE
@@ -51,8 +51,8 @@ export async function deleteWebPage(id: string) {
       success: true,
       message: 'WebPage deleted successfully',
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 

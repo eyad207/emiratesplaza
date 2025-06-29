@@ -52,8 +52,7 @@ const EmailButton = ({ email }: { email: string }) => {
 
       const data = await response.json()
       return data.firstName
-    } catch (error) {
-      console.error('Failed to fetch user first name:', error)
+    } catch {
       return 'User'
     }
   }
@@ -75,8 +74,7 @@ const EmailButton = ({ email }: { email: string }) => {
       if (!response.ok) {
         throw new Error('Failed to send email')
       }
-    } catch (error) {
-      console.error('Failed to send email:', error)
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to send email. Please try again later.',
@@ -138,7 +136,6 @@ const EmailButton = ({ email }: { email: string }) => {
 
         if (!response.ok) {
           const errorData = await response.json()
-          console.error('Error from API:', errorData)
           throw new Error(errorData.error || 'Failed to create reset token')
         }
 
@@ -152,7 +149,6 @@ const EmailButton = ({ email }: { email: string }) => {
         })
       }
     } catch (error) {
-      console.error('Error submitting code:', error)
       toast({
         title: 'Error',
         description:

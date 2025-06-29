@@ -23,6 +23,8 @@ import StripeForm from './stripe-form'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import useCartStore from '@/hooks/use-cart-store'
+import useSettingStore from '@/hooks/use-setting-store'
+import useStripePayment from '@/hooks/use-stripe-payment'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
@@ -30,13 +32,14 @@ const stripePromise = loadStripe(
 export default function OrderDetailsForm({
   order,
   paypalClientId,
-  clientSecret,
 }: {
   order: IOrder
   paypalClientId: string
   isAdmin: boolean
-  clientSecret: string | null
 }) {
+  const {
+    setting: { currency },
+  } = useSettingStore()
   const router = useRouter()
   const {
     shippingAddress,
@@ -50,6 +53,13 @@ export default function OrderDetailsForm({
     isPaid,
   } = order
   const { toast } = useToast()
+
+  // Use the Stripe payment hook for client-side payment intent creation
+  const {
+    clientSecret: stripeClientSecret,
+    convertedPrice,
+    loading: stripeLoading,
+  } = useStripePayment(order._id, currency)
 
   if (isPaid) {
     redirect(`/account/orders/${order._id}`)
@@ -65,7 +75,7 @@ export default function OrderDetailsForm({
     return status
   }
   const handleCreatePayPalOrder = async () => {
-    const res = await createPayPalOrder(order._id)
+    const res = await createPayPalOrder(order._id, currency)
     if (!res.success)
       return toast({
         description: res.message,
@@ -159,8 +169,7 @@ export default function OrderDetailsForm({
                   <PayPalButtons
                     createOrder={handleCreatePayPalOrder}
                     onApprove={handleApprovePayPalOrder}
-                    onError={(err) => {
-                      console.error('PayPal Error:', err)
+                    onError={() => {
                       toast({
                         description:
                           'PayPal payment failed. Please try again or use a different payment method.',
@@ -177,18 +186,29 @@ export default function OrderDetailsForm({
                 </PayPalScriptProvider>
               </div>
             )}
-            {!isPaid && paymentMethod === 'Stripe' && clientSecret && (
-              <Elements
-                options={{
-                  clientSecret,
-                }}
-                stripe={stripePromise}
-              >
-                <StripeForm
-                  priceInCents={Math.round(order.totalPrice * 100)}
-                  orderId={order._id}
-                />
-              </Elements>
+            {!isPaid && paymentMethod === 'Stripe' && (
+              <div>
+                {stripeLoading ? (
+                  <div className='text-center p-4'>Loading payment...</div>
+                ) : stripeClientSecret ? (
+                  <Elements
+                    options={{
+                      clientSecret: stripeClientSecret,
+                    }}
+                    stripe={stripePromise}
+                  >
+                    <StripeForm
+                      priceInCents={Math.round(order.totalPrice * 100)}
+                      orderId={order._id}
+                      convertedPrice={convertedPrice || undefined}
+                    />
+                  </Elements>
+                ) : (
+                  <div className='text-center p-4 text-destructive'>
+                    Failed to initialize payment. Please refresh and try again.
+                  </div>
+                )}
+              </div>
             )}
             {!isPaid && paymentMethod === 'Vipps' && (
               <Button

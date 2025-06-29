@@ -21,7 +21,7 @@ export async function sendEmail({
 ---
 This is an automated message from EmiratesPlaza. Please do not reply to this email.`,
     })
-  } catch (error) {
-    console.error('Error sending email:', error)
+  } catch {
+    // Silently handle email errors
   }
 }

@@ -24,8 +24,7 @@ export default async function handler(
       { $set: { discount } }
     )
     res.status(200).json({ message: 'Discount applied successfully' })
-  } catch (error) {
-    console.error(error)
+  } catch {
     res.status(500).json({ message: 'Failed to apply discount' })
   }
 }

@@ -13,8 +13,8 @@ export default async function handler(
   try {
     const categories = await getAllCategories()
     res.status(200).json({ success: true, categories })
-  } catch (error) {
-    console.error(error)
+  } catch {
+    
     res
       .status(500)
       .json({ success: false, message: 'Failed to fetch categories' })

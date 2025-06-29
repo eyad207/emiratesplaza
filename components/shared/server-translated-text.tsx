@@ -43,8 +43,7 @@ export default async function ServerTranslatedText({
 
     const translatedText = await translateText(text, locale)
     return <span className={className}>{translatedText}</span>
-  } catch (error) {
-    console.warn('Server-side translation failed:', error)
+  } catch {
     // Fallback to original text
     return <span className={className}>{fallback || text}</span>
   }

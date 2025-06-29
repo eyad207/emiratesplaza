@@ -4,7 +4,7 @@ import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
 import Tag from '@/lib/db/models/tag.model'
 import { revalidatePath } from 'next/cache'
-import { formatError } from '../utils'
+import {} from '../utils'
 import { toSlug } from '../utils' // Add this import for toSlug
 import { ProductInputSchema, ProductUpdateSchema } from '../validator'
 import { IProductInput } from '@/types'
@@ -28,8 +28,8 @@ export async function createProduct(data: IProductInput) {
       success: true,
       message: 'Product created successfully',
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -45,8 +45,8 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
       success: true,
       message: 'Product updated successfully',
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -61,8 +61,8 @@ export async function deleteProduct(id: string) {
       success: true,
       message: 'Product deleted successfully',
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -420,11 +420,10 @@ export async function addItem(
       success: true,
       message: 'Item added successfully',
     }
-  } catch (error) {
+  } catch {
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : 'An unknown error occurred',
+      message: 'An unknown error occurred',
     }
   }
 }
@@ -464,10 +463,10 @@ export async function applyDiscountToProducts({
       success: true,
       message: 'Discount applied successfully',
     }
-  } catch (error) {
+  } catch {
     return {
       success: false,
-      message: formatError(error),
+      message: 'Operation failed',
     }
   }
 }
@@ -491,10 +490,10 @@ export async function removeDiscountFromProducts({
       success: true,
       message: 'Discount removed successfully',
     }
-  } catch (error) {
+  } catch {
     return {
       success: false,
-      message: formatError(error),
+      message: 'Operation failed',
     }
   }
 }
@@ -528,10 +527,10 @@ export async function updateStockForProducts({
       success: true,
       message: 'Stock updated successfully for selected products',
     }
-  } catch (error) {
+  } catch {
     return {
       success: false,
-      message: formatError(error),
+      message: 'Operation failed',
     }
   }
 }
@@ -566,11 +565,7 @@ export async function getAllCategoriesWithTranslation(
       locale
     )
     return translatedCategories
-  } catch (error) {
-    console.warn(
-      'Category translation failed, returning original categories:',
-      error
-    )
+  } catch {
     // Fallback to original categories if translation fails
     return categories.map((category) => ({
       original: category,
@@ -594,8 +589,7 @@ export async function getAllTagsWithTranslation(
       locale
     )
     return translatedTags
-  } catch (error) {
-    console.warn('Translation failed, falling back to original tags:', error)
+  } catch {
     return tags.map((tag) => ({
       _id: tag._id.toString(),
       original: tag.name,

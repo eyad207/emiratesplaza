@@ -137,13 +137,10 @@ const ResetPassword = () => {
         variant: 'default',
       })
       router.push('/sign-in')
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
-        description:
-          typeof error === 'object' && error !== null && 'message' in error
-            ? (error as { message: string }).message
-            : 'An error occurred. Please try again.',
+        description: 'An error occurred. Please try again.',
         variant: 'destructive',
       })
     } finally {

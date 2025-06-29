@@ -32,6 +32,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { TrashIcon } from 'lucide-react'
 import CheckoutFooter from './checkout-footer'
 import { ShippingAddress } from '@/types'
 import useIsMounted from '@/hooks/use-is-mounted'
@@ -118,9 +119,8 @@ const CheckoutForm = () => {
   }, [refreshCartStock])
 
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false)
+  const [isItemsSelected, setIsItemsSelected] = useState<boolean>(false)
   const [isPaymentMethodSelected, setIsPaymentMethodSelected] =
-    useState<boolean>(false)
-  const [isDeliveryDateSelected, setIsDeliveryDateSelected] =
     useState<boolean>(false)
 
   const handlePlaceOrder = async () => {
@@ -164,7 +164,12 @@ const CheckoutForm = () => {
   }
   const handleSelectPaymentMethod = () => {
     setIsAddressSelected(true)
+    setIsItemsSelected(true)
     setIsPaymentMethodSelected(true)
+  }
+  const handleSelectItemsAndShipping = () => {
+    setIsAddressSelected(true)
+    setIsItemsSelected(true)
   }
   const handleSelectShippingAddress = () => {
     shippingAddressForm.handleSubmit(onSubmitShippingAddress)()
@@ -181,24 +186,37 @@ const CheckoutForm = () => {
               {t('shipToThisAddress')}
             </Button>
             <p className='text-xs text-center py-2'>
-              {t('chooseShippingAddressAndPayment')}
+              {t('chooseShippingAddressFirst')}
             </p>
           </div>
         )}
-        {isAddressSelected && !isPaymentMethodSelected && (
+        {isAddressSelected && !isItemsSelected && (
+          <div className=' mb-4'>
+            <Button
+              className='rounded-full w-full'
+              onClick={handleSelectItemsAndShipping}
+            >
+              {t('continueToItems')}
+            </Button>
+            <p className='text-xs text-center py-2'>
+              {t('reviewItemsAndShipping')}
+            </p>
+          </div>
+        )}
+        {isItemsSelected && !isPaymentMethodSelected && (
           <div className=' mb-4'>
             <Button
               className='rounded-full w-full'
               onClick={handleSelectPaymentMethod}
             >
-              {t('useThisPaymentMethod')}
+              {t('continueToPayment')}
             </Button>
             <p className='text-xs text-center py-2'>
               {t('choosePaymentMethodToContinue')}
             </p>
           </div>
         )}
-        {isPaymentMethodSelected && isAddressSelected && (
+        {isPaymentMethodSelected && isAddressSelected && isItemsSelected && (
           <div>
             <Button onClick={handlePlaceOrder} className='rounded-full w-full'>
               {t('placeYourOrder')}
@@ -273,8 +291,8 @@ const CheckoutForm = () => {
                     variant={'outline'}
                     onClick={() => {
                       setIsAddressSelected(false)
-                      setIsPaymentMethodSelected(true)
-                      setIsDeliveryDateSelected(true)
+                      setIsItemsSelected(false)
+                      setIsPaymentMethodSelected(false)
                     }}
                   >
                     {t('change')}
@@ -436,80 +454,12 @@ const CheckoutForm = () => {
               </>
             )}
           </div>
-          {/* payment method */}
-          <div className='border-y'>
-            {isPaymentMethodSelected && paymentMethod ? (
-              <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
-                <div className='flex text-lg font-bold  col-span-5'>
-                  <span className='w-8'>2 </span>
-                  <span>{t('paymentMethod')}</span>
-                </div>
-                <div className='col-span-5 '>
-                  <p>{paymentMethod}</p>
-                </div>
-                <div className='col-span-2'>
-                  <Button
-                    variant='outline'
-                    onClick={() => {
-                      setIsPaymentMethodSelected(false)
-                      if (paymentMethod) setIsDeliveryDateSelected(true)
-                    }}
-                  >
-                    {t('change')}
-                  </Button>
-                </div>
-              </div>
-            ) : isAddressSelected ? (
-              <>
-                <div className='flex text-primary text-lg font-bold my-2'>
-                  <span className='w-8'>2 </span>
-                  <span>{t('choosePaymentMethod')}</span>
-                </div>
-                <Card className='md:ml-8 my-4'>
-                  <CardContent className='p-4'>
-                    <RadioGroup
-                      value={paymentMethod}
-                      onValueChange={(value) => setPaymentMethod(value)}
-                    >
-                      {availablePaymentMethods.map((pm) => (
-                        <div key={pm.name} className='flex items-center py-1 '>
-                          <RadioGroupItem
-                            value={pm.name}
-                            id={`payment-${pm.name}`}
-                          />
-                          <Label
-                            className='font-bold pl-2 cursor-pointer'
-                            htmlFor={`payment-${pm.name}`}
-                          >
-                            {pm.name}
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  </CardContent>
-                  <CardFooter className='p-4'>
-                    <Button
-                      onClick={handleSelectPaymentMethod}
-                      className='rounded-full font-bold'
-                    >
-                      {t('useThisPaymentMethod')}
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </>
-            ) : (
-              <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
-                <span className='w-8'>2 </span>
-                <span>{t('choosePaymentMethod')}</span>
-              </div>
-            )}
-          </div>
           {/* items and delivery date */}
-          <div>
-            {isDeliveryDateSelected && deliveryDateIndex != undefined ? (
+          <div className='border-y'>
+            {isItemsSelected && deliveryDateIndex != undefined ? (
               <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
                 <div className='flex text-lg font-bold  col-span-5'>
-                  <span className='w-8'>3 </span>
+                  <span className='w-8'>2 </span>
                   <span>{t('itemsAndShipping')}</span>
                 </div>
                 <div className='col-span-5'>
@@ -536,18 +486,18 @@ const CheckoutForm = () => {
                   <Button
                     variant={'outline'}
                     onClick={() => {
-                      setIsPaymentMethodSelected(true)
-                      setIsDeliveryDateSelected(false)
+                      setIsItemsSelected(false)
+                      setIsPaymentMethodSelected(false)
                     }}
                   >
                     {t('change')}
                   </Button>
                 </div>
               </div>
-            ) : isPaymentMethodSelected && isAddressSelected ? (
+            ) : isAddressSelected ? (
               <>
                 <div className='flex text-primary  text-lg font-bold my-2'>
-                  <span className='w-8'>3 </span>
+                  <span className='w-8'>2 </span>
                   <span>{t('reviewItemsAndShipping')}</span>
                 </div>
                 <Card className='md:ml-8'>
@@ -596,41 +546,55 @@ const CheckoutForm = () => {
                                 <ProductPrice price={item.price} plain />
                               </p>
 
-                              <Select
-                                value={item.quantity.toString()}
-                                onValueChange={(value) => {
-                                  const newQuantity = Number(value)
-                                  if (newQuantity === 0) {
-                                    removeItem(item) // Remove the item if quantity is 0
-                                  } else {
-                                    updateItem(item, newQuantity)
-                                  }
-                                }}
-                              >
-                                <SelectTrigger className='w-24'>
-                                  <SelectValue>
-                                    {t('qty', { quantity: item.quantity })}
-                                  </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent position='popper'>
-                                  {Array.from({
-                                    length:
-                                      item.colors
-                                        .find((c) => c.color === item.color)
-                                        ?.sizes.find(
-                                          (s) => s.size === item.size
-                                        )?.countInStock || 0,
-                                  }).map((_, i) => (
-                                    <SelectItem key={i + 1} value={`${i + 1}`}>
-                                      {i + 1}
-                                    </SelectItem>
-                                  ))}
-                                  <SelectItem value='0'>
-                                    {t('delete')}
-                                  </SelectItem>{' '}
-                                  {/* Add an option to remove */}
-                                </SelectContent>
-                              </Select>
+                              <div className='flex items-center gap-2 mt-2'>
+                                <Select
+                                  value={item.quantity.toString()}
+                                  onValueChange={(value) => {
+                                    const newQuantity = Number(value)
+                                    if (newQuantity === 0) {
+                                      removeItem(item) // Remove the item if quantity is 0
+                                    } else {
+                                      updateItem(item, newQuantity)
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger className='w-24'>
+                                    <SelectValue>
+                                      {t('qty', { quantity: item.quantity })}
+                                    </SelectValue>
+                                  </SelectTrigger>
+                                  <SelectContent position='popper'>
+                                    {Array.from({
+                                      length:
+                                        item.colors
+                                          .find((c) => c.color === item.color)
+                                          ?.sizes.find(
+                                            (s) => s.size === item.size
+                                          )?.countInStock || 0,
+                                    }).map((_, i) => (
+                                      <SelectItem
+                                        key={i + 1}
+                                        value={`${i + 1}`}
+                                      >
+                                        {i + 1}
+                                      </SelectItem>
+                                    ))}
+                                    <SelectItem value='0'>
+                                      {t('delete')}
+                                    </SelectItem>{' '}
+                                    {/* Add an option to remove */}
+                                  </SelectContent>
+                                </Select>
+                                <Button
+                                  variant='ghost'
+                                  size='sm'
+                                  className='h-8 w-8 p-0 text-muted-foreground hover:text-destructive'
+                                  onClick={() => removeItem(item)}
+                                  title={t('removeItem')}
+                                >
+                                  <TrashIcon className='w-4 h-4' />
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -691,16 +655,91 @@ const CheckoutForm = () => {
                       </div>
                     </div>
                   </CardContent>
+                  <CardFooter className='p-4'>
+                    <Button
+                      onClick={handleSelectItemsAndShipping}
+                      className='rounded-full font-bold'
+                    >
+                      {t('continueToItems')}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </>
+            ) : (
+              <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
+                <span className='w-8'>2 </span>
+                <span>{t('itemsAndShipping')}</span>
+              </div>
+            )}
+          </div>
+          {/* payment method */}
+          <div>
+            {isPaymentMethodSelected && paymentMethod ? (
+              <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
+                <div className='flex text-lg font-bold  col-span-5'>
+                  <span className='w-8'>3 </span>
+                  <span>{t('paymentMethod')}</span>
+                </div>
+                <div className='col-span-5 '>
+                  <p>{paymentMethod}</p>
+                </div>
+                <div className='col-span-2'>
+                  <Button
+                    variant='outline'
+                    onClick={() => {
+                      setIsPaymentMethodSelected(false)
+                    }}
+                  >
+                    {t('change')}
+                  </Button>
+                </div>
+              </div>
+            ) : isItemsSelected ? (
+              <>
+                <div className='flex text-primary text-lg font-bold my-2'>
+                  <span className='w-8'>3 </span>
+                  <span>{t('choosePaymentMethod')}</span>
+                </div>
+                <Card className='md:ml-8 my-4'>
+                  <CardContent className='p-4'>
+                    <RadioGroup
+                      value={paymentMethod}
+                      onValueChange={(value) => setPaymentMethod(value)}
+                    >
+                      {availablePaymentMethods.map((pm) => (
+                        <div key={pm.name} className='flex items-center py-1 '>
+                          <RadioGroupItem
+                            value={pm.name}
+                            id={`payment-${pm.name}`}
+                          />
+                          <Label
+                            className='font-bold pl-2 cursor-pointer'
+                            htmlFor={`payment-${pm.name}`}
+                          >
+                            {pm.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </CardContent>
+                  <CardFooter className='p-4'>
+                    <Button
+                      onClick={handleSelectPaymentMethod}
+                      className='rounded-full font-bold'
+                    >
+                      {t('useThisPaymentMethod')}
+                    </Button>
+                  </CardFooter>
                 </Card>
               </>
             ) : (
               <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
                 <span className='w-8'>3 </span>
-                <span>{t('itemsAndShipping')}</span>
+                <span>{t('choosePaymentMethod')}</span>
               </div>
             )}
           </div>
-          {isPaymentMethodSelected && isAddressSelected && (
+          {isPaymentMethodSelected && isAddressSelected && isItemsSelected && (
             <div className='mt-6'>
               <div className='block md:hidden'>
                 <CheckoutSummary />

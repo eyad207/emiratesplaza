@@ -10,7 +10,7 @@ import { auth } from '@/auth'
 import { connectToDatabase } from '../db'
 import Product from '../db/models/product.model'
 import Review, { IReview } from '../db/models/review.model'
-import { formatError } from '../utils'
+import {} from '../utils'
 import { ReviewInputSchema } from '../validator'
 import { IReviewDetails } from '@/types'
 import { getSetting } from './setting.actions'
@@ -68,10 +68,10 @@ export async function createUpdateReview({
         // data: JSON.parse(JSON.stringify(newReview)),
       }
     }
-  } catch (error) {
+  } catch {
     return {
       success: false,
-      message: formatError(error),
+      message: 'Operation failed',
     }
   }
 }
@@ -190,10 +190,10 @@ export async function deleteReview(reviewId: string, productId: string) {
       success: true,
       message: 'Review deleted successfully',
     }
-  } catch (error) {
+  } catch {
     return {
       success: false,
-      message: formatError(error),
+      message: 'Operation failed',
     }
   }
 }
@@ -213,10 +213,10 @@ export async function deleteAllReviews(productId: string) {
       success: true,
       message: 'All reviews deleted successfully',
     }
-  } catch (error) {
+  } catch {
     return {
       success: false,
-      message: formatError(error),
+      message: 'Operation failed',
     }
   }
 }

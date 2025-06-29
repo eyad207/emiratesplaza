@@ -1,7 +1,7 @@
 'use server'
 
 import { Cart, IOrderList, OrderItem, ShippingAddress } from '@/types'
-import { formatError, round2 } from '../utils'
+import { round2 } from '../utils'
 import { connectToDatabase } from '../db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
@@ -16,6 +16,7 @@ import mongoose from 'mongoose'
 import { getSetting } from './setting.actions'
 import { sendEmail } from '@/lib/email'
 import { vipps } from '../vipps'
+import Stripe from 'stripe'
 import type { SortOrder } from 'mongoose'
 
 // CREATE
@@ -34,8 +35,8 @@ export const createOrder = async (clientSideCart: Cart) => {
       message: 'Order placed successfully',
       data: { orderId: createdOrder._id.toString() },
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Failed to create order' }
   }
 }
 export const createOrderFromCart = async (
@@ -110,13 +111,13 @@ export async function updateOrderToPaid(orderId: string) {
 
       revalidatePath(`/account/orders/${orderId}`)
       return { success: true, message: 'Order paid successfully' }
-    } catch (error) {
+    } catch {
       await session.abortTransaction()
       session.endSession()
-      throw error
+      throw new Error('Payment processing failed')
     }
-  } catch (err) {
-    return { success: false, message: formatError(err) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -150,10 +151,10 @@ const updateProductStock = async (orderId: string) => {
     await session.commitTransaction()
     session.endSession()
     return true
-  } catch (error) {
+  } catch {
     await session.abortTransaction()
     session.endSession()
-    throw error
+    throw new Error('Transaction failed')
   }
 }
 
@@ -188,8 +189,8 @@ EmiratesPlaza Kundeservice`,
       success: true,
       message: 'Fraktstatus for bestillingen er oppdatert',
     }
-  } catch (err) {
-    return { success: false, message: formatError(err) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -223,8 +224,8 @@ EmiratesPlaza Kundeservice`,
       success: true,
       message: 'Fraktstatusen for bestillingen er oppdatert',
     }
-  } catch (err) {
-    return { success: false, message: formatError(err) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -239,8 +240,8 @@ export async function deleteOrder(id: string) {
       success: true,
       message: 'Order deleted successfully',
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Failed to delete order' }
   }
 }
 // GET ALL ORDERS
@@ -341,12 +342,36 @@ export async function getOrderById(orderId: string): Promise<IOrder> {
   return JSON.parse(JSON.stringify(order))
 }
 
-export async function createPayPalOrder(orderId: string) {
+export async function createPayPalOrder(
+  orderId: string,
+  currency: string = 'NOK'
+) {
   await connectToDatabase()
   try {
     const order = await Order.findById(orderId)
     if (order) {
-      const paypalOrder = await paypal.createOrder(order.totalPrice, 'NOK')
+      // Get the settings to access currency conversion rates
+      const settings = await getSetting()
+
+      // Find the target currency information
+      const targetCurrency = settings.availableCurrencies.find(
+        (c) => c.code === currency
+      )
+      if (!targetCurrency) {
+        throw new Error(`Currency ${currency} not supported`)
+      }
+
+      // Convert the price from NOK (base currency) to target currency
+      // The totalPrice is stored in NOK (base currency with convertRate = 1)
+      // We need to convert it to the target currency using the convertRate
+      const convertedPrice = order.totalPrice * targetCurrency.convertRate
+
+      // Validate converted price is reasonable (basic sanity check)
+      if (convertedPrice <= 0 || convertedPrice > 1000000) {
+        throw new Error(`Invalid converted price: ${convertedPrice}`)
+      }
+
+      const paypalOrder = await paypal.createOrder(convertedPrice, currency)
       order.paymentResult = {
         id: paypalOrder.id,
         email_address: '',
@@ -362,8 +387,8 @@ export async function createPayPalOrder(orderId: string) {
     } else {
       throw new Error('Order not found')
     }
-  } catch (err) {
-    return { success: false, message: formatError(err) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -400,8 +425,8 @@ export async function approvePayPalOrder(
       success: true,
       message: 'Your order has been successfully paid by PayPal',
     }
-  } catch (err) {
-    return { success: false, message: formatError(err) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -413,13 +438,10 @@ export const createVippsOrder = async (orderId: string, amount: number) => {
       data: payment,
       message: 'Vipps payment created successfully.',
     }
-  } catch (error) {
+  } catch {
     return {
       success: false,
-      message:
-        typeof error === 'object' && error !== null && 'message' in error
-          ? (error as { message: string }).message
-          : 'Failed to create Vipps payment.',
+      message: 'Failed to create Vipps payment.',
     }
   }
 }
@@ -432,14 +454,64 @@ export const approveVippsOrder = async (orderId: string) => {
       data: payment,
       message: 'Vipps payment approved successfully.',
     }
-  } catch (error) {
+  } catch {
     return {
       success: false,
-      message:
-        typeof error === 'object' && error !== null && 'message' in error
-          ? (error as { message: string }).message
-          : 'Failed to approve Vipps payment.',
+      message: 'Failed to approve Vipps payment.',
     }
+  }
+}
+
+export async function createStripePaymentIntent(
+  orderId: string,
+  currency: string = 'NOK'
+) {
+  await connectToDatabase()
+  try {
+    const order = await Order.findById(orderId)
+    if (order) {
+      // Get the settings to access currency conversion rates
+      const settings = await getSetting()
+
+      // Find the target currency information
+      const targetCurrency = settings.availableCurrencies.find(
+        (c) => c.code === currency
+      )
+      if (!targetCurrency) {
+        throw new Error(`Currency ${currency} not supported`)
+      }
+
+      // Convert the price from NOK (base currency) to target currency
+      // The totalPrice is stored in NOK (base currency with convertRate = 1)
+      // We need to convert it to the target currency using the convertRate
+      const convertedPrice = order.totalPrice * targetCurrency.convertRate
+
+      // Validate converted price is reasonable (basic sanity check)
+      if (convertedPrice <= 0 || convertedPrice > 1000000) {
+        throw new Error(`Invalid converted price: ${convertedPrice}`)
+      }
+
+      // Create Stripe payment intent with converted price
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(convertedPrice * 100), // Stripe expects amount in cents
+        currency: currency.toLowerCase(), // Stripe expects lowercase currency codes
+        metadata: { orderId: order._id },
+      })
+
+      return {
+        success: true,
+        message: 'Stripe payment intent created successfully',
+        data: {
+          clientSecret: paymentIntent.client_secret,
+          convertedPrice,
+        },
+      }
+    } else {
+      throw new Error('Order not found')
+    }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -782,8 +854,7 @@ export async function getRecentOrders(userId: string) {
       .lean()
 
     return JSON.parse(JSON.stringify(orders))
-  } catch (error) {
-    console.error('Error fetching recent orders:', error)
+  } catch {
     return []
   }
 }
@@ -791,8 +862,8 @@ export async function getRecentOrders(userId: string) {
 export const markOrderAsViewed = async (orderId: string) => {
   try {
     await Order.findByIdAndUpdate(orderId, { viewed: true })
-  } catch (error) {
-    console.error('Failed to mark order as viewed:', error)
+  } catch {
+    // Silently handle errors
   }
 }
 

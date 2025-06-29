@@ -300,9 +300,8 @@ class TranslationService {
         detectedSourceLanguage: detectedSourceLang,
         confidence: data.responseData.match || 0.7,
       }
-    } catch (error) {
-      console.error('MyMemory translation error:', error)
-      throw error
+    } catch {
+      throw new Error('Translation failed')
     }
   }
 
@@ -350,9 +349,8 @@ class TranslationService {
         detectedSourceLanguage: detectedLanguage,
         confidence: 0.8,
       }
-    } catch (error) {
-      console.error('Google Translate error:', error)
-      throw error
+    } catch {
+      throw new Error('Translation failed')
     }
   }
 
@@ -401,9 +399,8 @@ class TranslationService {
         detectedSourceLanguage: data.detectedLanguage || 'auto',
         confidence: 0.8,
       }
-    } catch (error) {
-      console.error('LaraTranslate error:', error)
-      throw error
+    } catch {
+      throw new Error('Translation failed')
     }
   }
 
@@ -464,16 +461,14 @@ class TranslationService {
             request.text,
             request.targetLanguage
           )
-        } catch (error) {
-          console.warn('MyMemory failed, trying Google Translate:', error)
+        } catch {
           result = await this.translateWithFreeGoogleTranslate(
             request.text,
             request.targetLanguage
           )
         }
-      } catch (error) {
+      } catch {
         // If all free providers fail, try OpenAI if available
-        console.warn('Free providers failed, trying OpenAI:', error)
 
         if (process.env.OPENAI_API_KEY) {
           try {
@@ -481,8 +476,7 @@ class TranslationService {
               request.text,
               request.targetLanguage
             )
-          } catch (openaiError) {
-            console.warn('OpenAI also failed:', openaiError)
+          } catch {
             // Use mock service as ultimate fallback
             result = await this.translateWithMockService(
               request.text,
@@ -502,9 +496,8 @@ class TranslationService {
       this.setCachedTranslation(cacheKey, result)
 
       return result
-    } catch (error) {
-      console.error('Translation error:', error)
-      throw error instanceof Error ? error : new Error('Translation failed')
+    } catch {
+      throw new Error('Translation failed')
     }
   }
 }
@@ -528,8 +521,7 @@ export const translateText = cache(
         clientId
       )
       return result.translatedText
-    } catch (error) {
-      console.error('Translation failed:', error)
+    } catch {
       // Return original text if translation fails
       return text
     }

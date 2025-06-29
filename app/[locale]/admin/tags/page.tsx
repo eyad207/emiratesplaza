@@ -28,8 +28,7 @@ export default function TagsPage() {
             variant: 'destructive',
           })
         }
-      } catch (error) {
-        console.error('Error fetching tags:', error)
+      } catch {
         toast({
           title: 'Error',
           description: 'Error fetching tags',
@@ -74,8 +73,7 @@ export default function TagsPage() {
             variant: 'destructive',
           })
         }
-      } catch (error) {
-        console.error('Error fetching products:', error)
+      } catch {
         toast({
           title: 'Error',
           description: 'Error fetching products',
@@ -118,8 +116,7 @@ export default function TagsPage() {
             variant: 'destructive',
           })
         }
-      } catch (error) {
-        console.error('Error adding tag:', error)
+      } catch {
         toast({
           title: 'Error',
           description: 'Error adding tag',
@@ -153,8 +150,7 @@ export default function TagsPage() {
             variant: 'destructive',
           })
         }
-      } catch (error) {
-        console.error('Error deleting tag:', error)
+      } catch {
         toast({
           title: 'Error',
           description: 'Error deleting tag',
@@ -197,7 +193,6 @@ export default function TagsPage() {
       setSelectedProducts([])
       setSelectedTag(null)
     } catch (error) {
-      console.error('Error assigning products to tag:', error)
       if (error instanceof Error) {
         toast({
           title: 'Error',
@@ -249,7 +244,6 @@ export default function TagsPage() {
       setSelectedProducts([])
       setSelectedTag(null)
     } catch (error) {
-      console.error('Error removing products from tag:', error)
       if (error instanceof Error) {
         toast({
           title: 'Error',

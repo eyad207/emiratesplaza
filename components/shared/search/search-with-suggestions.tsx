@@ -61,8 +61,8 @@ export default function SearchWithSuggestions({
           setSuggestions(data.suggestions || [])
           setSpellCheck(data.spellCheck)
           setShowSuggestions(true)
-        } catch (error) {
-          console.error('Failed to fetch suggestions:', error)
+        } catch {
+          // Silently handle suggestion fetch errors
         } finally {
           setIsLoading(false)
         }

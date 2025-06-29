@@ -36,8 +36,7 @@ export async function GET(request: NextRequest) {
       spellCheck: spellCheck.isLikelyMisspelled ? spellCheck : null,
       detectedLanguage: locale, // Include detected language in response
     })
-  } catch (error) {
-    console.error('Search suggestions error:', error)
+  } catch {
     return NextResponse.json(
       { error: 'Failed to generate suggestions' },
       { status: 500 }

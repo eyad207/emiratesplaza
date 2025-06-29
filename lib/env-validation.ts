@@ -41,19 +41,12 @@ export function validateTranslationConfiguration() {
   const hasLibreTranslate = !!process.env.LIBRETRANSLATE_URL
 
   if (!hasOpenAI && !hasLibreTranslate) {
-    console.warn(
-      'No translation service configured. AI translation will be disabled.'
-    )
-    console.info(
-      'To enable AI translation, set OPENAI_API_KEY or LIBRETRANSLATE_URL environment variable.'
-    )
     return false
   }
 
   if (hasOpenAI) {
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey?.startsWith('sk-')) {
-      console.warn('Invalid OpenAI API key format')
       return false
     }
   }

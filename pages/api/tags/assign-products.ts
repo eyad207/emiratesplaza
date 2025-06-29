@@ -47,8 +47,8 @@ export default async function handler(
         success: true,
         message: `${result.modifiedCount} products assigned to tag successfully`,
       })
-    } catch (error) {
-      console.error('Error assigning products to tag:', error)
+    } catch {
+      
       return res.status(500).json({
         success: false,
         message: 'Error assigning products to tag',

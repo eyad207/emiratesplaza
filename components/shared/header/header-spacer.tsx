@@ -16,8 +16,8 @@ export default function HeaderSpacer() {
           prevHeight !== height ? height : prevHeight
         )
       }
-    } catch (error) {
-      console.warn('Error calculating header height:', error)
+    } catch {
+      // Silently handle header height calculation errors
     }
   }, [])
 

@@ -56,7 +56,6 @@ export default function TranslatedText({
           throw new Error(data.error || 'Translation failed')
         }
       } catch (err) {
-        console.warn('Translation error:', err)
         setError(err instanceof Error ? err.message : 'Translation failed')
         // Keep original text on error
         setTranslatedText(text)

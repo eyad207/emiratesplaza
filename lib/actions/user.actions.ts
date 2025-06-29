@@ -11,7 +11,7 @@ import {
 } from '../validator'
 import { connectToDatabase } from '../db'
 import User, { IUser } from '../db/models/user.model'
-import { formatError } from '../utils'
+import {} from '../utils'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -34,8 +34,8 @@ export async function registerUser(userSignUp: IUserSignUp) {
       password: await bcrypt.hash(user.password, 5),
     })
     return { success: true, message: 'User created successfully' }
-  } catch (error) {
-    return { success: false, error: formatError(error) }
+  } catch {
+    return { success: false, error: 'Operation failed' }
   }
 }
 
@@ -59,8 +59,8 @@ export async function sendVerificationCode(email: string, name: string) {
       text: `Hello ${name},\n\nYour verification code is: ${code}\n\nThank you!`,
     })
     return { success: true, code }
-  } catch (error) {
-    return { success: false, error: formatError(error) }
+  } catch {
+    return { success: false, error: 'Operation failed' }
   }
 }
 
@@ -83,8 +83,8 @@ export async function verifyCodeAndRegisterUser(email: string, name: string) {
 
     await signInWithCredentials({ email, password: 'defaultPassword' })
     return { success: true }
-  } catch (error) {
-    return { success: false, error: formatError(error) }
+  } catch {
+    return { success: false, error: 'Operation failed' }
   }
 }
 
@@ -100,8 +100,8 @@ export async function deleteUser(id: string) {
       success: true,
       message: 'User deleted successfully',
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 // UPDATE
@@ -121,8 +121,8 @@ export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
       message: 'User updated successfully',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 export async function updateUserName(user: IUserName) {
@@ -142,8 +142,8 @@ export async function updateUserName(user: IUserName) {
       message: 'User updated successfully',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -170,8 +170,8 @@ export async function updateUserEmail(
       message: 'Email updated successfully. Please sign in again.',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -198,8 +198,8 @@ export async function updateUserPassword(
       message: 'Password updated successfully. Please sign in again.',
       data: JSON.parse(JSON.stringify(updatedUser)),
     }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 
@@ -264,8 +264,8 @@ export async function sendResetPasswordEmail(email: string) {
     }
 
     return { success: true, message: 'Password reset email sent successfully' }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
+  } catch {
+    return { success: false, message: 'Operation failed' }
   }
 }
 

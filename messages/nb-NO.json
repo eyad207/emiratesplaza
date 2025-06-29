@@ -376,6 +376,9 @@
   "Checkout": {
     "shipToThisAddress": "Send til denne adressen",
     "chooseShippingAddressAndPayment": "Velg en leveringsadresse og betalingsmetode for å beregne frakt, håndtering og skatt.",
+    "chooseShippingAddressFirst": "Velg en leveringsadresse for å fortsette til neste trinn.",
+    "continueToItems": "Fortsett til varer og frakt",
+    "continueToPayment": "Fortsett til betaling",
     "useThisPaymentMethod": "Bruk denne betalingsmetoden",
     "choosePaymentMethodToContinue": "Velg en betalingsmetode for å fortsette utsjekkingen. Du vil fortsatt ha mulighet til å gjennomgå og redigere bestillingen din før den er endelig.",
     "placeYourOrder": "Legg inn bestillingen din",
@@ -416,6 +419,7 @@
     "orderInNext": "Hvis du bestiller innen {hours} timer og {minutes} minutter.",
     "qty": "Antall: {quantity}",
     "delete": "Slett",
+    "removeItem": "Fjern vare",
     "chooseShippingSpeed": "Velg en frakthastighet",
     "freeShipping": "GRATIS frakt",
     "privacyPolicy": "personvernerklæring",

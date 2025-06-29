@@ -65,19 +65,10 @@ export function useProductTranslation(
           translationCache[cacheKey][locale] = translated
 
           setTranslatedText(translated)
-
-          // Debug log for development
-          if (process.env.NODE_ENV === 'development') {
-            console.log(
-              `Translated "${originalText}" -> "${translated}" (${locale})`
-            )
-          }
         } else {
-          console.warn('Translation API returned error:', response.status)
           setTranslatedText(originalText)
         }
-      } catch (error) {
-        console.warn('Failed to translate product text:', error)
+      } catch {
         setTranslatedText(originalText)
       } finally {
         setIsLoading(false)

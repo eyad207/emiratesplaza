@@ -14,8 +14,8 @@ export default async function handler(
         return res.status(404).json({ error: 'User not found' })
       }
       res.status(200).json({ firstName: user.name })
-    } catch (error) {
-      console.error('Failed to fetch user first name:', error)
+    } catch {
+      
       res.status(500).json({ error: 'Failed to fetch user first name' })
     }
   } else {
