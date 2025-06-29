@@ -39,7 +39,8 @@ export default function AddToCart({
     const sizeObj = colorObj?.sizes.find((s) => s.size === selectedSize)
     return sizeObj ? sizeObj.countInStock : 0
   }
-  const handleAddToCart = (e?: React.MouseEvent) => {
+
+  const handleAddToCart = async (e?: React.MouseEvent) => {
     // Prevent link navigation when button is clicked
     if (e) {
       e.preventDefault()
@@ -47,6 +48,7 @@ export default function AddToCart({
     }
 
     const countInStock = getCountInStockForSelectedSize()
+
     if (countInStock === 0) {
       toast({
         variant: 'destructive',
@@ -71,7 +73,7 @@ export default function AddToCart({
         ...item,
         price: item.discountedPrice ?? item.price,
       }
-      addItem(itemToAdd, quantity)
+      await addItem(itemToAdd, quantity)
       toast({
         description: t('Product.Added to Cart'),
         action: (
@@ -86,13 +88,14 @@ export default function AddToCart({
         ),
       })
     } catch (error: any) {
+      console.error('❌ Error adding to cart:', error)
       toast({
         variant: 'destructive',
         description: error.message,
       })
     }
   }
-  const handleBuyNow = (e?: React.MouseEvent) => {
+  const handleBuyNow = async (e?: React.MouseEvent) => {
     // Prevent link navigation when button is clicked
     if (e) {
       e.preventDefault()
@@ -124,7 +127,7 @@ export default function AddToCart({
         ...item,
         price: item.discountedPrice ?? item.price,
       }
-      addItem(itemToAdd, quantity)
+      await addItem(itemToAdd, quantity)
       router.push(`/checkout`)
     } catch (error: any) {
       toast({
@@ -137,7 +140,9 @@ export default function AddToCart({
   return minimal ? (
     <Button
       className='rounded-full w-auto font-semibold shadow-sm hover:shadow-md transition-all border-2 border-primary/80 dark:border-primary/60 dark:hover:border-primary'
-      onClick={handleAddToCart}
+      onClick={(e) => {
+        handleAddToCart(e)
+      }}
     >
       {t('Product.Add to Cart')}
     </Button>
@@ -161,7 +166,7 @@ export default function AddToCart({
             )
           )}
         </SelectContent>
-      </Select>
+      </Select>{' '}
       <Button
         className='rounded-full w-full'
         type='button'

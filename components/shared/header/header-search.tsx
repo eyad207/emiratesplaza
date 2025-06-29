@@ -79,6 +79,25 @@ export default function HeaderSearch({
     }
   }, [query, selectedCategory, router])
 
+  const handleCategoryChange = useCallback(
+    (categoryValue: string) => {
+      setSelectedCategory(categoryValue)
+
+      // If a specific category is selected, redirect immediately to that category page
+      // without the search query to show all products in that category
+      if (categoryValue !== 'all') {
+        const searchParams = new URLSearchParams()
+        searchParams.set('category', categoryValue)
+        searchParams.set('q', 'all') // Clear search query when selecting category
+        const searchUrl = `/search?${searchParams.toString()}`
+        router.push(searchUrl)
+        setQuery('') // Clear the search input
+        setShowSuggestions(false)
+      }
+    },
+    [router]
+  )
+
   const handleSuggestionClick = useCallback(
     (suggestion: string) => {
       setQuery(suggestion)
@@ -175,7 +194,7 @@ export default function HeaderSearch({
         {/* Category Select */}
         <Select
           value={selectedCategory}
-          onValueChange={setSelectedCategory}
+          onValueChange={handleCategoryChange}
           name='category'
         >
           <SelectTrigger

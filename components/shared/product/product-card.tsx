@@ -1,5 +1,3 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -13,7 +11,6 @@ import ProductPrice from './product-price'
 import ImageHover from './image-hover'
 import AddToCart from './add-to-cart'
 import { useTranslations } from 'next-intl'
-import { useProductNameTranslation } from '@/hooks/use-product-translation'
 
 const ProductCard = ({
   product,
@@ -37,30 +34,26 @@ const ProductCard = ({
   const ProductImage = () => (
     <div
       className={cn(
-        'relative overflow-hidden rounded-t-lg', // Added overflow-hidden and rounded corners
+        'relative transform transition-transform duration-700 ease-out hover:scale-105',
         {
-          // More responsive heights for infinite list
-          'h-32 sm:h-40 md:h-48 lg:h-52 xl:h-56': isInInfiniteList,
+          'h-44 sm:h-60': isInInfiniteList, // Mobil: mindre høyde
           'h-52': !isInInfiniteList,
         }
       )}
     >
-      <div
-        className={cn(
-          'relative w-full h-full transform transition-transform duration-700 ease-out hover:scale-105',
-          {
-            'h-32 sm:h-40 md:h-48 lg:h-52 xl:h-56': isInInfiniteList,
+      {product.images.length > 1 ? (
+        <ImageHover
+          src={product.images[0]}
+          hoverSrc={product.images[1]}
+          alt={product.name}
+        />
+      ) : (
+        <div
+          className={cn('relative', {
+            'h-40': isInInfiniteList,
             'h-52': !isInInfiniteList,
-          }
-        )}
-      >
-        {product.images.length > 1 ? (
-          <ImageHover
-            src={product.images[0]}
-            hoverSrc={product.images[1]}
-            alt={product.name}
-          />
-        ) : (
+          })}
+        >
           <Image
             src={product.images[0]}
             alt={product.name}
@@ -68,8 +61,8 @@ const ProductCard = ({
             sizes='80vw'
             className='object-contain drop-shadow-md'
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 
@@ -77,61 +70,38 @@ const ProductCard = ({
 
   const ProductDetails = () => {
     const tags = product?.tags || [] // Ensure tags is always an array
-    const { translatedText: translatedName, isLoading: isTranslatingName } =
-      useProductNameTranslation(product.name)
 
     return (
-      <div
-        className={cn('flex-1 space-y-1 sm:space-y-2 flex flex-col', {
-          'p-1 sm:p-2': isInInfiniteList, // Tighter padding for infinite list
-          'p-2 sm:p-3': !isInInfiniteList,
-        })}
-      >
+      <div className='flex-1 space-y-2 flex flex-col'>
         <p
           className={cn('font-bold text-foreground dark:text-foreground/90', {
-            'text-xs sm:text-sm': isInInfiniteList,
-            'text-sm': !isInInfiniteList,
-            block: !hideBrandOnMobile, // Always show if not hidden
             'hidden sm:block': hideBrandOnMobile,
           })}
         >
           {product.brand}
         </p>
         <p
-          className={cn(
-            'overflow-hidden text-ellipsis font-medium hover:text-primary transition-colors duration-300 dark:text-foreground/80 dark:hover:text-primary leading-tight',
-            {
-              'text-xs sm:text-sm': isInInfiniteList,
-              'text-sm md:text-base': !isInInfiniteList,
-              'opacity-50': isTranslatingName,
-            }
-          )}
+          className='overflow-hidden text-ellipsis font-medium hover:text-primary transition-colors duration-300 dark:text-foreground/80 dark:hover:text-primary'
           style={{
             display: '-webkit-box',
-            WebkitLineClamp: isInInfiniteList ? 2 : 3,
+            WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
           }}
         >
-          {translatedName}
+          {product.name}
         </p>
         <div
-          className={cn('flex gap-1 sm:gap-2 justify-center items-center', {
-            'text-xs': isInInfiniteList,
-            'text-xs sm:text-sm': !isInInfiniteList,
-            flex: isInInfiniteList, // Always show ratings in infinite list
+          className={cn('flex gap-2 justify-center', {
+            'hidden sm:flex': isInInfiniteList,
           })}
         >
-          <Rating rating={product.avgRating} size={isInInfiniteList ? 4 : 6} />
+          <Rating rating={product.avgRating} />
           <span className='font-medium'>
             ({formatNumber(product.numReviews)})
           </span>
         </div>
-        <div
-          className={cn('mt-auto', {
-            'pt-1 sm:pt-2': isInInfiniteList,
-            'pt-2': !isInInfiniteList,
-          })}
-        >
+
+        <div className='mt-auto pt-2'>
           <ProductPrice
             isDeal={tags.includes('todays-deal')}
             price={product.price}
@@ -144,18 +114,9 @@ const ProductCard = ({
   }
 
   const AddButton = () => (
-    <div
-      className={cn('w-full text-center transition-all duration-300', {
-        'px-2 py-1': isInInfiniteList, // Professional padding for infinite list
-        'pb-1 lg:block': !isInInfiniteList,
-      })}
-      onClick={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-    >
+    <div className='w-full text-center transform transition-all duration-300 hover:scale-105 pb-1 lg:block'>
       <AddToCart
-        minimal={true} // Always use minimal version (only Add to Cart button)
+        minimal
         item={{
           clientId: generateId(),
           product: product._id,
@@ -164,7 +125,7 @@ const ProductCard = ({
           name: product.name,
           slug: product.slug,
           category: product.category,
-          price: round2(product.discountedPrice ?? product.price), // <--- THIS line is key!
+          price: round2(product.discountedPrice ?? product.price), // <--- this line!
           quantity: 1,
           image: product.images[0],
           colors: product.colors,
