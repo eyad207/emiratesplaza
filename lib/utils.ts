@@ -44,6 +44,10 @@ export const toSlug = (text: string): string =>
     .replace(/^-+|-+$/g, '')
     .replace(/-+/g, '-')
 
+/**
+ * @deprecated Use formatPrice from '@/lib/currency' instead
+ * This function only formats in NOK and doesn't consider user's selected currency
+ */
 const CURRENCY_FORMATTER = new Intl.NumberFormat('nb-NO', {
   currency: 'NOK',
   style: 'currency',
@@ -53,6 +57,10 @@ export function formatCurrency(amount: number) {
   return CURRENCY_FORMATTER.format(amount)
 }
 
+/**
+ * @deprecated Use formatPrice from '@/lib/currency' instead
+ * This function only formats in NOK and doesn't consider user's selected currency
+ */
 export function formatPrice(price: number): string {
   return new Intl.NumberFormat('nb-NO', {
     style: 'currency',

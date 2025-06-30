@@ -18,7 +18,7 @@ import {
   updateStockForProducts,
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
-import useSettingStore from '@/hooks/use-setting-store' // Import the setting store
+import { formatPrice } from '@/lib/currency'
 
 import React, { useEffect, useState, useTransition } from 'react'
 import { Input } from '@/components/ui/input'
@@ -54,19 +54,6 @@ const ProductList = () => {
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false) // State to track "Check/Uncheck All"
-
-  const {
-    setting: { currency, availableCurrencies },
-  } = useSettingStore()
-  const formatPrice = (price: number) => {
-    const selectedCurrency = availableCurrencies.find(
-      (c) => c.code === currency
-    )
-    return new Intl.NumberFormat('nb-NO', {
-      style: 'currency',
-      currency: selectedCurrency?.code || 'NOK',
-    }).format(price)
-  }
 
   const handlePageChange = (changeType: 'next' | 'prev') => {
     const newPage = changeType === 'next' ? page + 1 : page - 1

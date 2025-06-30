@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import useCartStore from '@/hooks/use-cart-store'
-import useSettingStore from '@/hooks/use-setting-store'
 import { TrashIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -25,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { formatPrice } from '@/lib/currency'
 import { useEffect } from 'react'
 
 export default function Cart() {
@@ -35,10 +35,6 @@ export default function Cart() {
     refreshCartStock,
   } = useCartStore()
 
-  const {
-    setting: { availableCurrencies, currency },
-  } = useSettingStore()
-
   const t = useTranslations()
 
   useEffect(() => {
@@ -48,11 +44,6 @@ export default function Cart() {
   if (items.length === 0) {
     return <EmptyCart />
   }
-
-  const selectedCurrency = availableCurrencies.find((c) => c.code === currency)
-  const convertRate = selectedCurrency?.convertRate || 1
-  const formatCurrency = (price: number) =>
-    `${(price * convertRate).toFixed(2)} ${selectedCurrency?.symbol || '$'}`
 
   return (
     <div className='container py-6 md:py-8 lg:py-10'>
@@ -130,7 +121,7 @@ export default function Cart() {
                           </div>
                         </TableCell>
                         <TableCell className='text-right font-medium'>
-                          {formatCurrency(item.price)}
+                          {formatPrice(item.price)}
                         </TableCell>
                         <TableCell>
                           <Select
@@ -164,7 +155,7 @@ export default function Cart() {
                           </Select>
                         </TableCell>
                         <TableCell className='text-right font-medium'>
-                          {formatCurrency(item.price * item.quantity)}
+                          {formatPrice(item.price * item.quantity)}
                         </TableCell>
                         <TableCell>
                           <button
@@ -199,17 +190,17 @@ export default function Cart() {
                     {t('Cart.Subtotal')} ({items.length}{' '}
                     {items.length === 1 ? t('Cart.item') : t('Cart.items')})
                   </span>
-                  <span>{formatCurrency(itemsPrice)}</span>
+                  <span>{formatPrice(itemsPrice)}</span>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>
                     {t('Cart.Shipping')}
                   </span>
-                  <span>{formatCurrency(shippingPrice ?? 0)}</span>
+                  <span>{formatPrice(shippingPrice ?? 0)}</span>
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>{t('Cart.Tax')}</span>
-                  <span>{formatCurrency(taxPrice ?? 0)}</span>
+                  <span>{formatPrice(taxPrice ?? 0)}</span>
                 </div>
               </div>
 
@@ -217,7 +208,7 @@ export default function Cart() {
 
               <div className='flex justify-between text-lg font-bold'>
                 <span>{t('Cart.Total')}</span>
-                <span>{formatCurrency(totalPrice)}</span>
+                <span>{formatPrice(totalPrice)}</span>
               </div>
 
               <div className='pt-4'>

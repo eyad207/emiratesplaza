@@ -18,6 +18,7 @@ import { sendEmail } from '@/lib/email'
 import { vipps } from '../vipps'
 import Stripe from 'stripe'
 import type { SortOrder } from 'mongoose'
+import { currencyManager } from '../currency'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -353,21 +354,18 @@ export async function createPayPalOrder(
       return { success: false, message: 'Order not found' }
     }
 
-    // Get the settings to access currency conversion rates
+    // Get the settings to initialize currency manager
     const settings = await getSetting()
 
-    // Find the target currency information
-    const targetCurrency = settings.availableCurrencies.find(
-      (c) => c.code === currency
-    )
-    if (!targetCurrency) {
-      return { success: false, message: `Currency ${currency} not supported` }
-    }
+    // Initialize currency manager with available currencies
+    currencyManager.init(settings.availableCurrencies, currency)
 
     // Convert the price from NOK (base currency) to target currency
-    // The totalPrice is stored in NOK (base currency with convertRate = 1)
-    // We need to convert it to the target currency using the convertRate
-    const convertedPrice = order.totalPrice * targetCurrency.convertRate
+    // The totalPrice is stored in NOK (base currency)
+    const convertedPrice = currencyManager.convertPriceTo(
+      order.totalPrice,
+      currency
+    )
 
     // Validate converted price is reasonable (basic sanity check)
     if (convertedPrice <= 0 || convertedPrice > 1000000) {

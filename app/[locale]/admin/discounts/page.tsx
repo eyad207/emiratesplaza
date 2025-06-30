@@ -20,8 +20,8 @@ import {
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { round2 } from '@/lib/utils'
+import { formatPrice, currencyManager } from '@/lib/currency'
 import useSettingStore from '@/hooks/use-setting-store'
-import { useFormatter } from 'next-intl'
 
 export default function DiscountsPage() {
   const [products, setProducts] = useState<IProduct[]>([])
@@ -37,9 +37,18 @@ export default function DiscountsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
 
-  const { getCurrency } = useSettingStore()
+  const { getCurrency, setting } = useSettingStore()
   const currency = getCurrency()
-  const format = useFormatter()
+
+  // Initialize currency manager
+  React.useEffect(() => {
+    if (
+      setting?.availableCurrencies &&
+      setting.availableCurrencies.length > 0
+    ) {
+      currencyManager.init(setting.availableCurrencies, currency.code)
+    }
+  }, [setting?.availableCurrencies, currency.code])
 
   useEffect(() => {
     async function fetchProducts() {
@@ -426,15 +435,6 @@ export default function DiscountsPage() {
                       ? round2(product.price * (1 - product.discount / 100))
                       : undefined
 
-                // Convert prices using selected currency
-                const convertedOriginalPrice = round2(
-                  currency.convertRate * product.price
-                )
-                const convertedDiscountedPrice =
-                  productDiscountedPrice !== undefined
-                    ? round2(currency.convertRate * productDiscountedPrice)
-                    : undefined
-
                 return (
                   <TableRow
                     key={product._id}
@@ -449,40 +449,22 @@ export default function DiscountsPage() {
                       />
                     </TableCell>
                     <TableCell>{product.name}</TableCell>
+                    <TableCell>{formatPrice(product.price)}</TableCell>
                     <TableCell>
-                      {format.number(convertedOriginalPrice, {
-                        style: 'currency',
-                        currency: currency.code,
-                        currencyDisplay: 'narrowSymbol',
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      {convertedDiscountedPrice !== undefined
-                        ? format.number(convertedDiscountedPrice, {
-                            style: 'currency',
-                            currency: currency.code,
-                            currencyDisplay: 'narrowSymbol',
-                          })
+                      {productDiscountedPrice !== undefined
+                        ? formatPrice(productDiscountedPrice)
                         : 'N/A'}
                     </TableCell>
                     <TableCell>
-                      {convertedDiscountedPrice !== undefined
-                        ? format.number(
-                            convertedOriginalPrice - convertedDiscountedPrice,
-                            {
-                              style: 'currency',
-                              currency: currency.code,
-                              currencyDisplay: 'narrowSymbol',
-                            }
-                          )
+                      {productDiscountedPrice !== undefined
+                        ? formatPrice(product.price - productDiscountedPrice)
                         : 'N/A'}
                     </TableCell>
                     <TableCell>
-                      {convertedDiscountedPrice !== undefined
+                      {productDiscountedPrice !== undefined
                         ? `${(
-                            ((convertedOriginalPrice -
-                              convertedDiscountedPrice) /
-                              convertedOriginalPrice) *
+                            ((product.price - productDiscountedPrice) /
+                              product.price) *
                             100
                           ).toFixed(2)}%`
                         : 'N/A'}

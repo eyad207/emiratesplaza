@@ -1,7 +1,8 @@
 'use client'
 
 import useCartStore from '@/hooks/use-cart-store'
-import { cn, formatPrice } from '@/lib/utils'
+import { cn } from '@/lib/utils'
+import { formatPrice } from '@/lib/currency'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
 import { Button, buttonVariants } from '../ui/button'

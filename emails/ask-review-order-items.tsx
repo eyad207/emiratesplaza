@@ -15,9 +15,9 @@ import {
   Text,
 } from '@react-email/components'
 
-import { formatCurrency } from '@/lib/utils'
 import { IOrder } from '@/lib/db/models/order.model'
 import { getSetting } from '@/lib/actions/setting.actions'
+import { formatPrice, currencyManager } from '@/lib/currency'
 
 type OrderInformationProps = {
   order: IOrder
@@ -70,7 +70,11 @@ const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
 export default async function AskReviewOrderItemsEmail({
   order,
 }: OrderInformationProps) {
-  const { site } = await getSetting()
+  const { site, availableCurrencies, defaultCurrency } = await getSetting()
+
+  // Initialize currency manager for this email context
+  currencyManager.init(availableCurrencies, defaultCurrency)
+
   return (
     <Html>
       <Preview>Review Order Items</Preview>
@@ -100,7 +104,7 @@ export default async function AskReviewOrderItemsEmail({
                     Price Paid
                   </Text>
                   <Text className='mt-0 mr-4'>
-                    {formatCurrency(order.totalPrice)}
+                    {formatPrice(order.totalPrice)}
                   </Text>
                 </Column>
               </Row>
@@ -148,7 +152,7 @@ export default async function AskReviewOrderItemsEmail({
                 <Row key={name} className='py-1'>
                   <Column align='right'>{name}:</Column>
                   <Column align='right' width={70} className='align-top'>
-                    <Text className='m-0'>{formatCurrency(price)}</Text>
+                    <Text className='m-0'>{formatPrice(price)}</Text>
                   </Column>
                 </Row>
               ))}

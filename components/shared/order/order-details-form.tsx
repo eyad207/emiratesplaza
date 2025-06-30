@@ -181,7 +181,9 @@ export default function OrderDetailsForm({
                     <TableCell>
                       <span className='px-2'>{item.quantity}</span>
                     </TableCell>
-                    <TableCell className='text-right'>${item.price}</TableCell>
+                    <TableCell className='text-right'>
+                      <ProductPrice price={item.price} plain />
+                    </TableCell>
                     <TableCell>
                       <span className='px-2'>
                         {item.color || t('Orders.None')}

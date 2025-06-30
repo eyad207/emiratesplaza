@@ -1,7 +1,9 @@
 'use client'
 import useSettingStore from '@/hooks/use-setting-store'
-import { cn, round2 } from '@/lib/utils'
-import { useFormatter, useTranslations } from 'next-intl'
+import { cn } from '@/lib/utils'
+import { currencyManager, getPriceParts, formatPrice } from '@/lib/currency'
+import { useTranslations } from 'next-intl'
+import { useEffect } from 'react'
 
 const ProductPrice = ({
   price,
@@ -11,39 +13,40 @@ const ProductPrice = ({
   forListing = true,
   plain = false,
 }: {
-  price: number
-  discountedPrice?: number
+  price: number // Price in NOK (base currency)
+  discountedPrice?: number // Discounted price in NOK (base currency)
   isDeal?: boolean
   className?: string
   forListing?: boolean
   plain?: boolean
 }) => {
-  const { getCurrency } = useSettingStore()
+  const { setting, getCurrency } = useSettingStore()
   const currency = getCurrency()
   const t = useTranslations()
 
+  // Initialize currency manager with current settings
+  useEffect(() => {
+    if (
+      setting?.availableCurrencies &&
+      setting.availableCurrencies.length > 0
+    ) {
+      currencyManager.init(setting.availableCurrencies, currency.code)
+    }
+  }, [setting?.availableCurrencies, currency.code])
+
   const finalPrice = discountedPrice ?? price
-  const convertedPrice = round2(currency.convertRate * finalPrice)
-
-  const format = useFormatter()
-
   const hasDiscount = discountedPrice !== undefined && discountedPrice < price
 
   const discountPercent = hasDiscount
     ? Math.round(100 - (discountedPrice! / price) * 100)
     : 0
 
-  const stringValue = convertedPrice.toString()
-  const [intValue, floatValue] = stringValue.includes('.')
-    ? stringValue.split('.')
-    : [stringValue, '']
+  // Use the new currency manager for price formatting
+  const { integerPart, decimalPart } = getPriceParts(finalPrice)
+  const currentCurrency = currencyManager.getCurrentCurrency()
 
   return plain ? (
-    format.number(convertedPrice, {
-      style: 'currency',
-      currency: currency.code,
-      currencyDisplay: 'narrowSymbol',
-    })
+    formatPrice(finalPrice)
   ) : isDeal ? (
     <div className='space-y-2'>
       <div className='flex justify-center items-center gap-2'>
@@ -58,17 +61,13 @@ const ProductPrice = ({
         className={`flex ${forListing && 'justify-center'} items-center gap-2`}
       >
         <div className={cn('text-3xl', className)}>
-          <span className='text-xs align-super'>{currency.symbol}</span>
-          {intValue}
-          <span className='text-xs align-super'>{floatValue}</span>
+          <span className='text-xs align-super'>{currentCurrency.symbol}</span>
+          {integerPart}
+          <span className='text-xs align-super'>{decimalPart}</span>
         </div>
         {hasDiscount && (
           <div className='text-muted-foreground text-xs py-2 line-through'>
-            {format.number(price * currency.convertRate, {
-              style: 'currency',
-              currency: currency.code,
-              currencyDisplay: 'narrowSymbol',
-            })}
+            {formatPrice(price)}
           </div>
         )}
       </div>
@@ -80,18 +79,14 @@ const ProductPrice = ({
           <div className='text-3xl text-orange-700'>-{discountPercent}%</div>
         )}
         <div className={cn('text-3xl', className)}>
-          <span className='text-xs align-super'>{currency.symbol}</span>
-          {intValue}
-          <span className='text-xs align-super'>{floatValue}</span>
+          <span className='text-xs align-super'>{currentCurrency.symbol}</span>
+          {integerPart}
+          <span className='text-xs align-super'>{decimalPart}</span>
         </div>
       </div>
       {hasDiscount && (
         <div className='text-muted-foreground text-xs py-2 line-through'>
-          {format.number(price * currency.convertRate, {
-            style: 'currency',
-            currency: currency.code,
-            currencyDisplay: 'narrowSymbol',
-          })}
+          {formatPrice(price)}
         </div>
       )}
     </div>
