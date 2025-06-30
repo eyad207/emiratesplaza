@@ -69,11 +69,10 @@ export default function OrderDetailsForm({
   // Debug logging - remove after fixing
   console.log('Debug Payment Values:', {
     orderTotalPrice: order.totalPrice,
-    currency,
+    displayCurrency: currency, // What user sees in UI
+    paymentCurrency: 'NOK', // What we actually charge
     convertedPrice,
-    calculatedCents: convertedPrice
-      ? Math.round(convertedPrice * 100)
-      : Math.round(order.totalPrice * 100),
+    calculatedCents: Math.round(order.totalPrice * 100), // Always use order.totalPrice (which is in NOK)
   })
 
   if (isPaid) {
@@ -90,7 +89,7 @@ export default function OrderDetailsForm({
     return status
   }
   const handleCreatePayPalOrder = async () => {
-    const res = await createPayPalOrder(order._id, currency)
+    const res = await createPayPalOrder(order._id) // Always use NOK for payments
     if (!res.success)
       return toast({
         description: res.message,
@@ -112,6 +111,7 @@ export default function OrderDetailsForm({
   }
 
   const handleCreateVippsOrder = async () => {
+    // Always use order.totalPrice which is stored in NOK (base currency)
     const res = await createVippsOrder(order._id, order.totalPrice)
     if (!res.success)
       return toast({
@@ -228,7 +228,7 @@ export default function OrderDetailsForm({
                       stripe={stripePromise}
                     >
                       <StripeForm
-                        priceInCents={Math.round(order.totalPrice * 100)}
+                        priceInCents={Math.round(order.totalPrice * 100)} // order.totalPrice is in NOK
                         orderId={order._id}
                       />
                     </Elements>
@@ -256,9 +256,11 @@ export default function OrderDetailsForm({
                   <PayPalScriptProvider
                     options={{
                       clientId: paypalClientId,
-                      currency: 'NOK',
+                      currency: 'NOK', // Always use NOK for payments
                       intent: 'capture',
                       components: 'buttons',
+                      'enable-funding': 'venmo,paylater,card',
+                      'disable-funding': '',
                     }}
                   >
                     <PrintLoadingState />
@@ -271,6 +273,7 @@ export default function OrderDetailsForm({
                         height: 40,
                         tagline: false,
                       }}
+                      fundingSource={undefined} // Allow all funding sources
                       createOrder={handleCreatePayPalOrder}
                       onApprove={handleApprovePayPalOrder}
                       onError={() => {

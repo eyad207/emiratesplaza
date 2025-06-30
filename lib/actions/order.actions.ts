@@ -18,7 +18,6 @@ import { sendEmail } from '@/lib/email'
 import { vipps } from '../vipps'
 import Stripe from 'stripe'
 import type { SortOrder } from 'mongoose'
-import { currencyManager } from '../currency'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -343,10 +342,7 @@ export async function getOrderById(orderId: string): Promise<IOrder> {
   return JSON.parse(JSON.stringify(order))
 }
 
-export async function createPayPalOrder(
-  orderId: string,
-  currency: string = 'NOK'
-) {
+export async function createPayPalOrder(orderId: string) {
   await connectToDatabase()
   try {
     const order = await Order.findById(orderId)
@@ -354,28 +350,19 @@ export async function createPayPalOrder(
       return { success: false, message: 'Order not found' }
     }
 
-    // Get the settings to initialize currency manager
-    const settings = await getSetting()
+    // Always use NOK for payments regardless of display currency
+    const paymentCurrency = 'NOK'
+    const orderPrice = order.totalPrice // Already in NOK (base currency)
 
-    // Initialize currency manager with available currencies
-    currencyManager.init(settings.availableCurrencies, currency)
-
-    // Convert the price from NOK (base currency) to target currency
-    // The totalPrice is stored in NOK (base currency)
-    const convertedPrice = currencyManager.convertPriceTo(
-      order.totalPrice,
-      currency
-    )
-
-    // Validate converted price is reasonable (basic sanity check)
-    if (convertedPrice <= 0 || convertedPrice > 1000000) {
+    // Validate price is reasonable (basic sanity check)
+    if (orderPrice <= 0 || orderPrice > 1000000) {
       return {
         success: false,
-        message: `Invalid converted price: ${convertedPrice}`,
+        message: `Invalid order price: ${orderPrice}`,
       }
     }
 
-    const paypalOrder = await paypal.createOrder(convertedPrice, currency)
+    const paypalOrder = await paypal.createOrder(orderPrice, paymentCurrency)
     order.paymentResult = {
       id: paypalOrder.id,
       email_address: '',
