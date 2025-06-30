@@ -17,7 +17,10 @@ const initialState: Cart = {
 
 interface CartState {
   cart: Cart
-  addItem: (item: OrderItem, quantity: number) => Promise<string>
+  addItem: (
+    item: OrderItem,
+    quantity: number
+  ) => Promise<{ success: boolean; message?: string; clientId?: string }>
   updateItem: (item: OrderItem, quantity: number) => Promise<void>
   removeItem: (item: OrderItem) => void
   clearCart: () => void
@@ -41,17 +44,29 @@ const useCartStore = create(
             x.size === item.size
         )
 
+        // Check stock availability
+        const colorObj = item.colors.find((c) => c.color === item.color)
+        const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
+
+        if (!sizeObj) {
+          return { success: false, message: 'Size not available' }
+        }
+
         if (existItem) {
-          const colorObj = existItem.colors.find((c) => c.color === item.color)
-          const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
-          if (sizeObj && sizeObj.countInStock < quantity + existItem.quantity) {
-            throw new Error('Not enough items in stock')
+          // Check if adding to existing item would exceed stock
+          if (sizeObj.countInStock < quantity + existItem.quantity) {
+            return {
+              success: false,
+              message: 'You cant add it to cart, change color or size',
+            }
           }
         } else {
-          const colorObj = item.colors.find((c) => c.color === item.color)
-          const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
-          if (sizeObj && sizeObj.countInStock < item.quantity) {
-            throw new Error('Not enough items in stock')
+          // Check if new item quantity exceeds stock
+          if (sizeObj.countInStock < quantity) {
+            return {
+              success: false,
+              message: 'You cant add it to cart, change color or size',
+            }
           }
         }
 
@@ -75,16 +90,19 @@ const useCartStore = create(
             })),
           },
         })
+
         const foundItem = updatedCartItems.find(
           (x) =>
             x.product === item.product &&
             x.color === item.color &&
             x.size === item.size
         )
+
         if (!foundItem) {
-          throw new Error('Item not found in cart')
+          return { success: false, message: 'Item not found in cart' }
         }
-        return foundItem.clientId
+
+        return { success: true, clientId: foundItem.clientId }
       },
       updateItem: async (item: OrderItem, quantity: number) => {
         const { items, shippingAddress } = get().cart

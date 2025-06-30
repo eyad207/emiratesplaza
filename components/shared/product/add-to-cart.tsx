@@ -47,33 +47,30 @@ export default function AddToCart({
       e.stopPropagation()
     }
 
-    const countInStock = getCountInStockForSelectedSize()
-
-    if (countInStock === 0) {
-      toast({
-        variant: 'destructive',
-        description: t('Product.You cant add it to cart, change color or size'),
-      })
-      return
-    }
-
-    if (quantity > countInStock) {
-      toast({
-        variant: 'destructive',
-        description: t('Product.Only X left in stock - order soon', {
-          count: countInStock,
-        }),
-      })
-      return
-    }
-
     try {
       // Always use discountedPrice if present
       const itemToAdd = {
         ...item,
         price: item.discountedPrice ?? item.price,
       }
-      await addItem(itemToAdd, quantity)
+      const result = await addItem(itemToAdd, quantity)
+
+      if (!result.success) {
+        // Translate the error message
+        let errorMessage = result.message || 'Failed to add item to cart'
+        if (errorMessage === 'You cant add it to cart, change color or size') {
+          errorMessage = t(
+            'Product.You cant add it to cart, change color or size'
+          )
+        }
+
+        toast({
+          variant: 'destructive',
+          description: errorMessage,
+        })
+        return
+      }
+
       toast({
         description: t('Product.Added to Cart'),
         action: (
@@ -88,10 +85,9 @@ export default function AddToCart({
         ),
       })
     } catch (error: any) {
-      console.error('❌ Error adding to cart:', error)
       toast({
         variant: 'destructive',
-        description: error.message,
+        description: error.message || 'An unexpected error occurred',
       })
     }
   }
@@ -102,37 +98,35 @@ export default function AddToCart({
       e.stopPropagation()
     }
 
-    const countInStock = getCountInStockForSelectedSize()
-    if (countInStock === 0) {
-      toast({
-        variant: 'destructive',
-        description: t('Product.You cant add it to cart, change color or size'),
-      })
-      return
-    }
-
-    if (quantity > countInStock) {
-      toast({
-        variant: 'destructive',
-        description: t('Product.Only X left in stock - order soon', {
-          count: countInStock,
-        }),
-      })
-      return
-    }
-
     try {
       // Always use discountedPrice if present
       const itemToAdd = {
         ...item,
         price: item.discountedPrice ?? item.price,
       }
-      await addItem(itemToAdd, quantity)
+      const result = await addItem(itemToAdd, quantity)
+
+      if (!result.success) {
+        // Translate the error message
+        let errorMessage = result.message || 'Failed to add item to cart'
+        if (errorMessage === 'You cant add it to cart, change color or size') {
+          errorMessage = t(
+            'Product.You cant add it to cart, change color or size'
+          )
+        }
+
+        toast({
+          variant: 'destructive',
+          description: errorMessage,
+        })
+        return
+      }
+
       router.push(`/checkout`)
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        description: error.message,
+        description: error.message || 'An unexpected error occurred',
       })
     }
   }
