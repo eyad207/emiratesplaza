@@ -509,11 +509,26 @@ export async function createStripePaymentIntent(orderId: string) {
 
     // Verify Stripe secret key exists
     if (!process.env.STRIPE_SECRET_KEY) {
-      return { success: false, message: 'Stripe configuration missing' }
+      return {
+        success: false,
+        message: 'STRIPE_SECRET_KEY environment variable is not set',
+      }
+    }
+
+    // Validate Stripe secret key format
+    if (!process.env.STRIPE_SECRET_KEY.startsWith('sk_')) {
+      return { success: false, message: 'Invalid STRIPE_SECRET_KEY format' }
     }
 
     // Create Stripe payment intent with the exact order price
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+
+    console.log('Creating Stripe payment intent:', {
+      orderId: order._id.toString(),
+      amount: Math.round(orderPrice * 100),
+      currency: 'NOK',
+    })
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(orderPrice * 100), // Stripe expects amount in cents
       currency: 'NOK', // Use NOK as the base currency for all orders

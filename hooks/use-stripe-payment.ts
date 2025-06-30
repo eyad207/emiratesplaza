@@ -18,21 +18,31 @@ export default function useStripePayment(orderId: string) {
     setError(null)
 
     try {
+      console.log('Creating Stripe payment intent for order:', orderId)
       const result = await createStripePaymentIntent(orderId)
+
+      console.log('Stripe payment intent result:', {
+        success: result.success,
+        message: result.message,
+        hasData: !!result.data,
+      })
 
       if (result.success && result.data) {
         setClientSecret(result.data.clientSecret)
         setConvertedPrice(result.data.convertedPrice)
       } else {
         const errorMessage = result.message || 'Failed to create payment intent'
+        console.error('Stripe payment intent failed:', errorMessage)
         setError(errorMessage)
         toast({
           description: errorMessage,
           variant: 'destructive',
         })
       }
-    } catch {
-      const errorMessage = 'An unexpected error occurred'
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'An unexpected error occurred'
+      console.error('Stripe payment intent error:', err)
       setError(errorMessage)
       toast({
         description: errorMessage,

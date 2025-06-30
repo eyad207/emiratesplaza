@@ -29,9 +29,16 @@ import { useTheme } from 'next-themes'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
-)
+// Validate Stripe configuration before loading
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+console.log('Stripe publishable key check:', {
+  hasKey: !!stripePublishableKey,
+  keyPrefix: stripePublishableKey?.substring(0, 7) || 'missing',
+})
+
+const stripePromise = stripePublishableKey
+  ? loadStripe(stripePublishableKey)
+  : null
 export default function OrderDetailsForm({
   order,
   paypalClientId,
@@ -235,6 +242,15 @@ export default function OrderDetailsForm({
                     <div className='mt-2 text-xs text-purple-600 dark:text-purple-400 text-center'>
                       {t('secureStripePayment')}
                     </div>
+                  </div>
+                ) : !stripePromise ? (
+                  <div className='text-center p-4 bg-yellow-50 dark:bg-yellow-950 rounded-lg'>
+                    <div className='text-yellow-600 dark:text-yellow-400 text-sm font-medium'>
+                      Stripe payment is not configured
+                    </div>
+                    <p className='text-xs text-yellow-500 dark:text-yellow-400 mt-1'>
+                      Contact support for assistance
+                    </p>
                   </div>
                 ) : (
                   <div className='text-center p-4 bg-red-50 dark:bg-red-950 rounded-lg'>
