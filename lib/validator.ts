@@ -265,6 +265,7 @@ export const WebPageUpdateSchema = WebPageInputSchema.extend({
 export const SiteLanguageSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   code: z.string().min(1, 'Code is required'),
+  icon: z.string().min(1, 'Icon is required'),
 })
 export const CarouselSchema = z.object({
   title: z.string().min(1, 'title is required'),

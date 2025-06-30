@@ -20,19 +20,20 @@ export default function LanguageSwitcher() {
   const locale = useLocale()
   const pathname = usePathname()
 
+  const currentLocale = locales.find((l) => l.code === locale)
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='header-button h-[41px]'>
-        <div className='flex items-center gap-1'>
-          <span className='text-xl'>
-            {locales.find((l) => l.code === locale)?.icon} {/* Display flag */}
+        <div className='flex items-center gap-2'>
+          <span className='text-xl'>{currentLocale?.icon}</span>
+          <span className='hidden sm:inline font-medium'>
+            {currentLocale?.name}
           </span>
-          <span className='hidden sm:inline'>
-            {' '}
-            {/* Ensure locale code is visible on PC */}
+          <span className='sm:hidden font-medium'>
             {locale.toUpperCase().slice(0, 2)}
           </span>
-          <ChevronDownIcon />
+          <ChevronDownIcon className='h-4 w-4' />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56'>
@@ -41,12 +42,15 @@ export default function LanguageSwitcher() {
           {locales.map((c, index) => (
             <DropdownMenuRadioItem key={`${c.code}-${index}`} value={c.code}>
               <Link
-                className='w-full flex items-center gap-1'
+                className='w-full flex items-center gap-3'
                 href={pathname}
                 locale={c.code}
               >
-                <span className='text-lg'>{c.icon}</span> {c.name}{' '}
-                {/* Display flag and name */}
+                <span className='text-lg'>{c.icon}</span>
+                <span className='flex-1'>{c.name}</span>
+                <span className='text-xs text-muted-foreground'>
+                  {c.code.toUpperCase()}
+                </span>
               </Link>
             </DropdownMenuRadioItem>
           ))}

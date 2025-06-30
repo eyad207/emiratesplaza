@@ -1417,6 +1417,7 @@ For more details, visit our Returns Center.`,
       availableLanguages: i18n.locales.map((locale) => ({
         code: locale.code,
         name: locale.name,
+        icon: locale.icon,
       })),
       defaultLanguage: 'en-US',
       availableCurrencies: [

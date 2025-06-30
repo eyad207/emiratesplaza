@@ -58,6 +58,11 @@ const settingSchema = new Schema<ISetting>(
           set: (value: string) => Buffer.from(value).toString('utf8'),
         },
         code: { type: String, required: true },
+        icon: {
+          type: String,
+          required: true,
+          set: (value: string) => Buffer.from(value).toString('utf8'),
+        },
       },
     ],
     defaultLanguage: { type: String, required: true },

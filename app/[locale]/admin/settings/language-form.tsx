@@ -113,6 +113,21 @@ export default function LanguageForm({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name={`availableLanguages.${index}.icon`}
+                render={({ field }) => (
+                  <FormItem>
+                    {index == 0 && <FormLabel>Flag</FormLabel>}
+                    <FormControl>
+                      <Input {...field} placeholder='🇺🇸' />
+                    </FormControl>
+                    <FormMessage>
+                      {errors.availableLanguages?.[index]?.icon?.message}
+                    </FormMessage>
+                  </FormItem>
+                )}
+              />
               <div>
                 {index == 0 && <div>Action</div>}
                 <Button
@@ -133,7 +148,7 @@ export default function LanguageForm({
           <Button
             type='button'
             variant={'outline'}
-            onClick={() => append({ name: '', code: '' })}
+            onClick={() => append({ name: '', code: '', icon: '' })}
           >
             Add Language
           </Button>
