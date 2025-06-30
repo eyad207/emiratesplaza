@@ -26,6 +26,7 @@ import useCartStore from '@/hooks/use-cart-store'
 import useSettingStore from '@/hooks/use-setting-store'
 import useStripePayment from '@/hooks/use-stripe-payment'
 import { useTheme } from 'next-themes'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 const stripePromise = loadStripe(
@@ -39,6 +40,7 @@ export default function OrderDetailsForm({
   paypalClientId: string
   isAdmin: boolean
 }) {
+  const t = useTranslations('PaymentForm')
   const {
     setting: { currency },
   } = useSettingStore()
@@ -81,9 +83,9 @@ export default function OrderDetailsForm({
     const [{ isPending, isRejected }] = usePayPalScriptReducer()
     let status = ''
     if (isPending) {
-      status = 'Loading PayPal...'
+      status = t('loadingPayPal')
     } else if (isRejected) {
-      status = 'Error in loading PayPal.'
+      status = t('errorLoadingPayPal')
     }
     return status
   }
@@ -123,13 +125,13 @@ export default function OrderDetailsForm({
     <Card>
       <CardContent className='p-4'>
         <div>
-          <div className='text-lg font-bold mb-4'>Order Summary</div>
+          <div className='text-lg font-bold mb-4'>{t('orderSummary')}</div>
           {/* Price Breakdown */}
           <div className='border-t border-gray-200 dark:border-gray-700 pt-4'>
             <div className='space-y-2'>
               <div className='flex justify-between text-sm'>
                 <span className='text-gray-600 dark:text-gray-400'>
-                  Subtotal:
+                  {t('subtotal')}:
                 </span>
                 <span className='text-gray-900 dark:text-gray-100'>
                   <ProductPrice price={itemsPrice} plain />
@@ -137,20 +139,22 @@ export default function OrderDetailsForm({
               </div>
               <div className='flex justify-between text-sm'>
                 <span className='text-gray-600 dark:text-gray-400'>
-                  Shipping & Handling:
+                  {t('shippingHandling')}:
                 </span>
                 <span className='text-gray-900 dark:text-gray-100'>
                   {shippingPrice === undefined ? (
                     '--'
                   ) : shippingPrice === 0 ? (
-                    'FREE'
+                    t('free')
                   ) : (
                     <ProductPrice price={shippingPrice} plain />
                   )}
                 </span>
               </div>
               <div className='flex justify-between text-sm'>
-                <span className='text-gray-600 dark:text-gray-400'>Tax:</span>
+                <span className='text-gray-600 dark:text-gray-400'>
+                  {t('tax')}:
+                </span>
                 <span className='text-gray-900 dark:text-gray-100'>
                   {taxPrice === undefined ? (
                     '--'
@@ -162,7 +166,7 @@ export default function OrderDetailsForm({
               <div className='border-t border-gray-200 dark:border-gray-700 pt-2 mt-2'>
                 <div className='flex justify-between text-lg font-bold'>
                   <span className='text-gray-900 dark:text-gray-100'>
-                    Order Total:
+                    {t('orderTotal')}:
                   </span>
                   <span className='text-gray-900 dark:text-gray-100'>
                     <ProductPrice price={totalPrice} plain />
@@ -177,16 +181,16 @@ export default function OrderDetailsForm({
             {/* Vipps Payment Method */}
             {!isPaid && (
               <div className='space-y-3'>
-                <div className='text-xl'>Pay With Vipps:</div>
+                <div className='text-xl'>{t('payWithVipps')}:</div>
                 <div className='bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border border-orange-200 dark:border-orange-800 rounded-lg p-3'>
                   <Button
                     className='w-full h-10 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors'
                     onClick={handleCreateVippsOrder}
                   >
-                    Pay with Vipps
+                    {t('payWithVipps')}
                   </Button>
                   <div className='mt-2 text-xs text-orange-600 dark:text-orange-400 text-center'>
-                    Secure Norwegian mobile payment
+                    {t('secureNorwegianPayment')}
                   </div>
                 </div>
               </div>
@@ -194,12 +198,12 @@ export default function OrderDetailsForm({
             {/* Stripe Payment Method */}
             {!isPaid && (
               <div className='space-y-3'>
-                <div className='text-xl'>Credit Card:</div>
+                <div className='text-xl'>{t('creditCard')}:</div>
                 {stripeLoading ? (
                   <div className='flex items-center justify-center p-4 bg-white dark:bg-gray-800 rounded-lg'>
                     <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600'></div>
                     <span className='ml-2 text-sm text-purple-700 dark:text-purple-300'>
-                      Loading payment...
+                      {t('loadingPayment')}...
                     </span>
                   </div>
                 ) : stripeClientSecret ? (
@@ -229,16 +233,16 @@ export default function OrderDetailsForm({
                       />
                     </Elements>
                     <div className='mt-2 text-xs text-purple-600 dark:text-purple-400 text-center'>
-                      Secure payment with Stripe
+                      {t('secureStripePayment')}
                     </div>
                   </div>
                 ) : (
                   <div className='text-center p-4 bg-red-50 dark:bg-red-950 rounded-lg'>
                     <div className='text-red-600 dark:text-red-400 text-sm font-medium'>
-                      Failed to initialize payment
+                      {t('failedToInitializePayment')}
                     </div>
                     <p className='text-xs text-red-500 dark:text-red-400 mt-1'>
-                      Please refresh and try again
+                      {t('refreshAndTryAgain')}
                     </p>
                   </div>
                 )}
@@ -247,7 +251,7 @@ export default function OrderDetailsForm({
             {/* PayPal Payment Method */}
             {!isPaid && (
               <div className='space-y-3'>
-                <div className='text-xl'>PayPal Payment:</div>
+                <div className='text-xl'>{t('paypalPayment')}:</div>
                 <div className='bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border border-blue-200 dark:border-blue-800 rounded-lg p-3'>
                   <PayPalScriptProvider
                     options={{
@@ -271,21 +275,20 @@ export default function OrderDetailsForm({
                       onApprove={handleApprovePayPalOrder}
                       onError={() => {
                         toast({
-                          description:
-                            'PayPal payment failed. Please try again or use a different payment method.',
+                          description: t('paypalPaymentFailed'),
                           variant: 'destructive',
                         })
                       }}
                       onCancel={() => {
                         toast({
-                          description: 'PayPal payment was cancelled.',
+                          description: t('paypalPaymentCancelled'),
                           variant: 'default',
                         })
                       }}
                     />
                   </PayPalScriptProvider>
                   <div className='mt-2 text-xs text-blue-600 dark:text-blue-400 text-center'>
-                    Protected by PayPal&apos;s Buyer Protection
+                    {t('protectedByPayPal')}
                   </div>
                 </div>
               </div>
@@ -294,17 +297,17 @@ export default function OrderDetailsForm({
             {!isPaid && paymentMethod === 'Cash On Delivery' && (
               <div className='space-y-3'>
                 <h4 className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  Cash on Delivery
+                  {t('cashOnDelivery')}
                 </h4>
                 <div className='bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border border-green-200 dark:border-green-800 rounded-lg p-3'>
                   <Button
                     className='w-full h-10 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors'
                     onClick={() => router.push(`/account/orders/${order._id}`)}
                   >
-                    View Order Details
+                    {t('viewOrderDetails')}
                   </Button>
                   <div className='mt-2 text-xs text-green-600 dark:text-green-400 text-center'>
-                    Pay when your order is delivered
+                    {t('payWhenDelivered')}
                   </div>
                 </div>
               </div>
@@ -323,7 +326,7 @@ export default function OrderDetailsForm({
           <div>
             <div className='grid md:grid-cols-3 my-3 pb-3'>
               <div className='text-lg font-bold'>
-                <span>Shipping Address</span>
+                <span>{t('shippingAddress')}</span>
               </div>
               <div className='col-span-2'>
                 <p>
@@ -339,7 +342,7 @@ export default function OrderDetailsForm({
           <div className='border-y'>
             <div className='grid md:grid-cols-3 my-3 pb-3'>
               <div className='text-lg font-bold'>
-                <span>Payment Method</span>
+                <span>{t('paymentMethod')}</span>
               </div>
               <div className='col-span-2'>
                 <p>{paymentMethod}</p>
@@ -349,11 +352,12 @@ export default function OrderDetailsForm({
 
           <div className='grid md:grid-cols-3 my-3 pb-3'>
             <div className='flex text-lg font-bold'>
-              <span>Items and shipping</span>
+              <span>{t('itemsAndShipping')}</span>
             </div>
             <div className='col-span-2'>
               <p className='mb-4 text-gray-600 dark:text-gray-400'>
-                Delivery date: {formatDateTime(expectedDeliveryDate).dateOnly}
+                {t('deliveryDate')}:{' '}
+                {formatDateTime(expectedDeliveryDate).dateOnly}
               </p>
               <div className='space-y-3'>
                 {items.map((item) => (
@@ -380,7 +384,9 @@ export default function OrderDetailsForm({
                             {item.name}
                           </h6>
                           <div className='flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400 mt-1'>
-                            <span>Qty: {item.quantity}</span>
+                            <span>
+                              {t('qty')}: {item.quantity}
+                            </span>
                             {item.color && (
                               <span className='flex items-center'>
                                 <span
@@ -392,7 +398,11 @@ export default function OrderDetailsForm({
                                 {item.color}
                               </span>
                             )}
-                            {item.size && <span>Size: {item.size}</span>}
+                            {item.size && (
+                              <span>
+                                {t('size')}: {item.size}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
