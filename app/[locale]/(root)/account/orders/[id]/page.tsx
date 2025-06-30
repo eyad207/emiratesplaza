@@ -62,7 +62,7 @@ export default async function OrderDetailsPage(props: {
       {/* Order Details Header */}
       <div className='mb-6'>
         <h1 className='text-2xl sm:text-3xl font-bold mb-1'>
-          {t('Orders.Order')} #{formatId(order._id)}
+          {t('Orders.Order')} #{order._id}
         </h1>
         <p className='text-muted-foreground'>
           {t('Orders.PlacedOn')}{' '}
