@@ -121,7 +121,7 @@ export async function updateOrderToPaid(orderId: string) {
   }
 }
 
-const updateProductStock = async (orderId: string) => {
+export const updateProductStock = async (orderId: string) => {
   const session = await mongoose.connection.startSession()
 
   try {
@@ -349,46 +349,56 @@ export async function createPayPalOrder(
   await connectToDatabase()
   try {
     const order = await Order.findById(orderId)
-    if (order) {
-      // Get the settings to access currency conversion rates
-      const settings = await getSetting()
-
-      // Find the target currency information
-      const targetCurrency = settings.availableCurrencies.find(
-        (c) => c.code === currency
-      )
-      if (!targetCurrency) {
-        throw new Error(`Currency ${currency} not supported`)
-      }
-
-      // Convert the price from NOK (base currency) to target currency
-      // The totalPrice is stored in NOK (base currency with convertRate = 1)
-      // We need to convert it to the target currency using the convertRate
-      const convertedPrice = order.totalPrice * targetCurrency.convertRate
-
-      // Validate converted price is reasonable (basic sanity check)
-      if (convertedPrice <= 0 || convertedPrice > 1000000) {
-        throw new Error(`Invalid converted price: ${convertedPrice}`)
-      }
-
-      const paypalOrder = await paypal.createOrder(convertedPrice, currency)
-      order.paymentResult = {
-        id: paypalOrder.id,
-        email_address: '',
-        status: '',
-        pricePaid: '0',
-      }
-      await order.save()
-      return {
-        success: true,
-        message: 'PayPal order created successfully',
-        data: paypalOrder.id,
-      }
-    } else {
-      throw new Error('Order not found')
+    if (!order) {
+      return { success: false, message: 'Order not found' }
     }
-  } catch {
-    return { success: false, message: 'Operation failed' }
+
+    // Get the settings to access currency conversion rates
+    const settings = await getSetting()
+
+    // Find the target currency information
+    const targetCurrency = settings.availableCurrencies.find(
+      (c) => c.code === currency
+    )
+    if (!targetCurrency) {
+      return { success: false, message: `Currency ${currency} not supported` }
+    }
+
+    // Convert the price from NOK (base currency) to target currency
+    // The totalPrice is stored in NOK (base currency with convertRate = 1)
+    // We need to convert it to the target currency using the convertRate
+    const convertedPrice = order.totalPrice * targetCurrency.convertRate
+
+    // Validate converted price is reasonable (basic sanity check)
+    if (convertedPrice <= 0 || convertedPrice > 1000000) {
+      return {
+        success: false,
+        message: `Invalid converted price: ${convertedPrice}`,
+      }
+    }
+
+    const paypalOrder = await paypal.createOrder(convertedPrice, currency)
+    order.paymentResult = {
+      id: paypalOrder.id,
+      email_address: '',
+      status: '',
+      pricePaid: '0',
+    }
+    await order.save()
+    return {
+      success: true,
+      message: 'PayPal order created successfully',
+      data: paypalOrder.id,
+    }
+  } catch (error) {
+    console.error('PayPal order creation error:', error)
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : 'Failed to create PayPal order',
+    }
   }
 }
 
@@ -399,15 +409,26 @@ export async function approvePayPalOrder(
   await connectToDatabase()
   try {
     const order = await Order.findById(orderId).populate('user', 'email')
-    if (!order) throw new Error('Order not found')
+    if (!order) {
+      return { success: false, message: 'Order not found' }
+    }
 
     const captureData = await paypal.capturePayment(data.orderID)
-    if (
-      !captureData ||
-      captureData.id !== order.paymentResult?.id ||
-      captureData.status !== 'COMPLETED'
-    )
-      throw new Error('Error in paypal payment')
+    if (!captureData) {
+      return { success: false, message: 'Failed to capture PayPal payment' }
+    }
+
+    if (captureData.id !== order.paymentResult?.id) {
+      return { success: false, message: 'PayPal order ID mismatch' }
+    }
+
+    if (captureData.status !== 'COMPLETED') {
+      return {
+        success: false,
+        message: `PayPal payment not completed. Status: ${captureData.status}`,
+      }
+    }
+
     order.isPaid = true
     order.paidAt = new Date()
     order.paymentResult = {
@@ -425,8 +446,15 @@ export async function approvePayPalOrder(
       success: true,
       message: 'Your order has been successfully paid by PayPal',
     }
-  } catch {
-    return { success: false, message: 'Operation failed' }
+  } catch (error) {
+    console.error('PayPal order approval error:', error)
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : 'Failed to approve PayPal payment',
+    }
   }
 }
 
@@ -462,56 +490,55 @@ export const approveVippsOrder = async (orderId: string) => {
   }
 }
 
-export async function createStripePaymentIntent(
-  orderId: string,
-  currency: string = 'NOK'
-) {
+export async function createStripePaymentIntent(orderId: string) {
   await connectToDatabase()
   try {
     const order = await Order.findById(orderId)
-    if (order) {
-      // Get the settings to access currency conversion rates
-      const settings = await getSetting()
-
-      // Find the target currency information
-      const targetCurrency = settings.availableCurrencies.find(
-        (c) => c.code === currency
-      )
-      if (!targetCurrency) {
-        throw new Error(`Currency ${currency} not supported`)
-      }
-
-      // Convert the price from NOK (base currency) to target currency
-      // The totalPrice is stored in NOK (base currency with convertRate = 1)
-      // We need to convert it to the target currency using the convertRate
-      const convertedPrice = order.totalPrice * targetCurrency.convertRate
-
-      // Validate converted price is reasonable (basic sanity check)
-      if (convertedPrice <= 0 || convertedPrice > 1000000) {
-        throw new Error(`Invalid converted price: ${convertedPrice}`)
-      }
-
-      // Create Stripe payment intent with converted price
-      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(convertedPrice * 100), // Stripe expects amount in cents
-        currency: currency.toLowerCase(), // Stripe expects lowercase currency codes
-        metadata: { orderId: order._id },
-      })
-
-      return {
-        success: true,
-        message: 'Stripe payment intent created successfully',
-        data: {
-          clientSecret: paymentIntent.client_secret,
-          convertedPrice,
-        },
-      }
-    } else {
-      throw new Error('Order not found')
+    if (!order) {
+      return { success: false, message: 'Order not found' }
     }
-  } catch {
-    return { success: false, message: 'Operation failed' }
+
+    // Use the order's original total price without currency conversion
+    const orderPrice = order.totalPrice
+
+    // Validate price is reasonable (basic sanity check)
+    if (orderPrice <= 0 || orderPrice > 1000000) {
+      return {
+        success: false,
+        message: `Invalid order price: ${orderPrice}`,
+      }
+    }
+
+    // Verify Stripe secret key exists
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return { success: false, message: 'Stripe configuration missing' }
+    }
+
+    // Create Stripe payment intent with the exact order price
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(orderPrice * 100), // Stripe expects amount in cents
+      currency: 'NOK', // Use NOK as the base currency for all orders
+      metadata: { orderId: order._id.toString() }, // Convert ObjectId to string
+    })
+
+    return {
+      success: true,
+      message: 'Stripe payment intent created successfully',
+      data: {
+        clientSecret: paymentIntent.client_secret,
+        convertedPrice: orderPrice, // Return the exact order price
+      },
+    }
+  } catch (error) {
+    console.error('Stripe payment intent creation error:', error)
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : 'Failed to create Stripe payment intent',
+    }
   }
 }
 

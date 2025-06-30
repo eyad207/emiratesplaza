@@ -426,6 +426,8 @@
     "change": "Change",
     "paymentMethod": "Payment Method",
     "choosePaymentMethod": "Choose a payment method",
+    "payHere": "Pay Here",
+    "payInStoreCash": "Pay in Store (Cash)",
     "itemsAndShipping": "Items and shipping",
     "deliveryDate": "Delivery date",
     "reviewItemsAndShipping": "Review items and shipping",

@@ -7,6 +7,13 @@ const requiredEnvVars = [
   'SENDER_NAME',
 ] as const
 
+const paymentEnvVars = [
+  'PAYPAL_CLIENT_ID',
+  'PAYPAL_APP_SECRET',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET',
+] as const
+
 export function validateEnvironmentVariables() {
   const missing: string[] = []
 
@@ -68,4 +75,23 @@ export function sanitizeForLog(
   }
 
   return sanitized
+}
+
+export function validatePaymentEnvironmentVariables() {
+  const missing: string[] = []
+
+  for (const envVar of paymentEnvVars) {
+    if (!process.env[envVar]) {
+      missing.push(envVar)
+    }
+  }
+
+  if (missing.length > 0) {
+    console.warn(
+      `Warning: Missing payment environment variables: ${missing.join(', ')}`
+    )
+    return false
+  }
+
+  return true
 }

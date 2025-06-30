@@ -412,6 +412,8 @@
     "change": "Endre",
     "paymentMethod": "Betalingsmetode",
     "choosePaymentMethod": "Velg en betalingsmetode",
+    "payHere": "Betal her",
+    "payInStoreCash": "Betal i butikken (kontant)",
     "itemsAndShipping": "Varer og frakt",
     "deliveryDate": "Leveringsdato",
     "reviewItemsAndShipping": "Gjennomgå varer og frakt",

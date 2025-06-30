@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createStripePaymentIntent } from '@/lib/actions/order.actions'
 import { useToast } from '@/hooks/use-toast'
 
-export default function useStripePayment(orderId: string, currency: string) {
+export default function useStripePayment(orderId: string) {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [convertedPrice, setConvertedPrice] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
@@ -18,7 +18,7 @@ export default function useStripePayment(orderId: string, currency: string) {
     setError(null)
 
     try {
-      const result = await createStripePaymentIntent(orderId, currency)
+      const result = await createStripePaymentIntent(orderId)
 
       if (result.success && result.data) {
         setClientSecret(result.data.clientSecret)
@@ -41,13 +41,13 @@ export default function useStripePayment(orderId: string, currency: string) {
     } finally {
       setLoading(false)
     }
-  }, [orderId, currency, loading, clientSecret, toast])
+  }, [orderId, loading, clientSecret, toast])
 
   useEffect(() => {
-    if (orderId && currency) {
+    if (orderId) {
       createPaymentIntent()
     }
-  }, [orderId, currency, createPaymentIntent])
+  }, [orderId, createPaymentIntent])
 
   return {
     clientSecret,

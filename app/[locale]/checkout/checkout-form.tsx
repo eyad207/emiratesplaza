@@ -67,11 +67,7 @@ const CheckoutForm = () => {
   const { toast } = useToast()
   const router = useRouter()
   const {
-    setting: {
-      availablePaymentMethods,
-      defaultPaymentMethod,
-      availableDeliveryDates,
-    },
+    setting: { defaultPaymentMethod, availableDeliveryDates },
   } = useSettingStore()
 
   const {
@@ -159,13 +155,49 @@ const CheckoutForm = () => {
         description: res.message,
         variant: 'default',
       })
-      router.push(`/checkout/${res.data?.orderId}`)
+
+      // For Cash On Delivery, redirect to order confirmation instead of payment
+      if (paymentMethod === 'Cash On Delivery') {
+        router.push(`/account/orders/${res.data?.orderId}`)
+      } else {
+        router.push(`/checkout/${res.data?.orderId}`)
+      }
     }
   }
-  const handleSelectPaymentMethod = () => {
+  const handleSelectPaymentMethod = async () => {
     setIsAddressSelected(true)
     setIsItemsSelected(true)
     setIsPaymentMethodSelected(true)
+
+    // If "Pay Here" is selected, proceed to payment form
+    if (paymentMethod === 'Pay Here') {
+      // Create order first, then redirect to payment
+      const res = await createOrder({
+        items,
+        shippingAddress,
+        expectedDeliveryDate: calculateFutureDate(
+          availableDeliveryDates[deliveryDateIndex!].daysToDeliver
+        ),
+        deliveryDateIndex,
+        paymentMethod: 'Stripe', // Default to Stripe for Pay Here
+        itemsPrice,
+        shippingPrice,
+        taxPrice,
+        totalPrice,
+      })
+      if (!res.success) {
+        toast({
+          description: res.message,
+          variant: 'destructive',
+        })
+      } else {
+        router.push(`/checkout/${res.data?.orderId}`)
+      }
+    } else if (paymentMethod === 'Cash On Delivery') {
+      // For "Pay in Store (Cash)", set the payment method to Cash On Delivery
+      // The user will see the "Place Your Order" button to complete the order
+      setPaymentMethod('Cash On Delivery')
+    }
   }
   const handleSelectItemsAndShipping = () => {
     setIsAddressSelected(true)
@@ -474,13 +506,56 @@ const CheckoutForm = () => {
                       ).dateOnly
                     }
                   </p>
-                  <ul>
+                  {/* Product List */}
+                  <div className='space-y-3 mb-4'>
                     {items.map((item, index) => (
-                      <li key={`${item.slug}-${index}`}>
-                        {item.name} x {item.quantity} = {item.price}
-                      </li>
+                      <div
+                        key={`${item.slug}-${index}`}
+                        className='flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg'
+                      >
+                        {/* Product Image */}
+                        <div className='flex-shrink-0'>
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            width={48}
+                            height={48}
+                            className='rounded-md object-cover border border-gray-200 dark:border-gray-600'
+                          />
+                        </div>
+
+                        {/* Product Details */}
+                        <div className='flex-1'>
+                          <div className='flex items-center justify-between'>
+                            <div>
+                              <h6 className='text-sm font-medium text-gray-900 dark:text-gray-100'>
+                                {item.name}
+                              </h6>
+                              <div className='flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400 mt-1'>
+                                <span>Qty: {item.quantity}</span>
+                                {item.color && (
+                                  <span className='flex items-center'>
+                                    <span
+                                      className='w-2 h-2 rounded-full border border-gray-300 mr-1'
+                                      style={{
+                                        backgroundColor:
+                                          item.color.toLowerCase(),
+                                      }}
+                                    />
+                                    {item.color}
+                                  </span>
+                                )}
+                                {item.size && <span>Size: {item.size}</span>}
+                              </div>
+                            </div>
+                            <div className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
+                              <ProductPrice price={item.price} plain />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
                 <div className='col-span-2'>
                   <Button
@@ -706,20 +781,30 @@ const CheckoutForm = () => {
                       value={paymentMethod}
                       onValueChange={(value) => setPaymentMethod(value)}
                     >
-                      {availablePaymentMethods.map((pm) => (
-                        <div key={pm.name} className='flex items-center py-1 '>
-                          <RadioGroupItem
-                            value={pm.name}
-                            id={`payment-${pm.name}`}
-                          />
-                          <Label
-                            className='font-bold pl-2 cursor-pointer'
-                            htmlFor={`payment-${pm.name}`}
-                          >
-                            {pm.name}
-                          </Label>
-                        </div>
-                      ))}
+                      <div className='flex items-center py-1'>
+                        <RadioGroupItem
+                          value='Pay Here'
+                          id='payment-pay-here'
+                        />
+                        <Label
+                          className='font-bold pl-2 cursor-pointer'
+                          htmlFor='payment-pay-here'
+                        >
+                          {t('payHere')}
+                        </Label>
+                      </div>
+                      <div className='flex items-center py-1'>
+                        <RadioGroupItem
+                          value='Cash On Delivery'
+                          id='payment-cash-delivery'
+                        />
+                        <Label
+                          className='font-bold pl-2 cursor-pointer'
+                          htmlFor='payment-cash-delivery'
+                        >
+                          {t('payInStoreCash')}
+                        </Label>
+                      </div>
                     </RadioGroup>
                   </CardContent>
                   <CardFooter className='p-4'>
