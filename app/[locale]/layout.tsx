@@ -10,6 +10,7 @@ import { getSetting } from '@/lib/actions/setting.actions'
 import { cookies } from 'next/headers'
 import CartSidebar from '@/components/shared/cart-sidebar'
 import { NextAuthProvider } from '@/components/providers/session-provider'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -68,6 +69,7 @@ export default async function AppLayout({
             <NextAuthProvider>{children}</NextAuthProvider>
           </ClientProviders>
           <CartSidebar />
+          <SpeedInsights />
         </NextIntlClientProvider>
       </body>
     </html>
