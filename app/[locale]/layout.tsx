@@ -1,6 +1,9 @@
 import { Geist, Geist_Mono } from 'next/font/google'
 import '../globals.css'
 import ClientProviders from '@/components/shared/client-providers'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // revalidate every hour
 import { getDirection } from '@/i18n-config'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
@@ -12,6 +15,7 @@ import CartSidebar from '@/components/shared/cart-sidebar'
 import { NextAuthProvider } from '@/components/providers/session-provider'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/react'
+import { WebVitals } from '@/components/shared/web-vitals'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -72,6 +76,7 @@ export default async function AppLayout({
           <CartSidebar />
           <SpeedInsights />
           <Analytics />
+          <WebVitals />
         </NextIntlClientProvider>
       </body>
     </html>

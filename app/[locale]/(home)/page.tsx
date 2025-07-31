@@ -14,13 +14,18 @@ import Tag from '@/lib/db/models/tag.model'
 import { connectToDatabase } from '@/lib/db'
 import InfiniteProductList from '@/components/shared/infinite-product-list'
 
-export default async function HomePage() {
-  const t = await getTranslations('Home')
-  const { carousels } = await getSetting()
+// Add cache configuration
+export const runtime = 'nodejs' // or 'edge'
+export const preferredRegion = 'auto'
+export const dynamic = 'force-dynamic'
+export const revalidate = 60 // revalidate every minute
 
-  // Fetch updated tags whenever the homepage is rendered
-  await connectToDatabase()
-  const tags = await Tag.find().sort({ name: 1 }).lean()
+export default async function HomePage() {
+  const [t, { carousels }, tags] = await Promise.all([
+    getTranslations('Home'),
+    getSetting(),
+    connectToDatabase().then(() => Tag.find().sort({ name: 1 }).lean()),
+  ])
 
   const tagsWithProducts = await Promise.all(
     tags.map(async (tag) => {
