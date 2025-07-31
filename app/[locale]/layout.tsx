@@ -74,10 +74,10 @@ export default async function AppLayout({
             <NextAuthProvider>{children}</NextAuthProvider>
           </ClientProviders>
           <CartSidebar />
-          <SpeedInsights />
-          <Analytics />
-          <WebVitals />
         </NextIntlClientProvider>
+        <SpeedInsights />
+        <Analytics mode='auto' />
+        <WebVitals />
       </body>
     </html>
   )
