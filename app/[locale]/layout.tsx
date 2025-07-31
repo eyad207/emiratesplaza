@@ -11,6 +11,7 @@ import { cookies } from 'next/headers'
 import CartSidebar from '@/components/shared/cart-sidebar'
 import { NextAuthProvider } from '@/components/providers/session-provider'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/react'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -70,6 +71,7 @@ export default async function AppLayout({
           </ClientProviders>
           <CartSidebar />
           <SpeedInsights />
+          <Analytics />
         </NextIntlClientProvider>
       </body>
     </html>
