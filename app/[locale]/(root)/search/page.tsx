@@ -1,5 +1,4 @@
 import Link from 'next/link'
-
 import Pagination from '@/components/shared/pagination'
 import ProductCard from '@/components/shared/product/product-card'
 import { Button } from '@/components/ui/button'

@@ -16,42 +16,43 @@ export const metadata: Metadata = {
   title: 'Sign In',
 }
 
-export default async function SignInPage(props: {
-  searchParams: Promise<{
-    callbackUrl: string
-  }>
+export default async function SignInPage({
+  searchParams: searchParamsPromise,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>
 }) {
-  const searchParams = await props.searchParams
-  const { site } = await getSetting()
-
-  const { callbackUrl = '/' } = searchParams
+  const { callbackUrl = '/' } = await searchParamsPromise
 
   const session = await auth()
   if (session) {
-    return redirect(callbackUrl)
+    redirect(callbackUrl)
   }
 
-  const t = await getTranslations('SignIn')
+  const [t, { site }] = await Promise.all([
+    getTranslations('SignIn'),
+    getSetting(),
+  ])
 
   return (
-    <div className='w-full'>
+    <div className='w-full max-w-md mx-auto'>
       <Card>
         <CardHeader>
           <CardTitle className='text-2xl'>{t('SignIn')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div>
-            <CredentialsSignInForm />
+          <CredentialsSignInForm />
+          <div className='my-6'>
             <SeparatorWithOr />
-            <div className='mt-4'>
-              <GoogleSignInForm />
-            </div>
           </div>
+          <GoogleSignInForm />
         </CardContent>
       </Card>
-      <SeparatorWithOr>
-        {t('NewToSite', { siteName: site.name })}
-      </SeparatorWithOr>
+
+      <div className='my-6'>
+        <SeparatorWithOr>
+          {t('NewToSite', { siteName: site.name })}
+        </SeparatorWithOr>
+      </div>
 
       <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
         <Button className='w-full' variant='outline'>
