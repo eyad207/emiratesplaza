@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { cache } from 'react'
 import {
   getAllCategoriesWithTranslation,
   getAllTagsWithTranslation,
@@ -18,19 +19,33 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { EllipsisVerticalIcon } from 'lucide-react'
 
+// Cached fetchers (will only hit DB once per build/revalidate period)
+const getCachedCategories = cache(getAllCategoriesWithTranslation)
+const getCachedTags = cache(getAllTagsWithTranslation)
+const getCachedSettings = cache(getSetting)
+
 export default async function Header() {
   const locale = (await getLocale()) as 'ar' | 'en-US' | 'nb-NO'
-  const translatedTags = await getAllTagsWithTranslation(locale)
-  const translatedCategories = await getAllCategoriesWithTranslation(locale)
-  const { site } = await getSetting()
-  const t = await getTranslations()
+
+  // Fetch everything in parallel
+  const [translatedTags, translatedCategories, settings, t] = await Promise.all(
+    [
+      getCachedTags(locale),
+      getCachedCategories(locale),
+      getCachedSettings(),
+      getTranslations(),
+    ]
+  )
+
+  const { site } = settings
+
   return (
     <HeaderWrapper>
       <header className='bg-header text-white w-full'>
         {/* Main header row */}
         <div className='w-full px-3 sm:px-6 lg:px-8'>
           <div className='flex items-center justify-between py-2 sm:py-3'>
-            {/* Left section with logo */}
+            {/* Left: Logo */}
             <div className='flex items-center shrink-0'>
               <Link
                 href='/'
@@ -48,33 +63,37 @@ export default async function Header() {
                   {site.name}
                 </span>
               </Link>
-            </div>{' '}
-            {/* Center section with search - conditionally styled for different screen sizes */}
+            </div>
+
+            {/* Center: Search */}
             <div className='flex-1 px-2 max-w-xl mx-auto'>
               <HeaderSearch
                 compact={true}
                 categories={translatedCategories.map((c) => c.original)}
               />
             </div>
-            {/* Menu with user controls */}
+
+            {/* Desktop Menu */}
             <div className='flex-shrink-0 hidden nav:flex'>
               <Menu />
             </div>
-            {/* Mobile menu button */}
+
+            {/* Mobile Menu */}
             <div className='nav:hidden flex items-center'>
               <Menu />
             </div>
           </div>
         </div>
 
-        {/* Navigation bar - Full width */}
+        {/* Navigation Bar */}
         <div className='w-full bg-header-darker border-t border-white/10'>
           <div className='flex items-center justify-between py-2 px-3 sm:px-6 lg:px-8 max-w-[2000px] mx-auto'>
-            {/* Sidebar trigger (categories) */}{' '}
+            {/* Sidebar */}
             <div className='flex-shrink-0'>
               <Sidebar categories={translatedCategories} />
             </div>
-            {/* Desktop nav links */}
+
+            {/* Desktop Nav Links */}
             <div className='hidden nav:flex items-center flex-wrap gap-x-6 overflow-hidden px-4'>
               {translatedTags.map((tag) => (
                 <Link
@@ -104,7 +123,8 @@ export default async function Header() {
                 {t('Header.Contact Us')}
               </Link>
             </div>
-            {/* Mobile/tablet menu dropdown */}
+
+            {/* Mobile Dropdown */}
             <div className='nav:hidden flex items-center'>
               <DropdownMenu>
                 <DropdownMenuTrigger className='rounded-md hover:bg-white/10 transition-colors p-1.5'>
