@@ -118,21 +118,26 @@ const InfiniteProductList: React.FC = () => {
   return (
     <>
       <div
-        className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4
-                   px-4 sm:px-6 md:px-8'
+        className='grid gap-3 sm:gap-4 lg:gap-6 
+                    grid-cols-2 
+                    sm:grid-cols-4 
+                    md:grid-cols-4 
+                    lg:grid-cols-4 
+                    xl:grid-cols-4
+                    2xl:grid-cols-4'
       >
         {products.map((product, idx) => (
           <div
             key={product._id}
             ref={idx === products.length - 1 ? loadMoreRef : null}
-            className='transition-shadow duration-300 hover:shadow-lg rounded-md'
+            className='transition-all duration-300 hover:shadow-lg' // Removed hover:scale-105 to prevent overlap
           >
             <ProductCard
               product={product}
               hideAddToCartButton={false}
               hideBrandOnMobile={false}
               isInInfiniteList
-              className='w-full max-w-xs mx-auto'
+              className='h-full w-full max-w-sm mx-auto' // Responsive sizing
             />
           </div>
         ))}
