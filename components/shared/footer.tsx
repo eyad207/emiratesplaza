@@ -3,9 +3,7 @@ import { memo, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useLocale, useTranslations } from 'next-intl'
-import { usePathname, useRouter } from '@/i18n/routing'
-import { i18n } from '@/i18n-config'
+import { useTranslations } from 'next-intl'
 import useSettingStore from '@/hooks/use-setting-store'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,22 +21,11 @@ const ChevronUp = dynamic(
 )
 
 function FooterComponent() {
-  const router = useRouter()
-  const pathname = usePathname()
   const {
     setting: { site, availableCurrencies, currency },
     setCurrency,
   } = useSettingStore()
-  const { locales } = i18n
-  const locale = useLocale()
   const t = useTranslations()
-
-  const handleLocaleChange = useCallback(
-    (value: string) => {
-      router.push(pathname, { locale: value })
-    },
-    [pathname, router]
-  )
 
   const handleCurrencyChange = useCallback(
     (value: string) => {
@@ -70,20 +57,6 @@ function FooterComponent() {
                 height={56}
                 priority
               />
-
-              {/* Locale Selector */}
-              <Select value={locale} onValueChange={handleLocaleChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder='Language' />
-                </SelectTrigger>
-                <SelectContent>
-                  {locales.map((lang, index) => (
-                    <SelectItem key={index} value={lang.code}>
-                      <span className='text-lg'>{lang.icon}</span> {lang.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
 
               {/* Currency Selector */}
               <Select value={currency} onValueChange={handleCurrencyChange}>
