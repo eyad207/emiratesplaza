@@ -227,6 +227,7 @@ const CheckoutForm = () => {
             <Button
               className='rounded-full w-full'
               onClick={handleSelectItemsAndShipping}
+              disabled={items.some((it) => it.quantity === 0)}
             >
               {t('continueToItems')}
             </Button>
@@ -240,6 +241,7 @@ const CheckoutForm = () => {
             <Button
               className='rounded-full w-full'
               onClick={handleSelectPaymentMethod}
+              disabled={items.some((it) => it.quantity === 0)}
             >
               {t('continueToPayment')}
             </Button>
@@ -250,7 +252,11 @@ const CheckoutForm = () => {
         )}
         {isPaymentMethodSelected && isAddressSelected && isItemsSelected && (
           <div>
-            <Button onClick={handlePlaceOrder} className='rounded-full w-full'>
+            <Button
+              onClick={handlePlaceOrder}
+              className='rounded-full w-full'
+              disabled={items.some((it) => it.quantity === 0)}
+            >
               {t('placeYourOrder')}
             </Button>
           </div>
@@ -665,7 +671,7 @@ const CheckoutForm = () => {
                                   size='sm'
                                   className='h-8 w-8 p-0 text-muted-foreground hover:text-destructive'
                                   onClick={() => removeItem(item)}
-                                  title={t('removeItem')}
+                                  title={'0'}
                                 >
                                   <TrashIcon className='w-4 h-4' />
                                 </Button>
@@ -734,6 +740,7 @@ const CheckoutForm = () => {
                     <Button
                       onClick={handleSelectItemsAndShipping}
                       className='rounded-full font-bold'
+                      disabled={items.some((it) => it.quantity === 0)}
                     >
                       {t('continueToItems')}
                     </Button>
@@ -832,7 +839,11 @@ const CheckoutForm = () => {
 
               <Card className='hidden md:block '>
                 <CardContent className='p-4 flex flex-col md:flex-row justify-between items-center gap-3'>
-                  <Button onClick={handlePlaceOrder} className='rounded-full'>
+                  <Button
+                    onClick={handlePlaceOrder}
+                    className='rounded-full'
+                    disabled={items.some((it) => it.quantity === 0)}
+                  >
                     {t('placeYourOrder')}
                   </Button>
                   <div className='flex-1'>

@@ -43,6 +43,25 @@ export const createOrderFromCart = async (
   clientSideCart: Cart,
   userId: string
 ) => {
+  // ✅ Quantity validation
+  if (
+    !Array.isArray(clientSideCart.items) ||
+    clientSideCart.items.length === 0
+  ) {
+    throw new Error('Cart is empty')
+  }
+
+  for (const item of clientSideCart.items) {
+    if (
+      typeof item.quantity !== 'number' ||
+      item.quantity <= 0 ||
+      Number.isNaN(item.quantity)
+    ) {
+      throw new Error(`Invalid quantity for product ${item.product}`)
+    }
+  }
+
+  // ✅ Recalculate delivery date & prices on server
   const cart = {
     ...clientSideCart,
     ...calcDeliveryDateAndPrice({
@@ -52,6 +71,7 @@ export const createOrderFromCart = async (
     }),
   }
 
+  // ✅ Parse & validate full order
   const order = OrderInputSchema.parse({
     user: userId,
     items: cart.items,
@@ -63,6 +83,7 @@ export const createOrderFromCart = async (
     totalPrice: cart.totalPrice,
     expectedDeliveryDate: cart.expectedDeliveryDate,
   })
+
   return await Order.create(order)
 }
 

@@ -41,6 +41,8 @@ export default function CartSidebar() {
   const t = useTranslations()
   const locale = useLocale()
   const rtl = getDirection(locale) === 'rtl'
+  // Calculate total quantity in cart
+  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
 
   useEffect(() => {
     if (isOpen) {
@@ -244,7 +246,7 @@ export default function CartSidebar() {
                     className={cn(
                       buttonVariants({ size: 'sm' }),
                       'w-full',
-                      items.length === 0 && 'opacity-50 pointer-events-none' // Disable button if cart is empty
+                      totalQuantity === 0 && 'opacity-50 pointer-events-none'
                     )}
                     onClick={closeSidebar}
                   >
@@ -255,7 +257,7 @@ export default function CartSidebar() {
                     className={cn(
                       buttonVariants({ variant: 'outline', size: 'sm' }),
                       'w-full',
-                      items.length === 0 && 'opacity-50 pointer-events-none' // Disable button if cart is empty
+                      totalQuantity === 0 && 'opacity-50 pointer-events-none'
                     )}
                     onClick={closeSidebar}
                   >
