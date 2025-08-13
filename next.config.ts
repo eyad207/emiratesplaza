@@ -5,7 +5,8 @@ const nextConfig: NextConfig = withNextIntl()({
   experimental: {
     // Enable experimental features for better performance
     webpackBuildWorker: true,
-    optimizeCss: true,
+    // Disable optimizeCss to avoid critters dependency issue
+    // optimizeCss: true,
   },
   images: {
     remotePatterns: [
