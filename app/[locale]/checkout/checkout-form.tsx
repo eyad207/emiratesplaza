@@ -251,39 +251,10 @@ const CheckoutForm = () => {
       return
     }
 
+    // Just set the payment method as selected
     setIsAddressSelected(true)
     setIsItemsSelected(true)
     setIsPaymentMethodSelected(true)
-
-    // If "Pay Here" is selected, proceed to payment form
-    if (paymentMethod === 'Pay Here') {
-      // Create order first, then redirect to payment
-      const res = await createOrder({
-        items,
-        shippingAddress,
-        expectedDeliveryDate: calculateFutureDate(
-          availableDeliveryDates[deliveryDateIndex!].daysToDeliver
-        ),
-        deliveryDateIndex,
-        paymentMethod: 'Stripe', // Default to Stripe for Pay Here
-        itemsPrice,
-        shippingPrice,
-        taxPrice,
-        totalPrice,
-      })
-      if (!res.success) {
-        toast({
-          description: res.message,
-          variant: 'destructive',
-        })
-      } else {
-        router.push(`/checkout/${res.data?.orderId}`)
-      }
-    } else if (paymentMethod === 'Cash On Delivery') {
-      // For "Pay in Store (Cash)", set the payment method to Cash On Delivery
-      // The user will see the "Place Your Order" button to complete the order
-      setPaymentMethod('Cash On Delivery')
-    }
   }
   const handleSelectItemsAndShipping = () => {
     // Validate cart before proceeding to next step
