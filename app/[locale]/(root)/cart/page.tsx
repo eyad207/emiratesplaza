@@ -26,6 +26,14 @@ import {
 } from '@/components/ui/select'
 import { formatPrice } from '@/lib/currency'
 import { useEffect } from 'react'
+import { cn } from '@/lib/utils'
+import { useToast } from '@/hooks/use-toast'
+import { useSearchParams, useRouter } from 'next/navigation'
+import {
+  isCartReadyForCheckout,
+  hasInvalidQuantities,
+  getInvalidQuantityItems,
+} from '@/lib/cart-validation-client'
 
 export default function Cart() {
   const {
@@ -36,10 +44,80 @@ export default function Cart() {
   } = useCartStore()
 
   const t = useTranslations()
+  const { toast } = useToast()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // Validate cart state
+  const cartIsReady = isCartReadyForCheckout({
+    items,
+    itemsPrice,
+    totalPrice,
+    taxPrice: taxPrice || 0,
+    shippingPrice: shippingPrice || 0,
+  })
+  const invalidQuantityItems = getInvalidQuantityItems(items)
+  const hasInvalidItems = hasInvalidQuantities(items)
 
   useEffect(() => {
     refreshCartStock()
   }, [refreshCartStock])
+
+  // Handle error messages from checkout redirect
+  useEffect(() => {
+    const error = searchParams?.get('error')
+    if (error) {
+      let errorMessage = ''
+
+      switch (error) {
+        case 'empty-cart':
+          errorMessage = t('Cart.Your cart is empty')
+          break
+        case 'invalid-quantities':
+          errorMessage = t('Cart.Please fix invalid quantities before checkout')
+          break
+        case 'invalid-cart':
+          errorMessage = t(
+            'Cart.Invalid cart data Please refresh and try again'
+          )
+          break
+        default:
+          errorMessage = t(
+            'Cart.Unable to proceed to checkout Please check your cart'
+          )
+      }
+
+      if (errorMessage) {
+        toast({
+          description: errorMessage,
+          variant: 'destructive',
+        })
+
+        // Clean up the URL by removing the error parameter
+        const newSearchParams = new URLSearchParams(
+          searchParams ? searchParams.toString() : ''
+        )
+        newSearchParams.delete('error')
+        const newUrl = `/cart${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`
+        router.replace(newUrl)
+      }
+    }
+  }, [searchParams, toast, t, router])
+
+  // Handle checkout button click with validation
+  const handleCheckoutClick = (e: React.MouseEvent) => {
+    if (!cartIsReady || hasInvalidItems) {
+      e.preventDefault()
+
+      if (invalidQuantityItems.length > 0) {
+        toast({
+          description: t('Cart.Please fix invalid quantities before checkout'),
+          variant: 'destructive',
+        })
+      }
+      return
+    }
+  }
 
   if (items.length === 0) {
     return <EmptyCart />
@@ -212,9 +290,30 @@ export default function Cart() {
               </div>
 
               <div className='pt-4'>
+                {/* Show validation warning if cart has issues */}
+                {(hasInvalidItems || invalidQuantityItems.length > 0) && (
+                  <div className='mb-3 p-2 bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300 rounded-md text-sm'>
+                    <div className='font-medium mb-1'>
+                      {t('Cart.Cart Issues')}
+                    </div>
+                    {invalidQuantityItems.map((item) => (
+                      <div key={`${item.slug}-validation`} className='text-xs'>
+                        • {item.name}: {t('Cart.Invalid quantity')} (
+                        {item.quantity})
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <Link
                   href='/checkout'
-                  className={buttonVariants({ size: 'lg' }) + ' w-full'}
+                  className={cn(
+                    buttonVariants({ size: 'lg' }),
+                    'w-full',
+                    (!cartIsReady || hasInvalidItems) &&
+                      'opacity-50 pointer-events-none'
+                  )}
+                  onClick={handleCheckoutClick}
                 >
                   {t('Cart.Checkout')}
                 </Link>

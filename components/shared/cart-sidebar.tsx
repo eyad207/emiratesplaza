@@ -15,13 +15,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { ShoppingBag, TrashIcon, X } from 'lucide-react'
+import { ShoppingBag, TrashIcon, X, AlertTriangle } from 'lucide-react'
 import useSettingStore from '@/hooks/use-setting-store'
 import ProductPrice from './product/product-price'
 import { useLocale, useTranslations } from 'next-intl'
 import { getDirection } from '@/i18n-config'
 import { useCartSidebarStore } from '@/hooks/use-cart-sidebar-store'
 import { motion, AnimatePresence } from 'framer-motion'
+import {
+  hasInvalidQuantities,
+  getInvalidQuantityItems,
+} from '@/lib/cart-validation-client'
+import { useToast } from '@/hooks/use-toast'
 
 export default function CartSidebar() {
   const { isOpen, closeSidebar } = useCartSidebarStore()
@@ -41,14 +46,42 @@ export default function CartSidebar() {
   const t = useTranslations()
   const locale = useLocale()
   const rtl = getDirection(locale) === 'rtl'
+  const { toast } = useToast()
+
   // Calculate total quantity in cart
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
+  const invalidItems = getInvalidQuantityItems(items)
+  const canProceedToCheckout = totalQuantity > 0 && !hasInvalidQuantities(items)
 
   useEffect(() => {
     if (isOpen) {
       refreshCartStock() // Correctly call refreshCartStock from useCartStore
     }
   }, [isOpen, refreshCartStock])
+
+  // Handle checkout click with validation
+  const handleCheckoutClick = (e: React.MouseEvent) => {
+    if (!canProceedToCheckout) {
+      e.preventDefault()
+
+      if (totalQuantity === 0) {
+        toast({
+          description: t('Cart.Your cart is empty'),
+          variant: 'destructive',
+        })
+        return
+      }
+
+      if (invalidItems.length > 0) {
+        toast({
+          description: t('Cart.Please fix invalid quantities before checkout'),
+          variant: 'destructive',
+        })
+        return
+      }
+    }
+    closeSidebar()
+  }
 
   if (!isOpen) {
     return null // Sidebar is not open, so don't render it
@@ -112,95 +145,108 @@ export default function CartSidebar() {
                       {t('Cart.Your Shopping Cart is empty')}
                     </div>
                   ) : (
-                    items.map((item) => (
-                      <div
-                        key={item.clientId}
-                        className='p-3 hover:bg-muted/20 transition-colors'
-                      >
-                        <div className='flex gap-3 items-center'>
-                          <Link
-                            href={`/product/${item.slug}`}
-                            className='shrink-0'
-                            onClick={closeSidebar}
-                          >
-                            <div className='relative h-16 w-16 rounded-md overflow-hidden border border-border/30'>
-                              <Image
-                                src={item.image}
-                                alt={item.name}
-                                fill
-                                sizes='64px'
-                                className='object-contain'
-                              />
-                            </div>
-                          </Link>
-                          <div className='flex-1 min-w-0'>
+                    items.map((item) => {
+                      const isInvalidItem = invalidItems.includes(item)
+                      return (
+                        <div
+                          key={item.clientId}
+                          className={cn(
+                            'p-3 hover:bg-muted/20 transition-colors',
+                            isInvalidItem &&
+                              'bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800'
+                          )}
+                        >
+                          <div className='flex gap-3 items-center'>
                             <Link
                               href={`/product/${item.slug}`}
-                              className='font-medium text-sm line-clamp-1 hover:text-primary transition-colors'
+                              className='shrink-0'
                               onClick={closeSidebar}
                             >
-                              {item.name}
-                            </Link>
-                            <div className='text-muted-foreground text-xs mt-1'>
-                              {item.color && (
-                                <span className='mr-2'>
-                                  {t('Cart.Color')}: {item.color}
-                                </span>
-                              )}
-                              {item.size && (
-                                <span>
-                                  {t('Cart.Size')}: {item.size}
-                                </span>
-                              )}
-                            </div>
-                            <div className='flex items-center justify-between mt-2'>
-                              <div className='font-medium text-sm'>
-                                <ProductPrice price={item.price} plain />
+                              <div className='relative h-16 w-16 rounded-md overflow-hidden border border-border/30'>
+                                <Image
+                                  src={item.image}
+                                  alt={item.name}
+                                  fill
+                                  sizes='64px'
+                                  className='object-contain'
+                                />
                               </div>
-                              <div className='flex items-center gap-2'>
-                                <Select
-                                  value={item.quantity.toString()}
-                                  onValueChange={(value) => {
-                                    const newQuantity = Number(value)
-                                    updateItem(item, newQuantity) // Automatically removes the item if quantity is 0
-                                  }}
-                                >
-                                  <SelectTrigger className='text-xs h-7 w-14 px-2'>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {Array.from({
-                                      length:
-                                        item.colors
-                                          .find((c) => c.color === item.color)
-                                          ?.sizes.find(
-                                            (s) => s.size === item.size
-                                          )?.countInStock || 0,
-                                    }).map((_, i) => (
-                                      <SelectItem
-                                        value={(i + 1).toString()}
-                                        key={i + 1}
-                                      >
-                                        {i + 1}
-                                      </SelectItem>
-                                    ))}
-                                    <SelectItem value='0'>Remove</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Button
-                                  variant='ghost'
-                                  size='sm'
-                                  className='h-7 w-7 p-0 text-muted-foreground hover:text-destructive'
-                                  onClick={() => removeItem(item)}
-                                >
-                                  <TrashIcon className='w-4 h-4' />
-                                </Button>
+                            </Link>
+                            <div className='flex-1 min-w-0'>
+                              <Link
+                                href={`/product/${item.slug}`}
+                                className='font-medium text-sm line-clamp-1 hover:text-primary transition-colors'
+                                onClick={closeSidebar}
+                              >
+                                {item.name}
+                              </Link>
+                              <div className='text-muted-foreground text-xs mt-1'>
+                                {item.color && (
+                                  <span className='mr-2'>
+                                    {t('Cart.Color')}: {item.color}
+                                  </span>
+                                )}
+                                {item.size && (
+                                  <span>
+                                    {t('Cart.Size')}: {item.size}
+                                  </span>
+                                )}
+                              </div>
+                              {isInvalidItem && (
+                                <div className='text-red-600 dark:text-red-400 text-xs mt-1 flex items-center gap-1'>
+                                  <AlertTriangle className='h-3 w-3' />
+                                  {t('Cart.Invalid quantity')}
+                                </div>
+                              )}
+                              <div className='flex items-center justify-between mt-2'>
+                                <div className='font-medium text-sm'>
+                                  <ProductPrice price={item.price} plain />
+                                </div>
+                                <div className='flex items-center gap-2'>
+                                  <Select
+                                    value={item.quantity.toString()}
+                                    onValueChange={(value) => {
+                                      const newQuantity = Number(value)
+                                      updateItem(item, newQuantity) // Automatically removes the item if quantity is 0
+                                    }}
+                                  >
+                                    <SelectTrigger className='text-xs h-7 w-14 px-2'>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {Array.from({
+                                        length:
+                                          item.colors
+                                            .find((c) => c.color === item.color)
+                                            ?.sizes.find(
+                                              (s) => s.size === item.size
+                                            )?.countInStock || 0,
+                                      }).map((_, i) => (
+                                        <SelectItem
+                                          value={(i + 1).toString()}
+                                          key={i + 1}
+                                        >
+                                          {i + 1}
+                                        </SelectItem>
+                                      ))}
+                                      <SelectItem value='0'>Remove</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button
+                                    variant='ghost'
+                                    size='sm'
+                                    className='h-7 w-7 p-0 text-muted-foreground hover:text-destructive'
+                                    onClick={() => removeItem(item)}
+                                  >
+                                    <TrashIcon className='w-4 h-4' />
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      )
+                    })
                   )}
                 </div>
               </ScrollArea>
@@ -246,9 +292,9 @@ export default function CartSidebar() {
                     className={cn(
                       buttonVariants({ size: 'sm' }),
                       'w-full',
-                      totalQuantity === 0 && 'opacity-50 pointer-events-none'
+                      !canProceedToCheckout && 'opacity-50 pointer-events-none'
                     )}
-                    onClick={closeSidebar}
+                    onClick={handleCheckoutClick}
                   >
                     {t('Cart.Proceed to Checkout')}
                   </Link>

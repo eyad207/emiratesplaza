@@ -40,6 +40,11 @@ import useCartStore from '@/hooks/use-cart-store'
 import useSettingStore from '@/hooks/use-setting-store'
 import ProductPrice from '@/components/shared/product/product-price'
 import { useTranslations } from 'next-intl'
+import {
+  validateCartClientSide,
+  hasInvalidQuantities,
+  getInvalidQuantityItems,
+} from '@/lib/cart-validation-client'
 
 const shippingAddressDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -64,6 +69,7 @@ const shippingAddressDefaultValues =
 
 const CheckoutForm = () => {
   const t = useTranslations('Checkout')
+  const tCart = useTranslations('Cart')
   const { toast } = useToast()
   const router = useRouter()
   const {
@@ -114,19 +120,86 @@ const CheckoutForm = () => {
     refreshCartStock()
   }, [refreshCartStock])
 
+  // Early validation - redirect if cart is invalid
+  useEffect(() => {
+    if (!isMounted) return
+
+    if (items.length === 0) {
+      toast({
+        description: tCart('Your cart is empty'),
+        variant: 'destructive',
+      })
+      router.push('/cart?error=empty-cart')
+      return
+    }
+
+    // Check if any items have invalid quantities
+    if (hasInvalidQuantities(items)) {
+      toast({
+        description: tCart('Please fix invalid quantities before checkout'),
+        variant: 'destructive',
+      })
+      router.push('/cart?error=invalid-quantities')
+      return
+    }
+  }, [items, isMounted, router, tCart, toast])
+
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false)
   const [isItemsSelected, setIsItemsSelected] = useState<boolean>(false)
   const [isPaymentMethodSelected, setIsPaymentMethodSelected] =
     useState<boolean>(false)
 
   const handlePlaceOrder = async () => {
-    // Check if any item has a quantity of 0
-    const invalidItems = items.filter((item) => item.quantity === 0)
-    if (invalidItems.length > 0) {
-      toast({
-        description: t(
-          'Please remove items with zero quantity before placing your order'
+    // Comprehensive cart validation
+    const cartValidation = validateCartClientSide({
+      items,
+      itemsPrice,
+      totalPrice,
+      taxPrice: taxPrice || 0,
+      shippingPrice: shippingPrice || 0,
+    })
+
+    // Check for invalid quantities
+    const invalidQuantityItems = getInvalidQuantityItems(items)
+
+    if (!cartValidation.isValid || invalidQuantityItems.length > 0) {
+      const errorMessages = [
+        ...cartValidation.errors,
+        ...invalidQuantityItems.map(
+          (item) => `${item.name}: Invalid quantity (${item.quantity})`
         ),
+      ]
+
+      toast({
+        description:
+          errorMessages.length > 0
+            ? errorMessages.join('; ')
+            : t('Please fix cart issues before placing your order'),
+        variant: 'destructive',
+      })
+      return
+    }
+
+    // Check required fields
+    if (!shippingAddress) {
+      toast({
+        description: t('Shipping address is required'),
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (!paymentMethod) {
+      toast({
+        description: t('Payment method is required'),
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (deliveryDateIndex === undefined) {
+      toast({
+        description: t('Delivery date is required'),
         variant: 'destructive',
       })
       return
@@ -165,6 +238,19 @@ const CheckoutForm = () => {
     }
   }
   const handleSelectPaymentMethod = async () => {
+    // Validate cart before proceeding to payment
+    const invalidQuantityItems = getInvalidQuantityItems(items)
+
+    if (hasInvalidQuantities(items) || invalidQuantityItems.length > 0) {
+      toast({
+        description: t(
+          'Please fix invalid quantities before proceeding to payment'
+        ),
+        variant: 'destructive',
+      })
+      return
+    }
+
     setIsAddressSelected(true)
     setIsItemsSelected(true)
     setIsPaymentMethodSelected(true)
@@ -200,6 +286,17 @@ const CheckoutForm = () => {
     }
   }
   const handleSelectItemsAndShipping = () => {
+    // Validate cart before proceeding to next step
+    const invalidQuantityItems = getInvalidQuantityItems(items)
+
+    if (hasInvalidQuantities(items) || invalidQuantityItems.length > 0) {
+      toast({
+        description: t('Please fix invalid quantities before proceeding'),
+        variant: 'destructive',
+      })
+      return
+    }
+
     setIsAddressSelected(true)
     setIsItemsSelected(true)
   }
