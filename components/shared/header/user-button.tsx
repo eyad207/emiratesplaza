@@ -20,8 +20,18 @@ export default async function UserButton() {
   return (
     <div className='flex gap-2 items-center'>
       <DropdownMenu>
-        <DropdownMenuTrigger className='header-button hidden nav:flex' asChild>
-          <div className='flex items-center'>
+        <DropdownMenuTrigger
+          className='header-button hidden nav:flex'
+          asChild
+          aria-label={
+            session
+              ? `User menu for ${session.user.name}`
+              : 'User account menu - sign in or sign up'
+          }
+          aria-expanded={false}
+          aria-haspopup='menu'
+        >
+          <div className='flex items-center' role='button' tabIndex={0}>
             <div className='flex flex-col text-xs text-left'>
               <span>
                 {t('Header.Hello')},{' '}
@@ -29,7 +39,10 @@ export default async function UserButton() {
               </span>
               <span className='font-bold'>{t('Header.Account & Orders')}</span>
             </div>
-            <ChevronDownIcon className='transition-transform duration-200' />
+            <ChevronDownIcon
+              className='transition-transform duration-200'
+              aria-hidden='true'
+            />
           </div>
         </DropdownMenuTrigger>
         {session ? (
@@ -37,6 +50,8 @@ export default async function UserButton() {
             className='w-56 bg-white text-black shadow-md rounded-lg p-2'
             align='end'
             forceMount
+            role='menu'
+            aria-label='User account menu'
           >
             <DropdownMenuLabel className='font-normal'>
               <div className='flex flex-col space-y-1'>
@@ -48,21 +63,33 @@ export default async function UserButton() {
                 </p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuGroup>
+            <DropdownMenuGroup role='group' aria-label='Account actions'>
               <Link className='w-full' href='/account'>
-                <DropdownMenuItem className='hover:bg-primary/10 transition-colors'>
+                <DropdownMenuItem
+                  className='hover:bg-primary/10 transition-colors'
+                  role='menuitem'
+                  aria-label='Go to your account page'
+                >
                   {t('Header.Your account')}
                 </DropdownMenuItem>
               </Link>
               <Link className='w-full' href='/account/orders'>
-                <DropdownMenuItem className='hover:bg-primary/10 transition-colors'>
+                <DropdownMenuItem
+                  className='hover:bg-primary/10 transition-colors'
+                  role='menuitem'
+                  aria-label='View your orders'
+                >
                   {t('Header.Your orders')}
                 </DropdownMenuItem>
               </Link>
 
               {session.user.role === 'Admin' && (
                 <Link className='w-full' href='/admin/overview'>
-                  <DropdownMenuItem className='hover:bg-primary/10 transition-colors'>
+                  <DropdownMenuItem
+                    className='hover:bg-primary/10 transition-colors'
+                    role='menuitem'
+                    aria-label='Go to admin dashboard'
+                  >
                     {t('Header.Admin')}
                   </DropdownMenuItem>
                 </Link>
@@ -73,6 +100,9 @@ export default async function UserButton() {
                 <Button
                   className='w-full py-4 px-2 h-4 justify-start'
                   variant='ghost'
+                  type='submit'
+                  role='menuitem'
+                  aria-label='Sign out of your account'
                 >
                   {t('Header.Sign out')}
                 </Button>
@@ -84,6 +114,8 @@ export default async function UserButton() {
             className='w-56 bg-white text-black shadow-lg rounded-xl p-2 border border-gray-200'
             align='end'
             forceMount
+            role='menu'
+            aria-label='Account sign in menu'
           >
             {/* Main actions */}
             <DropdownMenuGroup>
@@ -144,6 +176,8 @@ export default async function UserButton() {
             <Button
               className='w-full py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
               variant='ghost'
+              type='submit'
+              aria-label='Sign out of your account'
             >
               {t('Header.Sign out')}
             </Button>
@@ -152,6 +186,7 @@ export default async function UserButton() {
           <Link
             href='/sign-in'
             className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
+            aria-label='Go to sign in page'
           >
             {t('Header.Sign in')}
           </Link>

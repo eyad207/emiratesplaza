@@ -14,21 +14,29 @@ import Tag from '@/lib/db/models/tag.model'
 import { connectToDatabase } from '@/lib/db'
 import InfiniteProductList from '@/components/shared/infinite-product-list'
 
-// Add cache configuration
-export const runtime = 'nodejs' // or 'edge'
+// Optimize cache configuration for better performance
+export const runtime = 'nodejs'
 export const preferredRegion = 'auto'
-export const dynamic = 'force-dynamic'
-export const revalidate = 60 // revalidate every minute
+export const revalidate = 300 // revalidate every 5 minutes instead of forcing dynamic
 
 export default async function HomePage() {
+  // Parallel data fetching for better performance
   const [t, { carousels }, tags] = await Promise.all([
     getTranslations('Home'),
     getSetting(),
-    connectToDatabase().then(() => Tag.find().sort({ name: 1 }).lean()),
+    connectToDatabase().then(() =>
+      Tag.find()
+        .sort({ name: 1 })
+        .limit(8) // Limit to reduce data load
+        .lean()
+        .exec()
+    ),
   ])
 
+  // Optimize: Only fetch products for the first few tags to reduce load time
+  const limitedTags = tags.slice(0, 6) // Only process first 6 tags
   const tagsWithProducts = await Promise.all(
-    tags.map(async (tag) => {
+    limitedTags.map(async (tag) => {
       const products = await getProductsByTag({
         tag: tag._id.toString(),
         limit: 4,

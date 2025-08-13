@@ -260,6 +260,8 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
         size='icon'
         className='absolute left-0 top-1/2 -translate-y-1/2 z-10 rounded-full bg-background/80 backdrop-blur-sm dark:bg-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-700 w-7 h-7 sm:w-8 sm:h-8'
         onClick={scrollPrev}
+        aria-label='Previous card'
+        disabled={currentCardIndex === 0}
       >
         <ChevronLeftIcon className='h-3 w-3 sm:h-4 sm:w-4' />
       </Button>
@@ -269,6 +271,8 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
         size='icon'
         className='absolute right-0 top-1/2 -translate-y-1/2 z-10 rounded-full bg-background/80 backdrop-blur-sm dark:bg-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-700 w-7 h-7 sm:w-8 sm:h-8'
         onClick={scrollNext}
+        aria-label='Next card'
+        disabled={currentCardIndex === totalCards - 1}
       >
         <ChevronRightIcon className='h-3 w-3 sm:h-4 sm:w-4' />
       </Button>
@@ -355,7 +359,11 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
       </div>
 
       {/* Pagination indicators - mobile only */}
-      <div className='flex justify-center mt-4 gap-2'>
+      <div
+        className='flex justify-center mt-4 gap-2'
+        role='tablist'
+        aria-label='Card navigation'
+      >
         {Array.from({ length: totalCards }).map((_, index) => (
           <button
             key={index}
@@ -378,7 +386,10 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
                 })
               }
             }}
-            aria-label={`Go to slide ${index + 1}`}
+            aria-label={`Go to card ${index + 1} of ${totalCards}`}
+            role='tab'
+            aria-selected={currentCardIndex === index}
+            tabIndex={currentCardIndex === index ? 0 : -1}
           />
         ))}
       </div>

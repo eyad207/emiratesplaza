@@ -205,6 +205,7 @@ export default function HeaderSearch({
                 ? 'min-w-[40px] xs:min-w-[60px] text-[10px] xs:text-xs'
                 : 'min-w-[70px] xs:min-w-[80px]'
             )}
+            aria-label='Select product category for search'
           >
             <SelectValue placeholder={t('Header.All')} />
           </SelectTrigger>
@@ -239,13 +240,21 @@ export default function HeaderSearch({
             onFocus={() => {
               if (suggestions.length > 0) setShowSuggestions(true)
             }}
-            onKeyDown={(e) => {
+            onKeyDown={(e: React.KeyboardEvent) => {
               if (e.key === 'Enter' && selectedIndex === -1) {
                 e.preventDefault()
                 handleSearch()
               }
             }}
+            role='searchbox'
+            aria-label='Search for products'
+            aria-autocomplete='list'
+            aria-describedby='search-instructions'
           />
+          <div id='search-instructions' className='sr-only'>
+            Use arrow keys to navigate suggestions, Enter to select, Escape to
+            close
+          </div>
         </div>
 
         {/* Search Button */}
@@ -256,7 +265,7 @@ export default function HeaderSearch({
             heightClass,
             compact ? 'px-1.5 sm:px-2' : 'px-3 sm:px-4'
           )}
-          aria-label={t('Header.Search')}
+          aria-label='Search for products'
         >
           <Search className='w-3 h-3 xs:w-4 xs:h-4' />
         </button>
@@ -267,6 +276,8 @@ export default function HeaderSearch({
         <div
           ref={suggestionsRef}
           className='absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-64 overflow-y-auto'
+          role='listbox'
+          aria-label='Search suggestions'
         >
           <div className='py-2'>
             <div className='px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider'>
@@ -281,9 +292,15 @@ export default function HeaderSearch({
                   index === selectedIndex &&
                     'bg-blue-50 border-r-2 border-blue-500'
                 )}
+                role='option'
+                aria-selected={index === selectedIndex}
+                tabIndex={-1}
               >
                 <div className='flex items-center gap-2'>
-                  <Search className='h-3 w-3 text-gray-400' />
+                  <Search
+                    className='h-3 w-3 text-gray-400'
+                    aria-hidden='true'
+                  />
                   <span className='text-sm text-gray-900'>{suggestion}</span>
                 </div>
               </button>

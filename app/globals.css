@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import '../styles/accessibility-improvements.css';
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }

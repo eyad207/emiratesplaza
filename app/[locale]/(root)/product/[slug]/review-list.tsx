@@ -428,7 +428,12 @@ export default function ReviewList({
           ))}
           <div ref={ref}>
             {page <= totalPages && (
-              <Button variant={'link'} onClick={loadMoreReviews}>
+              <Button
+                variant={'link'}
+                onClick={loadMoreReviews}
+                aria-label={`Load more reviews (showing ${reviews.length} of ${totalPages * 10} total reviews)`}
+                disabled={loadingReviews}
+              >
                 {t('See more reviews')}
               </Button>
             )}

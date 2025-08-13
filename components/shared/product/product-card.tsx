@@ -7,6 +7,7 @@ import { IProduct } from '@/lib/db/models/product.model'
 
 import Rating from './rating'
 import { formatNumber, generateId, round2, cn } from '@/lib/utils'
+import { formatPrice } from '@/lib/currency'
 import ProductPrice from './product-price'
 import ImageHover from './image-hover'
 import AddToCart from './add-to-cart'
@@ -45,7 +46,7 @@ const ProductCard = ({
         <ImageHover
           src={product.images[0]}
           hoverSrc={product.images[1]}
-          alt={product.name}
+          alt={`${product.name} - ${product.brand} product image with hover view${product.description ? ', ' + product.description.substring(0, 50) + '...' : ''}`}
         />
       ) : (
         <div
@@ -56,7 +57,7 @@ const ProductCard = ({
         >
           <Image
             src={product.images[0]}
-            alt={product.name}
+            alt={`${product.name} - ${product.brand} product image${product.description ? ', ' + product.description.substring(0, 50) + '...' : ''}`}
             fill
             sizes='80vw'
             className='object-contain drop-shadow-md'
@@ -149,6 +150,7 @@ const ProductCard = ({
           'hover:border-primary': isInInfiniteList,
         }
       )}
+      aria-label={`View ${product.name} by ${product.brand} - ${formatPrice(product.discountedPrice ?? product.price)} ${product.discount ? `(${product.discount}% off)` : ''}`}
     >
       {' '}
       <ProductImage />
@@ -167,7 +169,10 @@ const ProductCard = ({
       )}
     </Link>
   ) : (
-    <Link href={`/product/${product.slug}`}>
+    <Link
+      href={`/product/${product.slug}`}
+      aria-label={`View ${product.name} by ${product.brand} - ${formatPrice(product.discountedPrice ?? product.price)} ${product.discount ? `(${product.discount}% off)` : ''}`}
+    >
       <Card
         className={cn(
           'flex flex-col group card-professional h-full border-2 border-border/50 hover:border-primary/40 dark:bg-zinc-900 dark:hover:bg-zinc-900 dark:border-zinc-700 dark:hover:border-primary/60 overflow-hidden cursor-pointer',

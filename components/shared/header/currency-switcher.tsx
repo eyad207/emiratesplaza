@@ -43,22 +43,39 @@ export default function CurrencySwitcher() {
         </div>
       )}
       <DropdownMenu>
-        <DropdownMenuTrigger className='header-button h-[41px]'>
+        <DropdownMenuTrigger
+          className='header-button h-[41px]'
+          aria-label={`Current currency: ${currency}. Click to change currency`}
+          aria-expanded={false}
+          aria-haspopup='menu'
+          role='button'
+        >
           <div className='flex items-center gap-1'>
-            <span className='text-xl'>{selectedCurrency?.symbol}</span>
+            <span className='text-xl' aria-hidden='true'>
+              {selectedCurrency?.symbol}
+            </span>
             <span className='hidden sm:inline'>{currency}</span>
-            <ChevronDownIcon />
+            <ChevronDownIcon aria-hidden='true' />
           </div>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className='w-56'>
+        <DropdownMenuContent
+          className='w-56'
+          role='menu'
+          aria-label='Currency selection menu'
+        >
           <DropdownMenuLabel>Currency</DropdownMenuLabel>
           <DropdownMenuRadioGroup
             value={currency}
             onValueChange={handleCurrencyChange}
           >
             {availableCurrencies.map((c) => (
-              <DropdownMenuRadioItem key={c.name} value={c.code}>
+              <DropdownMenuRadioItem
+                key={c.name}
+                value={c.code}
+                role='menuitemradio'
+                aria-label={`Change currency to ${c.code} (${c.name})`}
+              >
                 {c.symbol} {c.code}
               </DropdownMenuRadioItem>
             ))}
