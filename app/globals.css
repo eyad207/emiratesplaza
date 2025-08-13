@@ -269,3 +269,63 @@ body {
 .animate-fadeInScale {
   animation: fadeInScale 0.4s ease-out forwards;
 }
+
+/* Professional loading animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(var(--primary), 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(var(--primary), 0.6);
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.animate-pulseGlow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Loading overlay backdrop animation */
+@keyframes backdropFadeIn {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+.animate-backdropFadeIn {
+  animation: backdropFadeIn 0.3s ease-out forwards;
+}

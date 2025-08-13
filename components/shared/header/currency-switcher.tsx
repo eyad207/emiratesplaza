@@ -13,6 +13,9 @@ import { ChevronDownIcon } from 'lucide-react'
 import useSettingStore from '@/hooks/use-setting-store'
 import { setCurrencyOnServer } from '@/lib/actions/setting.actions'
 import { useRouter } from 'next/navigation'
+import LoadingOverlay, {
+  InlineSpinner,
+} from '@/components/shared/loading-overlay'
 
 export default function CurrencySwitcher() {
   const {
@@ -23,13 +26,17 @@ export default function CurrencySwitcher() {
   const router = useRouter()
 
   const handleCurrencyChange = async (newCurrency: string) => {
-    setLoading(true) // Show loading screen
+    setLoading(true)
     try {
       await setCurrencyOnServer(newCurrency)
       setCurrency(newCurrency)
-      router.refresh() // Refresh the page to reflect changes
+      // Add a small delay to show the loading animation
+      await new Promise((resolve) => setTimeout(resolve, 800))
+      router.refresh()
+    } catch (error) {
+      console.error('Failed to change currency:', error)
     } finally {
-      setLoading(false) // Hide loading screen
+      setLoading(false)
     }
   }
 
@@ -37,11 +44,11 @@ export default function CurrencySwitcher() {
 
   return (
     <>
-      {loading && (
-        <div className='fixed inset-0 flex items-center justify-center bg-black/50 z-50'>
-          <div className='text-white text-lg'>Loading...</div>
-        </div>
-      )}
+      <LoadingOverlay
+        isVisible={loading}
+        type='currency'
+        message='Updating prices and currency...'
+      />
       <DropdownMenu>
         <DropdownMenuTrigger
           className='header-button h-[41px]'
@@ -49,11 +56,16 @@ export default function CurrencySwitcher() {
           aria-expanded={false}
           aria-haspopup='menu'
           role='button'
+          disabled={loading}
         >
           <div className='flex items-center gap-1'>
-            <span className='text-xl' aria-hidden='true'>
-              {selectedCurrency?.symbol}
-            </span>
+            {loading ? (
+              <InlineSpinner size='sm' className='mr-1' />
+            ) : (
+              <span className='text-xl' aria-hidden='true'>
+                {selectedCurrency?.symbol}
+              </span>
+            )}
             <span className='hidden sm:inline'>{currency}</span>
             <ChevronDownIcon aria-hidden='true' />
           </div>
@@ -75,8 +87,18 @@ export default function CurrencySwitcher() {
                 value={c.code}
                 role='menuitemradio'
                 aria-label={`Change currency to ${c.code} (${c.name})`}
+                disabled={loading}
+                className={loading ? 'opacity-50 cursor-not-allowed' : ''}
+                onClick={() => !loading && handleCurrencyChange(c.code)}
               >
-                {c.symbol} {c.code}
+                <div className='flex items-center justify-between w-full'>
+                  <span>
+                    {c.symbol} {c.code}
+                  </span>
+                  {loading && c.code !== currency && (
+                    <InlineSpinner size='sm' />
+                  )}
+                </div>
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>

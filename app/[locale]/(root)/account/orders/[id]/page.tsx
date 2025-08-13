@@ -120,16 +120,6 @@ export default async function OrderDetailsPage(props: {
           </div>
         </CardContent>
       </Card>
-
-      {/* Order Details Form wrapped in a card */}
-      <div className='rounded-lg overflow-hidden border border-border/40 shadow-sm'>
-        <h2 className='font-semibold p-4'>{t('Orders.OrderDetailsForm')}</h2>
-        <OrderDetailsForm
-          order={order}
-          isAdmin={session?.user?.role === 'Admin' || false}
-        />
-      </div>
-
       {/* Expected delivery information */}
       {order.expectedDeliveryDate && (
         <Card className='mt-6'>
@@ -152,6 +142,14 @@ export default async function OrderDetailsPage(props: {
           </CardContent>
         </Card>
       )}
+      {/* Order Details Form wrapped in a card */}
+      <div className='rounded-lg overflow-hidden border border-border/40 shadow-sm'>
+        <h2 className='font-semibold p-4'>{t('Orders.OrderDetailsForm')}</h2>
+        <OrderDetailsForm
+          order={order}
+          isAdmin={session?.user?.role === 'Admin' || false}
+        />
+      </div>
     </>
   )
 }

@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
 
 export default function ErrorPage({
-  error,
   reset,
 }: {
   error: Error
@@ -36,14 +35,9 @@ export default function ErrorPage({
               <h1 className='h1-bold text-foreground mb-4'>
                 {t('Error.Error')}
               </h1>
-              <div className='bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6'>
-                <p className='text-destructive text-sm font-medium leading-relaxed break-words'>
-                  {error.message}
-                </p>
-              </div>
               <p className='text-muted-foreground text-sm'>
-                Something went wrong while processing your request. You can try
-                again or return to the homepage.
+                Could not find the page you were looking for. Please try again
+                or return to the homepage.
               </p>
             </div>
 
