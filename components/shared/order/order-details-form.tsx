@@ -25,6 +25,7 @@ import {
   deliverOrder,
   shipOrder,
   updateOrderToPaid,
+  updateOrderAdminNotes,
 } from '@/lib/actions/order.actions'
 import { useTranslations } from 'next-intl'
 
@@ -53,6 +54,8 @@ export default function OrderDetailsForm({
   const [isPending, startTransition] = useTransition()
   const [isDelivered, setIsDelivered] = useState(initialIsDelivered)
   const [isShipped, setIsShipped] = useState(order.isShipped || false)
+  const [adminNotes, setAdminNotes] = useState(order.adminNotes || '')
+  const [isNotePending, setIsNotePending] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
@@ -138,6 +141,26 @@ export default function OrderDetailsForm({
         })
       }
     })
+  }
+
+  const handleSaveAdminNotes = async () => {
+    setIsNotePending(true)
+    try {
+      const res = await updateOrderAdminNotes(order._id, adminNotes)
+      if (res.success) {
+        toast({
+          description: res.message,
+        })
+        router.refresh()
+      } else {
+        toast({
+          variant: 'destructive',
+          description: res.message,
+        })
+      }
+    } finally {
+      setIsNotePending(false)
+    }
   }
 
   return (
@@ -662,13 +685,16 @@ export default function OrderDetailsForm({
               <textarea
                 className='w-full h-32 p-3 border border-border rounded-lg resize-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors'
                 placeholder='Write internal notes about this order...'
+                value={adminNotes}
+                onChange={(e) => setAdminNotes(e.target.value)}
               />
               <Button
-                disabled={isPending}
+                disabled={isNotePending}
                 size='sm'
                 className='w-full sm:w-auto'
+                onClick={handleSaveAdminNotes}
               >
-                {isPending ? 'Saving...' : 'Save Note'}
+                {isNotePending ? 'Saving...' : 'Save Note'}
               </Button>
             </CardContent>
           </Card>

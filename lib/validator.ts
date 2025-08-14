@@ -138,6 +138,7 @@ export const OrderInputSchema = z.object({
   shippedAt: z.date().optional(),
   isPaid: z.boolean().default(false),
   paidAt: z.date().optional(),
+  adminNotes: z.string().optional(),
 })
 // Cart
 
