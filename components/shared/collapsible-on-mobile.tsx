@@ -9,6 +9,11 @@ import {
 } from '../ui/collapsible'
 import useDeviceType from '@/hooks/use-device-type'
 import { Button } from '../ui/button'
+import {
+  SlidersHorizontalIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from 'lucide-react'
 
 export default function CollapsibleOnMobile({
   title,
@@ -33,9 +38,21 @@ export default function CollapsibleOnMobile({
           <Button
             onClick={() => setOpen(!open)}
             variant={'outline'}
-            className='w-full'
+            className='w-full mb-4 h-12 bg-white/70 dark:bg-zinc-800/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300'
           >
-            {title}
+            <div className='flex items-center justify-between w-full'>
+              <div className='flex items-center gap-3'>
+                <div className='p-1.5 bg-primary/10 rounded-lg'>
+                  <SlidersHorizontalIcon className='h-4 w-4 text-primary' />
+                </div>
+                <span className='font-semibold'>{title}</span>
+              </div>
+              {open ? (
+                <ChevronUpIcon className='h-4 w-4 text-gray-500' />
+              ) : (
+                <ChevronDownIcon className='h-4 w-4 text-gray-500' />
+              )}
+            </div>
           </Button>
         )}
       </CollapsibleTrigger>

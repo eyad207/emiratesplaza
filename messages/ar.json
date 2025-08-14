@@ -189,7 +189,15 @@
     "Did you mean": "هل تقصد",
     "Suggestions": "اقتراحات",
     "Popular": "البحث الشائع",
-    "Query": "بحث"
+    "Query": "بحث",
+    "products found": "منتج موجود",
+    "Showing": "عرض",
+    "Active filters": "الفلاتر النشطة",
+    "Sort by": "ترتيب حسب",
+    "Check spelling": "تحقق من الإملاء",
+    "Try different keywords": "جرب كلمات مفتاحية مختلفة",
+    "Remove filters": "إزالة بعض الفلاتر",
+    "Browse categories": "تصفح فئات مختلفة"
   },
   "Footer": {
     "Select a currency": "حدد عملة",

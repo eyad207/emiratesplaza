@@ -16,7 +16,16 @@ import Rating from '@/components/shared/product/rating'
 import CollapsibleOnMobile from '@/components/shared/collapsible-on-mobile'
 import { getTranslations } from 'next-intl/server'
 import { detectAndCorrectSpelling } from '@/lib/multilingual-search'
-import { SearchIcon, FilterIcon, SortAscIcon, X } from 'lucide-react'
+import {
+  SearchIcon,
+  FilterIcon,
+  SortAscIcon,
+  X,
+  LayoutGridIcon,
+  SlidersHorizontalIcon,
+  ShoppingBagIcon,
+  TrendingUpIcon,
+} from 'lucide-react'
 
 const sortOrders = [
   { value: 'price-low-to-high', name: 'Price: Low to high' },
@@ -130,27 +139,26 @@ export default async function SearchPage(props: {
   const t = await getTranslations()
 
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-zinc-900'>
-      {' '}
+    <div className='min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900'>
       {/* Enhanced Spell Check Suggestion */}
       {spellCheckResult?.isLikelyMisspelled &&
         spellCheckResult.correctedQuery && (
-          <div className='bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b shadow-sm'>
+          <div className='bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900/30 dark:via-indigo-900/30 dark:to-purple-900/30 border-b border-blue-200/50 dark:border-blue-700/50'>
             <div className='container mx-auto px-4 py-4'>
-              <div className='max-w-4xl mx-auto'>
-                <div className='flex items-center gap-3 p-4 bg-white dark:bg-zinc-800 border border-blue-200 dark:border-blue-700 rounded-lg shadow-sm'>
-                  <div className='flex-shrink-0'>
+              <div className='max-w-6xl mx-auto'>
+                <div className='flex items-center gap-4 p-4 bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm border border-blue-200/60 dark:border-blue-700/60 rounded-xl shadow-lg'>
+                  <div className='flex-shrink-0 p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg'>
                     <SearchIcon className='h-5 w-5 text-blue-600 dark:text-blue-400' />
                   </div>
                   <div className='flex-1'>
                     <p className='text-sm text-gray-700 dark:text-gray-300'>
-                      <span className='text-blue-600 dark:text-blue-400 font-medium'>
+                      <span className='text-blue-600 dark:text-blue-400 font-semibold'>
                         {t('Search.Did you mean')}
                       </span>
                       {': '}{' '}
                       <Button
                         variant='link'
-                        className='p-0 h-auto text-lg font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline-offset-2'
+                        className='p-0 h-auto text-lg font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline-offset-2'
                         asChild
                       >
                         <Link
@@ -163,215 +171,269 @@ export default async function SearchPage(props: {
                       <span className='text-blue-600 dark:text-blue-400'>
                         ?
                       </span>
-                    </p>{' '}
+                    </p>
                     <p className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
                       Showing results for &quot;{q}&quot; instead
                     </p>
                   </div>
                 </div>
               </div>
-            </div>{' '}
+            </div>
           </div>
         )}
-      {/* Results and Filters Section */}
-      <div className='container mx-auto px-4 py-6'>
+
+      {/* Main Container */}
+      <div className='container mx-auto px-4 py-8'>
         <div className='max-w-7xl mx-auto'>
-          {/* Results Header */}
-          <Card className='mb-6'>
-            <CardContent className='p-4'>
-              <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
-                <div className='flex items-center gap-2'>
-                  <span className='text-sm text-gray-600 dark:text-gray-400'>
-                    {data.totalProducts === 0
-                      ? t('Search.No')
-                      : `${data.from}-${data.to} ${t('Search.of')} ${data.totalProducts}`}{' '}
-                    {t('Search.results')}
-                  </span>
-                  {/* Active Filters */}
-                  <div className='flex flex-wrap gap-2'>
-                    {q !== 'all' && q !== '' && (
-                      <Badge
-                        variant='secondary'
-                        className='flex items-center gap-1'
-                      >
-                        {t('Search.Query')}: &quot;{q}&quot;
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          className='h-4 w-4 p-0'
-                          asChild
-                        >
-                          <Link
-                            href={getFilterUrl({
-                              params: { ...searchParamsObj, q: 'all' },
-                            })}
+          {/* Search Header with Results Summary */}
+          <div className='mb-8'>
+            <Card className='shadow-lg border-0 bg-white/70 dark:bg-zinc-800/70 backdrop-blur-sm'>
+              <CardContent className='p-6'>
+                <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6'>
+                  {/* Results Summary */}
+                  <div className='space-y-3'>
+                    <div className='flex items-center gap-3'>
+                      <div className='p-2 bg-primary/10 rounded-lg'>
+                        <ShoppingBagIcon className='h-5 w-5 text-primary' />
+                      </div>
+                      <div>
+                        <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
+                          {data.totalProducts === 0
+                            ? t('Search.No products found')
+                            : `${data.totalProducts} ${t('Search.products found')}`}
+                        </h1>
+                        {data.totalProducts > 0 && (
+                          <p className='text-sm text-gray-600 dark:text-gray-400'>
+                            {t('Search.Showing')} {data.from}-{data.to}{' '}
+                            {t('Search.of')} {data.totalProducts}{' '}
+                            {t('Search.results')}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Active Filters */}
+                    {((q !== 'all' && q !== '') ||
+                      (category !== 'all' && category !== '') ||
+                      price !== 'all' ||
+                      rating !== 'all') && (
+                      <div className='flex flex-wrap gap-2'>
+                        <span className='text-sm font-medium text-gray-700 dark:text-gray-300 self-center'>
+                          {t('Search.Active filters')}:
+                        </span>
+
+                        {q !== 'all' && q !== '' && (
+                          <Badge
+                            variant='default'
+                            className='flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors'
                           >
-                            <X className='h-3 w-3' />
-                          </Link>
-                        </Button>
-                      </Badge>
-                    )}
-                    {category !== 'all' && category !== '' && (
-                      <Badge
-                        variant='secondary'
-                        className='flex items-center gap-1'
-                      >
-                        {t('Search.Category')}: {category}
+                            <SearchIcon className='h-3 w-3' />
+                            &quot;{q}&quot;
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              className='h-4 w-4 p-0 hover:bg-primary/20'
+                              asChild
+                            >
+                              <Link
+                                href={getFilterUrl({
+                                  params: { ...searchParamsObj, q: 'all' },
+                                })}
+                              >
+                                <X className='h-3 w-3' />
+                              </Link>
+                            </Button>
+                          </Badge>
+                        )}
+
+                        {category !== 'all' && category !== '' && (
+                          <Badge
+                            variant='secondary'
+                            className='flex items-center gap-2 px-3 py-1'
+                          >
+                            <FilterIcon className='h-3 w-3' />
+                            {category}
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              className='h-4 w-4 p-0'
+                              asChild
+                            >
+                              <Link
+                                href={getFilterUrl({
+                                  category: 'all',
+                                  params: searchParamsObj,
+                                })}
+                              >
+                                <X className='h-3 w-3' />
+                              </Link>
+                            </Button>
+                          </Badge>
+                        )}
+
+                        {price !== 'all' && (
+                          <Badge
+                            variant='secondary'
+                            className='flex items-center gap-2 px-3 py-1'
+                          >
+                            {t('Search.Price')}: {price}
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              className='h-4 w-4 p-0'
+                              asChild
+                            >
+                              <Link
+                                href={getFilterUrl({
+                                  price: 'all',
+                                  params: searchParamsObj,
+                                })}
+                              >
+                                <X className='h-3 w-3' />
+                              </Link>
+                            </Button>
+                          </Badge>
+                        )}
+
+                        {rating !== 'all' && (
+                          <Badge
+                            variant='secondary'
+                            className='flex items-center gap-2 px-3 py-1'
+                          >
+                            {rating}+ ⭐
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              className='h-4 w-4 p-0'
+                              asChild
+                            >
+                              <Link
+                                href={getFilterUrl({
+                                  rating: 'all',
+                                  params: searchParamsObj,
+                                })}
+                              >
+                                <X className='h-3 w-3' />
+                              </Link>
+                            </Button>
+                          </Badge>
+                        )}
+
                         <Button
-                          variant='ghost'
+                          variant='outline'
                           size='sm'
-                          className='h-4 w-4 p-0'
+                          className='h-8 text-xs'
                           asChild
                         >
                           <Link
                             href={getFilterUrl({
                               category: 'all',
-                              params: searchParamsObj,
-                            })}
-                          >
-                            <X className='h-3 w-3' />
-                          </Link>
-                        </Button>
-                      </Badge>
-                    )}
-                    {price !== 'all' && (
-                      <Badge
-                        variant='secondary'
-                        className='flex items-center gap-1'
-                      >
-                        {t('Search.Price')}: {price}
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          className='h-4 w-4 p-0'
-                          asChild
-                        >
-                          <Link
-                            href={getFilterUrl({
                               price: 'all',
-                              params: searchParamsObj,
-                            })}
-                          >
-                            <X className='h-3 w-3' />
-                          </Link>
-                        </Button>
-                      </Badge>
-                    )}
-                    {rating !== 'all' && (
-                      <Badge
-                        variant='secondary'
-                        className='flex items-center gap-1'
-                      >
-                        {t('Search.Rating')}: {rating}+ stars
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          className='h-4 w-4 p-0'
-                          asChild
-                        >
-                          <Link
-                            href={getFilterUrl({
                               rating: 'all',
-                              params: searchParamsObj,
+                              params: { ...searchParamsObj, q: 'all' },
                             })}
                           >
-                            <X className='h-3 w-3' />
+                            {t('Search.Clear All')}
                           </Link>
                         </Button>
-                      </Badge>
+                      </div>
                     )}
-                  </div>{' '}
-                  {/* Clear all filters */}{' '}
-                  {((q !== 'all' && q !== '') ||
-                    (category !== 'all' && category !== '') ||
-                    price !== 'all' ||
-                    rating !== 'all') && (
-                    <Button variant='outline' size='sm' asChild>
-                      <Link
-                        href={getFilterUrl({
-                          category: 'all',
-                          price: 'all',
-                          rating: 'all',
-                          params: { ...searchParamsObj, q: 'all' },
-                        })}
-                      >
-                        {t('Search.Clear All')}
-                      </Link>
-                    </Button>
-                  )}
-                </div>
+                  </div>
 
-                <div className='flex items-center gap-2'>
-                  <SortAscIcon className='h-4 w-4 text-gray-400' />
-                  <ProductSortSelector
-                    sortOrders={sortOrders}
-                    sort={sort}
-                    params={searchParamsObj}
-                  />
+                  {/* Sort Controls */}
+                  <div className='flex items-center gap-3 bg-gray-50 dark:bg-zinc-800 rounded-lg p-3'>
+                    <div className='flex items-center gap-2'>
+                      <SortAscIcon className='h-4 w-4 text-gray-500' />
+                      <span className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                        {t('Search.Sort by')}:
+                      </span>
+                    </div>
+                    <ProductSortSelector
+                      sortOrders={sortOrders}
+                      sort={sort}
+                      params={searchParamsObj}
+                    />
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Main Content Grid */}
-          <div className='grid lg:grid-cols-5 gap-6'>
-            {/* Filters Sidebar */}{' '}
+          {/* Main Content Layout */}
+          <div className='grid lg:grid-cols-4 xl:grid-cols-5 gap-8'>
+            {/* Filters Sidebar */}
             <div className='lg:col-span-1'>
               <CollapsibleOnMobile title={t('Search.Filters')}>
-                <Card>
-                  <CardContent className='p-4 space-y-6'>
+                <Card className='sticky top-6 shadow-lg border-0 bg-white/70 dark:bg-zinc-800/70 backdrop-blur-sm'>
+                  <CardContent className='p-6 space-y-6'>
                     {/* Filters Header */}
-                    <div className='flex items-center gap-2 mb-4'>
-                      <FilterIcon className='h-4 w-4' />
-                      <span className='font-semibold'>
+                    <div className='flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700'>
+                      <div className='p-2 bg-primary/10 rounded-lg'>
+                        <SlidersHorizontalIcon className='h-5 w-5 text-primary' />
+                      </div>
+                      <h2 className='text-lg font-bold text-gray-900 dark:text-white'>
                         {t('Search.Filters')}
-                      </span>
-                    </div>{' '}
+                      </h2>
+                    </div>
+
                     {/* Department Filter */}
-                    <div>
-                      <h3 className='font-semibold text-gray-900 dark:text-white mb-3'>
+                    <div className='space-y-4'>
+                      <h3 className='font-semibold text-gray-900 dark:text-white flex items-center gap-2'>
+                        <LayoutGridIcon className='h-4 w-4 text-primary' />
                         {t('Search.Department')}
                       </h3>
-                      <div className='space-y-2'>
+                      <div className='space-y-2 max-h-48 overflow-y-auto'>
                         <Link
-                          className={`block text-sm hover:text-blue-600 transition-colors ${
-                            ('all' === category || '' === category) &&
-                            'text-blue-600 font-medium'
+                          className={`flex items-center justify-between p-2 rounded-lg text-sm transition-all duration-200 hover:bg-primary/10 ${
+                            'all' === category || '' === category
+                              ? 'bg-primary/10 text-primary font-semibold border border-primary/20'
+                              : 'text-gray-700 dark:text-gray-300 hover:text-primary'
                           }`}
                           href={getFilterUrl({
                             category: 'all',
-                            params: { ...searchParamsObj, q: 'all' }, // Clear search query when viewing all categories
+                            params: { ...searchParamsObj, q: 'all' },
                           })}
                         >
-                          {t('Search.All')}
+                          <span>{t('Search.All')}</span>
+                          {('all' === category || '' === category) && (
+                            <Badge variant='secondary' className='text-xs'>
+                              {data.totalProducts}
+                            </Badge>
+                          )}
                         </Link>
                         {translatedCategories.map((categoryItem) => (
                           <Link
                             key={categoryItem.original}
-                            className={`block text-sm hover:text-blue-600 transition-colors ${
-                              categoryItem.original === category &&
-                              'text-blue-600 font-medium'
+                            className={`flex items-center justify-between p-2 rounded-lg text-sm transition-all duration-200 hover:bg-primary/10 ${
+                              categoryItem.original === category
+                                ? 'bg-primary/10 text-primary font-semibold border border-primary/20'
+                                : 'text-gray-700 dark:text-gray-300 hover:text-primary'
                             }`}
                             href={getFilterUrl({
                               category: categoryItem.original,
-                              params: { ...searchParamsObj, q: 'all' }, // Clear search query when selecting a specific category
+                              params: { ...searchParamsObj, q: 'all' },
                             })}
                           >
-                            {categoryItem.translated}
+                            <span>{categoryItem.translated}</span>
                           </Link>
                         ))}
                       </div>
                     </div>
-                    <Separator />
+
+                    <Separator className='bg-gray-200 dark:bg-gray-700' />
+
                     {/* Price Filter */}
-                    <div>
-                      <h3 className='font-semibold text-gray-900 dark:text-white mb-3'>
+                    <div className='space-y-4'>
+                      <h3 className='font-semibold text-gray-900 dark:text-white flex items-center gap-2'>
+                        <TrendingUpIcon className='h-4 w-4 text-primary' />
                         {t('Search.Price')}
                       </h3>
                       <div className='space-y-2'>
                         <Link
-                          className={`block text-sm hover:text-blue-600 transition-colors ${
-                            'all' === price && 'text-blue-600 font-medium'
+                          className={`flex items-center p-2 rounded-lg text-sm transition-all duration-200 hover:bg-primary/10 ${
+                            'all' === price
+                              ? 'bg-primary/10 text-primary font-semibold border border-primary/20'
+                              : 'text-gray-700 dark:text-gray-300 hover:text-primary'
                           }`}
                           href={getFilterUrl({
                             price: 'all',
@@ -383,8 +445,10 @@ export default async function SearchPage(props: {
                         {prices.map((p) => (
                           <Link
                             key={p.value}
-                            className={`block text-sm hover:text-blue-600 transition-colors ${
-                              p.value === price && 'text-blue-600 font-medium'
+                            className={`flex items-center p-2 rounded-lg text-sm transition-all duration-200 hover:bg-primary/10 ${
+                              p.value === price
+                                ? 'bg-primary/10 text-primary font-semibold border border-primary/20'
+                                : 'text-gray-700 dark:text-gray-300 hover:text-primary'
                             }`}
                             href={getFilterUrl({
                               price: p.value,
@@ -396,16 +460,20 @@ export default async function SearchPage(props: {
                         ))}
                       </div>
                     </div>
-                    <Separator />
+
+                    <Separator className='bg-gray-200 dark:bg-gray-700' />
+
                     {/* Rating Filter */}
-                    <div>
-                      <h3 className='font-semibold text-gray-900 dark:text-white mb-3'>
-                        {t('Search.Customer Review')}
+                    <div className='space-y-4'>
+                      <h3 className='font-semibold text-gray-900 dark:text-white flex items-center gap-2'>
+                        ⭐ {t('Search.Customer Review')}
                       </h3>
                       <div className='space-y-2'>
                         <Link
-                          className={`block text-sm hover:text-blue-600 transition-colors ${
-                            'all' === rating && 'text-blue-600 font-medium'
+                          className={`flex items-center p-2 rounded-lg text-sm transition-all duration-200 hover:bg-primary/10 ${
+                            'all' === rating
+                              ? 'bg-primary/10 text-primary font-semibold border border-primary/20'
+                              : 'text-gray-700 dark:text-gray-300 hover:text-primary'
                           }`}
                           href={getFilterUrl({
                             rating: 'all',
@@ -415,8 +483,10 @@ export default async function SearchPage(props: {
                           {t('Search.All')}
                         </Link>
                         <Link
-                          className={`flex items-center gap-2 text-sm hover:text-blue-600 transition-colors ${
-                            '4' === rating && 'text-blue-600 font-medium'
+                          className={`flex items-center gap-3 p-2 rounded-lg text-sm transition-all duration-200 hover:bg-primary/10 ${
+                            '4' === rating
+                              ? 'bg-primary/10 text-primary font-semibold border border-primary/20'
+                              : 'text-gray-700 dark:text-gray-300 hover:text-primary'
                           }`}
                           href={getFilterUrl({
                             rating: '4',
@@ -432,36 +502,68 @@ export default async function SearchPage(props: {
                 </Card>
               </CollapsibleOnMobile>
             </div>
+
             {/* Products Grid */}
-            <div className='lg:col-span-4'>
+            <div className='lg:col-span-3 xl:col-span-4'>
               {data.products.length === 0 ? (
-                <Card>
-                  <CardContent className='p-8 text-center'>
-                    <div className='text-gray-500 dark:text-gray-400'>
-                      <SearchIcon className='h-12 w-12 mx-auto mb-4 opacity-50' />
-                      <h3 className='text-lg font-semibold mb-2'>
-                        {t('Search.No products found')}
-                      </h3>
-                      <p className='text-sm'>
-                        {t('Search.Try adjusting your search terms or filters')}
-                      </p>
+                <Card className='shadow-lg border-0 bg-white/70 dark:bg-zinc-800/70 backdrop-blur-sm'>
+                  <CardContent className='p-12 text-center'>
+                    <div className='max-w-md mx-auto space-y-6'>
+                      <div className='p-6 bg-gray-100 dark:bg-zinc-700 rounded-full w-24 h-24 mx-auto flex items-center justify-center'>
+                        <SearchIcon className='h-12 w-12 text-gray-400' />
+                      </div>
+                      <div className='space-y-3'>
+                        <h3 className='text-2xl font-bold text-gray-900 dark:text-white'>
+                          {t('Search.No products found')}
+                        </h3>
+                        <p className='text-gray-600 dark:text-gray-400 text-lg'>
+                          {t(
+                            'Search.Try adjusting your search terms or filters'
+                          )}
+                        </p>
+                      </div>
+                      <div className='space-y-2 pt-4'>
+                        <p className='text-sm text-gray-500 dark:text-gray-500 font-medium'>
+                          {t('Search.Suggestions')}:
+                        </p>
+                        <ul className='text-sm text-gray-500 dark:text-gray-400 space-y-1'>
+                          <li>• {t('Search.Check spelling')}</li>
+                          <li>• {t('Search.Try different keywords')}</li>
+                          <li>• {t('Search.Remove filters')}</li>
+                          <li>• {t('Search.Browse categories')}</li>
+                        </ul>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               ) : (
-                <>
-                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+                <div className='space-y-8'>
+                  {/* Products Grid */}
+                  <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6'>
                     {data.products.map((product: IProduct) => (
-                      <ProductCard key={product._id} product={product} />
+                      <div
+                        key={product._id}
+                        className='transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg'
+                      >
+                        <ProductCard product={product} />
+                      </div>
                     ))}
                   </div>
 
+                  {/* Pagination */}
                   {data.totalPages > 1 && (
-                    <div className='mt-8 flex justify-center'>
-                      <Pagination page={page} totalPages={data.totalPages} />
+                    <div className='flex justify-center pt-8'>
+                      <Card className='shadow-lg border-0 bg-white/70 dark:bg-zinc-800/70 backdrop-blur-sm'>
+                        <CardContent className='p-4'>
+                          <Pagination
+                            page={page}
+                            totalPages={data.totalPages}
+                          />
+                        </CardContent>
+                      </Card>
                     </div>
                   )}
-                </>
+                </div>
               )}
             </div>
           </div>

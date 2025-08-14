@@ -193,7 +193,15 @@
     "Did you mean": "Did you mean",
     "Suggestions": "Suggestions",
     "Popular": "Popular searches",
-    "Query": "Search"
+    "Query": "Search",
+    "products found": "products found",
+    "Showing": "Showing",
+    "Active filters": "Active filters",
+    "Sort by": "Sort by",
+    "Check spelling": "Check your spelling",
+    "Try different keywords": "Try different keywords",
+    "Remove filters": "Remove some filters",
+    "Browse categories": "Browse different categories"
   },
   "Footer": {
     "Select a currency": "Select a currency",

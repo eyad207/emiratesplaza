@@ -197,7 +197,7 @@ class MultilingualSearch {
         حقيبة: ['bag', 'handbag', 'purse', 'backpack'],
         نظارة: ['glasses', 'sunglasses', 'eyewear'],
         سوار: ['bracelet', 'wristband'],
-        
+
         // Colors
         أحمر: ['red', 'rød'],
         أزرق: ['blue', 'blå'],
@@ -209,14 +209,14 @@ class MultilingualSearch {
         بني: ['brown', 'brun'],
         وردي: ['pink', 'rosa'],
         بنفسجي: ['purple', 'lilla'],
-        
+
         // Sizes
         صغير: ['small', 's', 'liten'],
         متوسط: ['medium', 'm', 'middels'],
         كبير: ['large', 'l', 'stor'],
         كبير_جدا: ['extra large', 'xl', 'ekstra stor'],
         كبير_جدا_جدا: ['xxl', 'extra extra large'],
-        
+
         // Brands (popular ones)
         أديداس: ['adidas'],
         نايك: ['nike'],
@@ -237,7 +237,7 @@ class MultilingualSearch {
         veske: ['bag', 'handbag', 'purse', 'backpack'],
         briller: ['glasses', 'sunglasses', 'eyewear'],
         armbånd: ['bracelet', 'wristband'],
-        
+
         // Colors
         rød: ['red', 'أحمر'],
         blå: ['blue', 'أزرق'],
@@ -249,13 +249,13 @@ class MultilingualSearch {
         brun: ['brown', 'بني'],
         rosa: ['pink', 'وردي'],
         lilla: ['purple', 'بنفسجي'],
-        
+
         // Sizes
         liten: ['small', 's', 'صغير'],
         middels: ['medium', 'm', 'متوسط'],
         stor: ['large', 'l', 'كبير'],
         'ekstra stor': ['extra large', 'xl', 'كبير_جدا'],
-        
+
         // Brands
         adidas: ['أديداس'],
         nike: ['نايك'],
@@ -276,7 +276,7 @@ class MultilingualSearch {
         bag: ['حقيبة', 'veske'],
         glasses: ['نظارة', 'briller'],
         bracelet: ['سوار', 'armbånd'],
-        
+
         // Colors
         red: ['أحمر', 'rød'],
         blue: ['أزرق', 'blå'],
@@ -289,7 +289,7 @@ class MultilingualSearch {
         brown: ['بني', 'brun'],
         pink: ['وردي', 'rosa'],
         purple: ['بنفسجي', 'lilla'],
-        
+
         // Sizes
         small: ['صغير', 'liten'],
         s: ['صغير', 'liten'],
@@ -300,7 +300,7 @@ class MultilingualSearch {
         'extra large': ['كبير_جدا', 'ekstra stor'],
         xl: ['كبير_جدا', 'ekstra stor'],
         xxl: ['كبير_جدا_جدا'],
-        
+
         // Brands
         adidas: ['أديداس'],
         nike: ['نايك'],
@@ -927,11 +927,14 @@ export async function createMultilingualSearchFilter(
 
   // Add search queries - Enhanced to search across multiple fields
   if (processedTerms.originalQuery && processedTerms.originalQuery !== 'all') {
-    const searchQueries = [processedTerms.originalQuery, ...processedTerms.translatedQueries]
-    
+    const searchQueries = [
+      processedTerms.originalQuery,
+      ...processedTerms.translatedQueries,
+    ]
+
     // Remove duplicates
     const uniqueQueries = [...new Set(searchQueries)]
-    
+
     uniqueQueries.forEach((query) => {
       if (query && query.trim() !== '') {
         filter.$or?.push(

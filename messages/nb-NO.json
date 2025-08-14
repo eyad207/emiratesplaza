@@ -193,7 +193,15 @@
     "Did you mean": "Mente du",
     "Suggestions": "Forslag",
     "Popular": "Populære søk",
-    "Query": "Søk"
+    "Query": "Søk",
+    "products found": "produkter funnet",
+    "Showing": "Viser",
+    "Active filters": "Aktive filtre",
+    "Sort by": "Sorter etter",
+    "Check spelling": "Sjekk stavemåten",
+    "Try different keywords": "Prøv forskjellige nøkkelord",
+    "Remove filters": "Fjern noen filtre",
+    "Browse categories": "Bla gjennom forskjellige kategorier"
   },
   "Footer": {
     "Select a currency": "Velg en valuta",
