@@ -186,6 +186,7 @@ class MultilingualSearch {
   private getCommonProductTerms(): Record<string, Record<string, string[]>> {
     return {
       ar: {
+        // Product types
         حذاء: ['shoe', 'shoes', 'sneaker', 'sneakers', 'footwear'],
         قميص: ['shirt', 't-shirt', 'tshirt', 'top'],
         بنطلون: ['pants', 'trousers', 'jeans', 'bottom'],
@@ -196,8 +197,36 @@ class MultilingualSearch {
         حقيبة: ['bag', 'handbag', 'purse', 'backpack'],
         نظارة: ['glasses', 'sunglasses', 'eyewear'],
         سوار: ['bracelet', 'wristband'],
+        
+        // Colors
+        أحمر: ['red', 'rød'],
+        أزرق: ['blue', 'blå'],
+        أخضر: ['green', 'grønn'],
+        أصفر: ['yellow', 'gul'],
+        أسود: ['black', 'svart'],
+        أبيض: ['white', 'hvit'],
+        رمادي: ['gray', 'grey', 'grå'],
+        بني: ['brown', 'brun'],
+        وردي: ['pink', 'rosa'],
+        بنفسجي: ['purple', 'lilla'],
+        
+        // Sizes
+        صغير: ['small', 's', 'liten'],
+        متوسط: ['medium', 'm', 'middels'],
+        كبير: ['large', 'l', 'stor'],
+        كبير_جدا: ['extra large', 'xl', 'ekstra stor'],
+        كبير_جدا_جدا: ['xxl', 'extra extra large'],
+        
+        // Brands (popular ones)
+        أديداس: ['adidas'],
+        نايك: ['nike'],
+        بوما: ['puma'],
+        أسيكس: ['asics'],
+        سيكو: ['seiko'],
+        فوسيل: ['fossil'],
       },
       'nb-NO': {
+        // Product types
         sko: ['shoe', 'shoes', 'sneaker', 'sneakers', 'footwear'],
         skjorte: ['shirt', 't-shirt', 'tshirt', 'top'],
         bukse: ['pants', 'trousers', 'jeans', 'bottom'],
@@ -208,8 +237,35 @@ class MultilingualSearch {
         veske: ['bag', 'handbag', 'purse', 'backpack'],
         briller: ['glasses', 'sunglasses', 'eyewear'],
         armbånd: ['bracelet', 'wristband'],
+        
+        // Colors
+        rød: ['red', 'أحمر'],
+        blå: ['blue', 'أزرق'],
+        grønn: ['green', 'أخضر'],
+        gul: ['yellow', 'أصفر'],
+        svart: ['black', 'أسود'],
+        hvit: ['white', 'أبيض'],
+        grå: ['gray', 'grey', 'رمادي'],
+        brun: ['brown', 'بني'],
+        rosa: ['pink', 'وردي'],
+        lilla: ['purple', 'بنفسجي'],
+        
+        // Sizes
+        liten: ['small', 's', 'صغير'],
+        middels: ['medium', 'm', 'متوسط'],
+        stor: ['large', 'l', 'كبير'],
+        'ekstra stor': ['extra large', 'xl', 'كبير_جدا'],
+        
+        // Brands
+        adidas: ['أديداس'],
+        nike: ['نايك'],
+        puma: ['بوما'],
+        asics: ['أسيكس'],
+        seiko: ['سيكو'],
+        fossil: ['فوسيل'],
       },
       'en-US': {
+        // Product types
         shoes: ['حذاء', 'sko'],
         shirt: ['قميص', 'skjorte'],
         pants: ['بنطلون', 'bukse'],
@@ -220,6 +276,38 @@ class MultilingualSearch {
         bag: ['حقيبة', 'veske'],
         glasses: ['نظارة', 'briller'],
         bracelet: ['سوار', 'armbånd'],
+        
+        // Colors
+        red: ['أحمر', 'rød'],
+        blue: ['أزرق', 'blå'],
+        green: ['أخضر', 'grønn'],
+        yellow: ['أصفر', 'gul'],
+        black: ['أسود', 'svart'],
+        white: ['أبيض', 'hvit'],
+        gray: ['رمادي', 'grå'],
+        grey: ['رمادي', 'grå'],
+        brown: ['بني', 'brun'],
+        pink: ['وردي', 'rosa'],
+        purple: ['بنفسجي', 'lilla'],
+        
+        // Sizes
+        small: ['صغير', 'liten'],
+        s: ['صغير', 'liten'],
+        medium: ['متوسط', 'middels'],
+        m: ['متوسط', 'middels'],
+        large: ['كبير', 'stor'],
+        l: ['كبير', 'stor'],
+        'extra large': ['كبير_جدا', 'ekstra stor'],
+        xl: ['كبير_جدا', 'ekstra stor'],
+        xxl: ['كبير_جدا_جدا'],
+        
+        // Brands
+        adidas: ['أديداس'],
+        nike: ['نايك'],
+        puma: ['بوما'],
+        asics: ['أسيكس'],
+        seiko: ['سيكو'],
+        fossil: ['فوسيل'],
       },
     }
   }
@@ -837,20 +925,28 @@ export async function createMultilingualSearchFilter(
 ): Promise<MongoFilter> {
   const filter: MongoFilter = { $or: [] }
 
-  // Add search queries
+  // Add search queries - Enhanced to search across multiple fields
   if (processedTerms.originalQuery && processedTerms.originalQuery !== 'all') {
-    // Add original query
-    filter.$or?.push(
-      { name: { $regex: processedTerms.originalQuery, $options: 'i' } },
-      { description: { $regex: processedTerms.originalQuery, $options: 'i' } }
-    )
-
-    // Add translated queries
-    processedTerms.translatedQueries.forEach((query) => {
-      if (query !== processedTerms.originalQuery) {
+    const searchQueries = [processedTerms.originalQuery, ...processedTerms.translatedQueries]
+    
+    // Remove duplicates
+    const uniqueQueries = [...new Set(searchQueries)]
+    
+    uniqueQueries.forEach((query) => {
+      if (query && query.trim() !== '') {
         filter.$or?.push(
+          // Search in product name
           { name: { $regex: query, $options: 'i' } },
-          { description: { $regex: query, $options: 'i' } }
+          // Search in description
+          { description: { $regex: query, $options: 'i' } },
+          // Search in brand
+          { brand: { $regex: query, $options: 'i' } },
+          // Search in category (already handled below but included for completeness)
+          { category: { $regex: query, $options: 'i' } },
+          // Search in colors
+          { 'colors.color': { $regex: query, $options: 'i' } },
+          // Search in sizes
+          { 'colors.sizes.size': { $regex: query, $options: 'i' } }
         )
       }
     })
