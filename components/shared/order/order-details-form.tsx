@@ -104,20 +104,6 @@ export default function OrderDetailsForm({
 
   const actualPaymentMethod = getActualPaymentMethod()
 
-  // Get payment details for display
-  const getPaymentDetails = () => {
-    if (!isPaid || !paymentResult) return null
-
-    return {
-      transactionId: paymentResult.id,
-      status: paymentResult.status,
-      email: paymentResult.email_address,
-      amount: paymentResult.pricePaid,
-    }
-  }
-
-  const paymentDetails = getPaymentDetails()
-
   const handleDeliveryStatusChange = async () => {
     startTransition(async () => {
       const res = await deliverOrder(order._id)
@@ -316,12 +302,6 @@ export default function OrderDetailsForm({
                       ? t('Orders.ActualPaymentMethod')
                       : t('Orders.PaymentMethodLabel')}
                   </p>
-                  {paymentDetails && paymentDetails.transactionId && (
-                    <p className='text-xs text-muted-foreground mt-1'>
-                      {t('Orders.TransactionId')}:{' '}
-                      {paymentDetails.transactionId}
-                    </p>
-                  )}
                 </div>
               </div>
 
