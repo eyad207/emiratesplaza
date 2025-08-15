@@ -64,7 +64,7 @@ export default function ResetPasswordPage() {
     <div className='w-full max-w-md mx-auto space-y-8'>
       {/* Icon Section */}
       <div className='text-center space-y-4'>
-        <div className='w-20 h-20 bg-gradient-to-br from-green-500 to-teal-600 rounded-full mx-auto flex items-center justify-center shadow-xl'>
+        <div className='w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full mx-auto flex items-center justify-center shadow-xl'>
           <svg
             className='w-10 h-10 text-white'
             fill='none'
@@ -80,10 +80,8 @@ export default function ResetPasswordPage() {
           </svg>
         </div>
         <div>
-          <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
-            Reset Password
-          </h1>
-          <p className='text-gray-600 dark:text-gray-400 mt-2'>
+          <h1 className='text-3xl font-bold text-foreground'>Reset Password</h1>
+          <p className='text-muted-foreground mt-2'>
             Enter your new password below
           </p>
         </div>
@@ -98,7 +96,7 @@ export default function ResetPasswordPage() {
               name='password'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  <FormLabel className='text-sm font-medium text-foreground'>
                     New Password
                   </FormLabel>
                   <FormControl>
@@ -106,7 +104,7 @@ export default function ResetPasswordPage() {
                       type='password'
                       placeholder='Enter new password'
                       {...field}
-                      className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
+                      className='h-12 border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200'
                     />
                   </FormControl>
                   <FormMessage />
@@ -119,7 +117,7 @@ export default function ResetPasswordPage() {
               name='confirmPassword'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  <FormLabel className='text-sm font-medium text-foreground'>
                     Confirm Password
                   </FormLabel>
                   <FormControl>
@@ -127,7 +125,7 @@ export default function ResetPasswordPage() {
                       type='password'
                       placeholder='Confirm new password'
                       {...field}
-                      className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
+                      className='h-12 border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200'
                     />
                   </FormControl>
                   <FormMessage />
@@ -137,7 +135,7 @@ export default function ResetPasswordPage() {
 
             <Button
               type='submit'
-              className='w-full h-12 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]'
+              className='w-full h-12 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]'
             >
               Reset Password
             </Button>

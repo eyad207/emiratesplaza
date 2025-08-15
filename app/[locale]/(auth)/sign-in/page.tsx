@@ -70,7 +70,7 @@ export default async function SignInPage({
                 <span className='w-full border-t border-border' />
               </div>
               <div className='relative flex justify-center text-sm'>
-                <span className='px-4 mb-2 bg-zinc-900 text-muted-foreground'>
+                <span className='px-4 mb-2 bg-zinc-100 dark:bg-zinc-900 text-muted-foreground'>
                   or continue with
                 </span>
               </div>
@@ -86,7 +86,7 @@ export default async function SignInPage({
             <span className='w-full border-t border-border' />
           </div>
           <div className='relative flex justify-center text-sm'>
-            <span className='px-4 mb-2 bg-zinc-900 text-muted-foreground'>
+            <span className='px-4 mb-2 bg-zinc-100 dark:bg-zinc-900 text-muted-foreground'>
               {t('NewToSite', { siteName: site.name })}
             </span>
           </div>

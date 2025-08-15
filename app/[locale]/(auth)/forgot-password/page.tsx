@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
     <div className='w-full max-w-md mx-auto space-y-8'>
       {/* Icon Section */}
       <div className='text-center space-y-4'>
-        <div className='w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full mx-auto flex items-center justify-center shadow-xl'>
+        <div className='w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full mx-auto flex items-center justify-center shadow-xl'>
           <svg
             className='w-10 h-10 text-white'
             fill='none'
@@ -74,10 +74,10 @@ export default function ForgotPasswordPage() {
           </svg>
         </div>
         <div>
-          <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
+          <h1 className='text-3xl font-bold text-foreground'>
             {t('ForgotPassword')}
           </h1>
-          <p className='text-gray-600 dark:text-gray-400 mt-2'>
+          <p className='text-muted-foreground mt-2'>
             Enter your email to reset your password
           </p>
         </div>
@@ -92,14 +92,14 @@ export default function ForgotPasswordPage() {
               name='email'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  <FormLabel className='text-sm font-medium text-foreground'>
                     {t('Email')}
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder={t('EnterEmail')}
                       {...field}
-                      className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200'
+                      className='h-12 border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200'
                     />
                   </FormControl>
                   <FormMessage />
@@ -114,7 +114,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type='button'
                   onClick={() => router.push('/sign-in')}
-                  className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline transition-colors duration-200'
+                  className='text-primary hover:text-primary/80 font-medium hover:underline transition-colors duration-200'
                 >
                   ← {t('SignIn')}
                 </button>

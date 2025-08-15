@@ -17,7 +17,7 @@ export default async function CheckoutLayout({
   return (
     <div className='min-h-screen bg-zinc-100 dark:bg-zinc-900'>
       {/* Modern Header */}
-      <header className='bg-neutral-900 sticky top-0 z-50 shadow-sm'>
+      <header className='bg-zinc-100 dark:bg-zinc-900 sticky top-0 z-50 shadow-sm border-b border-zinc-200 dark:border-zinc-800'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between items-center h-16 md:h-20'>
             {/* Logo */}
@@ -39,13 +39,13 @@ export default async function CheckoutLayout({
 
             {/* Checkout Title */}
             <div className='text-center'>
-              <h1 className='text-2xl md:text-3xl font-bold '>Checkout</h1>
+              <h1 className='text-2xl md:text-3xl font-bold text-foreground'>Checkout</h1>
             </div>
 
             {/* Help Link */}
             <Link
               href='/page/help'
-              className='flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
+              className='flex items-center space-x-2 text-muted-foreground hover:text-primary transition-colors p-2 rounded-lg hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50'
             >
               <HelpCircle className='w-5 h-5' />
               <span className='hidden sm:inline text-sm font-medium'>Help</span>
@@ -60,7 +60,7 @@ export default async function CheckoutLayout({
       </main>
 
       {/* Footer */}
-      <footer className='bg-white/50 backdrop-blur-sm border-t border-gray-200/50 dark:bg-gray-900/50 dark:border-gray-700/50 mt-16'>
+      <footer className='bg-zinc-100/80 backdrop-blur-sm border-t border-zinc-200 dark:bg-zinc-900/80 dark:border-zinc-800 mt-16'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
           <div className='text-center'>
             <div className='flex items-center justify-center space-x-2 mb-4'>
@@ -74,7 +74,7 @@ export default async function CheckoutLayout({
                   height: 'auto',
                 }}
               />
-              <span className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
+              <span className='text-lg font-semibold text-foreground'>
                 {site.name}
               </span>
             </div>
