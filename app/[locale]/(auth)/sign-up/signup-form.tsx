@@ -17,7 +17,6 @@ import { sendVerificationCode } from '@/lib/actions/user.actions'
 import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignUpSchema } from '@/lib/validator'
-import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
@@ -85,9 +84,15 @@ export default function SignUpForm() {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>{t('Name')}</FormLabel>
+                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  {t('Name')}
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder={t('EnterName')} {...field} />
+                  <Input
+                    placeholder={t('EnterName')}
+                    {...field}
+                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -99,9 +104,15 @@ export default function SignUpForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>{t('Email')}</FormLabel>
+                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  {t('Email')}
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder={t('EnterEmail')} {...field} />
+                  <Input
+                    placeholder={t('EnterEmail')}
+                    {...field}
+                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -113,12 +124,15 @@ export default function SignUpForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>{t('Password')}</FormLabel>
+                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  {t('Password')}
+                </FormLabel>
                 <FormControl>
                   <Input
                     type='password'
                     placeholder={t('EnterPassword')}
                     {...field}
+                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
                   />
                 </FormControl>
                 <FormMessage />
@@ -130,31 +144,65 @@ export default function SignUpForm() {
             name='confirmPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>{t('ConfirmPassword')}</FormLabel>
+                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  {t('ConfirmPassword')}
+                </FormLabel>
                 <FormControl>
                   <Input
                     type='password'
                     placeholder={t('EnterConfirmPassword')}
                     {...field}
+                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div>
-            <Button type='submit'>{t('SignUp')}</Button>
+
+          <div className='space-y-4'>
+            <Button
+              type='submit'
+              className='w-full h-12 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]'
+            >
+              {t('SignUp')}
+            </Button>
+
+            <div className='text-center text-xs text-gray-500 dark:text-gray-400 leading-relaxed'>
+              {t('ByCreatingAccount', { siteName: site.name })}{' '}
+              <Link
+                href='/page/conditions-of-use'
+                className='text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:underline transition-colors duration-200'
+              >
+                {t('ConditionsOfUse')}
+              </Link>{' '}
+              {t('and')}{' '}
+              <Link
+                href='/page/privacy-policy'
+                className='text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:underline transition-colors duration-200'
+              >
+                {t('PrivacyNotice')}
+              </Link>
+              .
+            </div>
           </div>
-          <div className='text-sm'>
-            {t('ByCreatingAccount', { siteName: site.name })}{' '}
-            <Link href='/page/conditions-of-use'>{t('ConditionsOfUse')}</Link>{' '}
-            {t('and')}{' '}
-            <Link href='/page/privacy-policy'>{t('PrivacyNotice')}</Link>.
+
+          <div className='relative'>
+            <div className='absolute inset-0 flex items-center'>
+              <span className='w-full border-t border-gray-200 dark:border-gray-700' />
+            </div>
+            <div className='relative flex justify-center text-sm'>
+              <span className='px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400'>
+                Already have an account?
+              </span>
+            </div>
           </div>
-          <Separator className='mb-4' />
-          <div className='text-sm'>
-            {t('AlreadyHaveAccount')}{' '}
-            <Link className='link' href={`/sign-in?callbackUrl=${callbackUrl}`}>
+
+          <div className='text-center'>
+            <Link
+              className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline transition-colors duration-200'
+              href={`/sign-in?callbackUrl=${callbackUrl}`}
+            >
               {t('SignIn')}
             </Link>
           </div>

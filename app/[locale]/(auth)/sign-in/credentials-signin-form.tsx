@@ -70,9 +70,15 @@ export default function CredentialsSignInForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>{t('Email')}</FormLabel>
+                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  {t('Email')}
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder={t('EnterEmail')} {...field} />
+                  <Input
+                    placeholder={t('EnterEmail')}
+                    {...field}
+                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -84,12 +90,15 @@ export default function CredentialsSignInForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>{t('Password')}</FormLabel>
+                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  {t('Password')}
+                </FormLabel>
                 <FormControl>
                   <Input
                     type='password'
                     placeholder={t('EnterPassword')}
                     {...field}
+                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
                   />
                 </FormControl>
                 <FormMessage />
@@ -97,36 +106,45 @@ export default function CredentialsSignInForm() {
             )}
           />
 
-          <div>
-            <Button type='submit'>{t('SignIn')}</Button>
-          </div>
-          <div className='text-sm'>
-            <span className='mr-1'>{t('ForgotPassword')}</span>
-            <button
-              type='button'
-              onClick={() => router.push('/forgot-password')}
-              className='text-blue-600 hover:underline'
+          <div className='space-y-4'>
+            <Button
+              type='submit'
+              className='w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]'
             >
-              {t('ResetItHere')}
-            </button>
-          </div>
-          <div className='text-sm'>
-            {t('BySigningIn', { siteName: site.name })}{' '}
-            <button
-              type='button'
-              onClick={() => router.push('/page/conditions-of-use')}
-              className='text-blue-600 hover:underline'
-            >
-              {t('ConditionsOfUse')}
-            </button>{' '}
-            {t('and')}{' '}
-            <button
-              type='button'
-              onClick={() => router.push('/page/privacy-policy')}
-              className='text-blue-600 hover:underline'
-            >
-              {t('PrivacyNotice')}
-            </button>
+              {t('SignIn')}
+            </Button>
+
+            <div className='text-center'>
+              <span className='text-sm text-gray-600 dark:text-gray-400 mr-1'>
+                {t('ForgotPassword')}
+              </span>
+              <button
+                type='button'
+                onClick={() => router.push('/forgot-password')}
+                className='text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline transition-colors duration-200'
+              >
+                {t('ResetItHere')}
+              </button>
+            </div>
+
+            <div className='text-center text-xs text-gray-500 dark:text-gray-400 leading-relaxed'>
+              {t('BySigningIn', { siteName: site.name })}{' '}
+              <button
+                type='button'
+                onClick={() => router.push('/page/conditions-of-use')}
+                className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200'
+              >
+                {t('ConditionsOfUse')}
+              </button>{' '}
+              {t('and')}{' '}
+              <button
+                type='button'
+                onClick={() => router.push('/page/privacy-policy')}
+                className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200'
+              >
+                {t('PrivacyNotice')}
+              </button>
+            </div>
           </div>
         </div>
       </form>

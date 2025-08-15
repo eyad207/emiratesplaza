@@ -74,35 +74,75 @@ export default function ConfirmEmailPage() {
   }, [countdown])
 
   return (
-    <div className='flex flex-col items-center bg-zinc-900 rounded-2xl'>
-      <div className='w-full max-w-md p-8 bg- rounded-2xl shadow-md'>
-        <h1 className='text-3xl font-bold mb-6 text-center'>
-          Confirm Your Email
-        </h1>
-        <p className='mb-4 text-center'>
+    <div className='w-full max-w-md mx-auto space-y-8'>
+      {/* Icon Section */}
+      <div className='text-center space-y-4'>
+        <div className='w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto flex items-center justify-center shadow-xl'>
+          <svg
+            className='w-10 h-10 text-white'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+            />
+          </svg>
+        </div>
+        <div>
+          <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
+            Confirm Your Email
+          </h1>
+          <p className='text-gray-600 dark:text-gray-400 mt-2'>
+            We&apos;ve sent a verification code to your email
+          </p>
+        </div>
+      </div>
+
+      {/* Email Info */}
+      <div className='bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4'>
+        <p className='text-sm text-blue-800 dark:text-blue-200 text-center'>
           A verification code has been sent to{' '}
-          <span className='font-semibold'>{email}</span>. Please enter the code
-          below to complete your registration.
+          <span className='font-semibold text-blue-900 dark:text-blue-100'>
+            {email}
+          </span>
         </p>
-        <Input
-          type='text'
-          placeholder='Enter verification code'
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          className='mb-4'
-        />
-        <Button onClick={handleSubmit} className='w-full'>
+      </div>
+
+      {/* Form Section */}
+      <div className='space-y-6'>
+        <div>
+          <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'>
+            Verification Code
+          </label>
+          <Input
+            type='text'
+            placeholder='Enter verification code'
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-center text-lg font-mono tracking-wider'
+          />
+        </div>
+
+        <Button
+          onClick={handleSubmit}
+          className='w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]'
+        >
           Verify Code
         </Button>
-        <div className='mt-4 text-center'>
-          <p className='text-sm text-gray-600'>
+
+        <div className='text-center'>
+          <p className='text-sm text-gray-600 dark:text-gray-400'>
             Didn&apos;t receive the code?{' '}
             <button
-              className='text-blue-600 hover:underline'
+              className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline transition-colors duration-200'
               onClick={handleResendCode}
               disabled={countdown > 0}
             >
-              Resend Code {countdown > 0 && `(${countdown}s)`}
+              {countdown > 0 ? `Resend in ${countdown}s` : 'Resend Code'}
             </button>
           </p>
         </div>

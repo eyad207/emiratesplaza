@@ -55,42 +55,74 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <div className='w-full max-w-md mx-auto space-y-8'>
+      {/* Icon Section */}
+      <div className='text-center space-y-4'>
+        <div className='w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full mx-auto flex items-center justify-center shadow-xl'>
+          <svg
+            className='w-10 h-10 text-white'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
+            />
+          </svg>
+        </div>
         <div>
-          <h1 className='text-2xl font-bold bg-orange-400 py-2 text-center rounded-xl mb-5'>
+          <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
             {t('ForgotPassword')}
           </h1>
+          <p className='text-gray-600 dark:text-gray-400 mt-2'>
+            Enter your email to reset your password
+          </p>
         </div>
-        <div className='space-y-6'>
-          <FormField
-            control={control}
-            name='email'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>{t('Email')}</FormLabel>
-                <FormControl>
-                  <Input placeholder={t('EnterEmail')} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div>
-            <EmailButton email={email} />
-          </div>
-          <div></div>
-          <div className='text-sm'>
-            <button
-              type='button'
-              onClick={() => router.push('/sign-in')}
-              className='text-blue-600 hover:underline'
-            >
-              {t('SignIn')}
-            </button>
-          </div>
-        </div>
-      </form>
-    </Form>
+      </div>
+
+      {/* Form Section */}
+      <div className='space-y-6'>
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+            <FormField
+              control={control}
+              name='email'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                    {t('Email')}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t('EnterEmail')}
+                      {...field}
+                      className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className='space-y-4'>
+              <EmailButton email={email} />
+
+              <div className='text-center'>
+                <button
+                  type='button'
+                  onClick={() => router.push('/sign-in')}
+                  className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline transition-colors duration-200'
+                >
+                  ← {t('SignIn')}
+                </button>
+              </div>
+            </div>
+          </form>
+        </Form>
+      </div>
+    </div>
   )
 }
