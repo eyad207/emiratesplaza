@@ -69,7 +69,6 @@ const shippingAddressDefaultValues =
 
 const CheckoutForm = () => {
   const t = useTranslations('Checkout')
-  const tCart = useTranslations('Cart')
   const { toast } = useToast()
   const router = useRouter()
   const {
@@ -92,35 +91,11 @@ const CheckoutForm = () => {
     updateItem,
     removeItem,
     setDeliveryDateIndex,
-    refreshCartStock,
   } = useCartStore()
-  const isMounted = useIsMounted()
-  const [isCartRefreshing, setIsCartRefreshing] = useState(true)
-  const [hasInitialized, setHasInitialized] = useState(false)
-  // Track when the persisted zustand cart store has finished hydrating from localStorage
-  interface PersistAPI {
-    hasHydrated?: () => boolean
-    onFinishHydration?: (cb: () => void) => () => void
-  }
-  const [hasHydrated, setHasHydrated] = useState(() => {
-    const persistApi = (useCartStore as unknown as { persist?: PersistAPI })
-      .persist
-    if (typeof window === 'undefined') return false
-    return persistApi?.hasHydrated ? persistApi.hasHydrated() : false
-  })
 
-  useEffect(() => {
-    // Subscribe to hydration finish event (zustand persist API)
-    const persistApi = (useCartStore as unknown as { persist?: PersistAPI })
-      .persist
-    if (persistApi?.onFinishHydration) {
-      const unsub = persistApi.onFinishHydration(() => setHasHydrated(true))
-      return () => unsub?.()
-    }
-    // Fallback: mark hydrated on next tick (prevents blocking if API unavailable)
-    const id = setTimeout(() => setHasHydrated(true), 0)
-    return () => clearTimeout(id)
-  }, [])
+  const isMounted = useIsMounted()
+  const isCartRefreshing = useState(true)
+  const hasInitialized = useState(false)
 
   const shippingAddressForm = useForm<ShippingAddress>({
     resolver: zodResolver(ShippingAddressSchema),
@@ -141,79 +116,6 @@ const CheckoutForm = () => {
     shippingAddressForm.setValue('province', shippingAddress.province)
     shippingAddressForm.setValue('phone', shippingAddress.phone)
   }, [items, isMounted, router, shippingAddress, shippingAddressForm])
-
-  useEffect(() => {
-    const refreshStock = async () => {
-      setIsCartRefreshing(true)
-      try {
-        await refreshCartStock()
-      } catch (error) {
-        console.warn('Failed to refresh cart stock:', error)
-      } finally {
-        setIsCartRefreshing(false)
-        setHasInitialized(true)
-      }
-    }
-
-    if (isMounted) {
-      refreshStock()
-    }
-  }, [refreshCartStock, isMounted])
-
-  // Early validation - redirect ONLY after store hydration to avoid flashing wrong layout
-  useEffect(() => {
-    if (!isMounted || !hasInitialized || isCartRefreshing || !hasHydrated)
-      return
-
-    // Defer slightly so hydration updates (if any) settle
-    const timeoutId = setTimeout(() => {
-      try {
-        // Double‑check hydration state: if persisted storage existed but items now empty, then treat as truly empty
-        const persistedItemsLength = (() => {
-          try {
-            const raw = localStorage.getItem('cart-store')
-            if (!raw) return 0
-            const parsed = JSON.parse(raw)
-            return parsed?.state?.cart?.items?.length || 0
-          } catch {
-            return 0
-          }
-        })()
-
-        if (items.length === 0 && persistedItemsLength === 0) {
-          toast({
-            description: tCart('Your cart is empty'),
-            variant: 'destructive',
-          })
-          router.replace('/cart?error=empty-cart')
-          return
-        }
-
-        if (hasInvalidQuantities(items)) {
-          toast({
-            description: tCart('Please fix invalid quantities before checkout'),
-            variant: 'destructive',
-          })
-          router.replace('/cart?error=invalid-quantities')
-          return
-        }
-      } catch (error) {
-        console.warn('Cart validation error:', error)
-        router.replace('/cart')
-      }
-    }, 300) // shorter delay now that we gate on hydration
-
-    return () => clearTimeout(timeoutId)
-  }, [
-    items,
-    isMounted,
-    hasInitialized,
-    isCartRefreshing,
-    hasHydrated,
-    router,
-    tCart,
-    toast,
-  ])
 
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false)
   const [isItemsSelected, setIsItemsSelected] = useState<boolean>(false)
@@ -474,7 +376,6 @@ const CheckoutForm = () => {
                   <div className='col-span-2'>
                     <Button
                       variant={'outline'}
-                      className='bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 mt-2'
                       onClick={() => {
                         setIsAddressSelected(false)
                         setIsItemsSelected(false)
@@ -714,7 +615,6 @@ const CheckoutForm = () => {
                   <div className='col-span-2'>
                     <Button
                       variant={'outline'}
-                      className='bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 mt-2'
                       onClick={() => {
                         setIsItemsSelected(false)
                         setIsPaymentMethodSelected(false)
@@ -920,7 +820,6 @@ const CheckoutForm = () => {
                   <div className='col-span-2'>
                     <Button
                       variant='outline'
-                      className='bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 mt-2'
                       onClick={() => {
                         setIsPaymentMethodSelected(false)
                       }}
