@@ -370,6 +370,7 @@
     "QuickAccess": "وصول سريع إلى أحدث مشترياتك"
   },
   "Checkout": {
+    "Loading checkout": "جاري تحميل الدفع",
     "shipToThisAddress": "الشحن إلى هذا العنوان",
     "chooseShippingAddressAndPayment": "اختر عنوان الشحن وطريقة الدفع لحساب الشحن والمناولة والضرائب.",
     "chooseShippingAddressFirst": "اختر عنوان الشحن للمتابعة إلى الخطوة التالية.",

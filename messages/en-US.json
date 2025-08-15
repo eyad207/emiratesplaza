@@ -408,6 +408,7 @@
     "QuickAccess": "Quick access to your latest purchases"
   },
   "Checkout": {
+    "Loading checkout": "Loading checkout",
     "shipToThisAddress": "Ship to this address",
     "chooseShippingAddressAndPayment": "Choose a shipping address and payment method to calculate shipping, handling, and tax.",
     "chooseShippingAddressFirst": "Choose a shipping address to continue to the next step.",

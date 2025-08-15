@@ -392,6 +392,7 @@
     "Product": "Produkt"
   },
   "Checkout": {
+    "Loading checkout": "Laster utsjekking",
     "shipToThisAddress": "Send til denne adressen",
     "chooseShippingAddressAndPayment": "Velg en leveringsadresse og betalingsmetode for å beregne frakt, håndtering og skatt.",
     "chooseShippingAddressFirst": "Velg en leveringsadresse for å fortsette til neste trinn.",
