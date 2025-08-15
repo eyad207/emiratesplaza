@@ -70,14 +70,14 @@ export default function CredentialsSignInForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <FormLabel className='text-sm font-medium text-foreground'>
                   {t('Email')}
                 </FormLabel>
                 <FormControl>
                   <Input
                     placeholder={t('EnterEmail')}
                     {...field}
-                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
+                    className='h-12 border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200'
                   />
                 </FormControl>
                 <FormMessage />
@@ -90,7 +90,7 @@ export default function CredentialsSignInForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <FormLabel className='text-sm font-medium text-foreground'>
                   {t('Password')}
                 </FormLabel>
                 <FormControl>
@@ -98,7 +98,7 @@ export default function CredentialsSignInForm() {
                     type='password'
                     placeholder={t('EnterPassword')}
                     {...field}
-                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200'
+                    className='h-12 border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200'
                   />
                 </FormControl>
                 <FormMessage />
@@ -109,30 +109,30 @@ export default function CredentialsSignInForm() {
           <div className='space-y-4'>
             <Button
               type='submit'
-              className='w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]'
+              className='w-full h-12 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]'
             >
               {t('SignIn')}
             </Button>
 
             <div className='text-center'>
-              <span className='text-sm text-gray-600 dark:text-gray-400 mr-1'>
+              <span className='text-sm text-muted-foreground mr-1'>
                 {t('ForgotPassword')}
               </span>
               <button
                 type='button'
                 onClick={() => router.push('/forgot-password')}
-                className='text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline transition-colors duration-200'
+                className='text-sm text-primary hover:text-primary/80 font-medium hover:underline transition-colors duration-200'
               >
                 {t('ResetItHere')}
               </button>
             </div>
 
-            <div className='text-center text-xs text-gray-500 dark:text-gray-400 leading-relaxed'>
+            <div className='text-center text-xs text-muted-foreground leading-relaxed'>
               {t('BySigningIn', { siteName: site.name })}{' '}
               <button
                 type='button'
                 onClick={() => router.push('/page/conditions-of-use')}
-                className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200'
+                className='text-primary hover:text-primary/80 hover:underline transition-colors duration-200'
               >
                 {t('ConditionsOfUse')}
               </button>{' '}
@@ -140,7 +140,7 @@ export default function CredentialsSignInForm() {
               <button
                 type='button'
                 onClick={() => router.push('/page/privacy-policy')}
-                className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200'
+                className='text-primary hover:text-primary/80 hover:underline transition-colors duration-200'
               >
                 {t('PrivacyNotice')}
               </button>

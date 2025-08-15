@@ -36,37 +36,35 @@ function FooterComponent() {
   )
 
   return (
-    <footer className='bg-gradient-to-b from-gray-900 via-slate-900 to-black text-white mt-20 relative overflow-hidden'>
-      {/* Decorative background elements */}
-      <div className='absolute inset-0 opacity-30'>
-        <div className='absolute top-0 left-1/4 w-64 h-64 bg-blue-500/20 rounded-full filter blur-3xl'></div>
-        <div className='absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full filter blur-3xl'></div>
+    <footer className='bg-header text-white mt-20 relative overflow-hidden border-t border-header-darker'>
+      {/* Decorative background elements with subtle professional styling */}
+      <div className='absolute inset-0 opacity-20'>
+        <div className='absolute top-0 left-1/4 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl'></div>
+        <div className='absolute bottom-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full filter blur-3xl'></div>
       </div>
 
       <div className='relative z-10 w-full'>
         {/* Back to top button with enhanced styling */}
-        <div className='border-b border-gray-700/50'>
+        <div className='border-b border-header-darker'>
           <Button
             variant='ghost'
-            className='group w-full bg-gradient-to-r from-slate-800 to-gray-800 hover:from-slate-700 hover:to-gray-700 rounded-none py-4 text-gray-200 hover:text-white font-medium transition-all duration-300'
+            className='group w-full bg-header-darker hover:bg-primary/10 rounded-none py-4 text-gray-200 hover:text-white font-medium transition-all duration-300'
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             <ChevronUp className='mr-2 h-5 w-5 group-hover:transform group-hover:-translate-y-1 transition-transform duration-300' />
-            <span className='bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent'>
-              {t('Footer.Back to top')}
-            </span>
+            <span className='text-white'>{t('Footer.Back to top')}</span>
           </Button>
         </div>
 
         {/* Main footer content */}
-        <div className='border-b border-gray-700/50'>
+        <div className='border-b border-header-darker'>
           <div className='max-w-7xl mx-auto py-16 px-6'>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12'>
               {/* Brand Section */}
               <div className='lg:col-span-2 space-y-6'>
                 <div className='flex items-center space-x-4'>
                   <div className='relative group'>
-                    <div className='absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-75 group-hover:opacity-100 filter blur-sm transition-opacity duration-300'></div>
+                    <div className='absolute inset-0 bg-primary/20 rounded-full opacity-75 group-hover:opacity-100 filter blur-sm transition-opacity duration-300'></div>
                     <Image
                       src={site.logo}
                       alt={`${site.name} logo`}
@@ -77,10 +75,10 @@ function FooterComponent() {
                     />
                   </div>
                   <div>
-                    <h3 className='text-2xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent'>
+                    <h3 className='text-2xl font-bold text-white'>
                       {site.name}
                     </h3>
-                    <p className='text-gray-400 text-sm mt-1'>
+                    <p className='text-gray-300 text-sm mt-1'>
                       Your trusted shopping destination
                     </p>
                   </div>
@@ -93,10 +91,10 @@ function FooterComponent() {
                 </p>
 
                 {/* Contact Info */}
-                <div className='space-y-2 text-sm text-gray-400'>
+                <div className='space-y-2 text-sm text-gray-300'>
                   <div className='flex items-center space-x-2'>
                     <svg
-                      className='w-4 h-4'
+                      className='w-4 h-4 text-primary'
                       fill='currentColor'
                       viewBox='0 0 20 20'
                     >
@@ -107,7 +105,7 @@ function FooterComponent() {
                   </div>
                   <div className='flex items-center space-x-2'>
                     <svg
-                      className='w-4 h-4'
+                      className='w-4 h-4 text-primary'
                       fill='currentColor'
                       viewBox='0 0 20 20'
                     >
@@ -126,25 +124,25 @@ function FooterComponent() {
                 <div className='space-y-3'>
                   <Link
                     href='/page/about-us'
-                    className='block text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-200'
+                    className='block text-gray-300 hover:text-primary hover:translate-x-1 transition-all duration-200'
                   >
                     About Us
                   </Link>
                   <Link
                     href='/page/customer-service'
-                    className='block text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-200'
+                    className='block text-gray-300 hover:text-primary hover:translate-x-1 transition-all duration-200'
                   >
                     Customer Service
                   </Link>
                   <Link
                     href='/page/contact-us'
-                    className='block text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-200'
+                    className='block text-gray-300 hover:text-primary hover:translate-x-1 transition-all duration-200'
                   >
                     Contact Us
                   </Link>
                   <Link
                     href='/page/help'
-                    className='block text-gray-300 hover:text-white hover:translate-x-1 transition-all duration-200'
+                    className='block text-gray-300 hover:text-primary hover:translate-x-1 transition-all duration-200'
                   >
                     Help Center
                   </Link>
@@ -158,26 +156,26 @@ function FooterComponent() {
                 </h4>
                 <div className='space-y-4'>
                   <div>
-                    <label className='block text-sm text-gray-400 mb-2'>
+                    <label className='block text-sm text-gray-300 mb-2'>
                       Currency
                     </label>
                     <Select
                       value={currency}
                       onValueChange={handleCurrencyChange}
                     >
-                      <SelectTrigger className='bg-gray-800/50 border-gray-600 text-white hover:bg-gray-700/50 transition-colors duration-200'>
+                      <SelectTrigger className='bg-header-darker border-gray-600 text-white hover:bg-gray-700/50 transition-colors duration-200'>
                         <SelectValue
                           placeholder={t('Footer.Select a currency')}
                         />
                       </SelectTrigger>
-                      <SelectContent className='bg-gray-800 border-gray-600'>
+                      <SelectContent className='bg-header border-gray-600'>
                         {availableCurrencies
                           ?.filter((x) => x.code)
                           .map((c, index) => (
                             <SelectItem
                               key={index}
                               value={c.code}
-                              className='text-white hover:bg-gray-700 focus:bg-gray-700'
+                              className='text-white hover:bg-primary/20 focus:bg-primary/20'
                             >
                               {c.name} ({c.code})
                             </SelectItem>
@@ -198,19 +196,19 @@ function FooterComponent() {
             <div className='flex flex-wrap justify-center gap-6 mb-6'>
               <Link
                 href='/page/conditions-of-use'
-                className='text-sm text-gray-400 hover:text-white transition-colors duration-200 hover:underline underline-offset-4'
+                className='text-sm text-gray-300 hover:text-primary transition-colors duration-200 hover:underline underline-offset-4'
               >
                 {t('Footer.Conditions of Use')}
               </Link>
               <Link
                 href='/page/privacy-policy'
-                className='text-sm text-gray-400 hover:text-white transition-colors duration-200 hover:underline underline-offset-4'
+                className='text-sm text-gray-300 hover:text-primary transition-colors duration-200 hover:underline underline-offset-4'
               >
                 {t('Footer.Privacy Notice')}
               </Link>
               <Link
                 href='/page/help'
-                className='text-sm text-gray-400 hover:text-white transition-colors duration-200 hover:underline underline-offset-4'
+                className='text-sm text-gray-300 hover:text-primary transition-colors duration-200 hover:underline underline-offset-4'
               >
                 {t('Footer.Help')}
               </Link>
@@ -218,8 +216,8 @@ function FooterComponent() {
 
             {/* Copyright */}
             <div className='text-center'>
-              <p className='text-sm text-gray-400'>© {site.copyright}</p>
-              <p className='text-xs text-gray-500 mt-2'>
+              <p className='text-sm text-gray-300'>© {site.copyright}</p>
+              <p className='text-xs text-gray-400 mt-2'>
                 Built with ❤️ for an exceptional shopping experience
               </p>
             </div>

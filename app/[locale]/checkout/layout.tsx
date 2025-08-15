@@ -15,9 +15,9 @@ export default async function CheckoutLayout({
   const { site } = settings
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700'>
+    <div className='min-h-screen bg-zinc-100 dark:bg-zinc-900'>
       {/* Modern Header */}
-      <header className='bg-white/80 backdrop-blur-lg border-b border-gray-200/50 dark:bg-gray-900/80 dark:border-gray-700/50 sticky top-0 z-50 shadow-sm'>
+      <header className='bg-neutral-900 sticky top-0 z-50 shadow-sm'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between items-center h-16 md:h-20'>
             {/* Logo */}
@@ -39,12 +39,7 @@ export default async function CheckoutLayout({
 
             {/* Checkout Title */}
             <div className='text-center'>
-              <h1 className='text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent'>
-                Secure Checkout
-              </h1>
-              <p className='text-sm text-muted-foreground hidden sm:block'>
-                Complete your purchase safely
-              </p>
+              <h1 className='text-2xl md:text-3xl font-bold '>Checkout</h1>
             </div>
 
             {/* Help Link */}

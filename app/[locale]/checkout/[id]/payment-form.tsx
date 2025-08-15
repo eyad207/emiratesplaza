@@ -182,14 +182,14 @@ export default function OrderDetailsForm({
             {!isPaid && (
               <div className='space-y-3'>
                 <div className='text-xl'>{t('payWithVipps')}:</div>
-                <div className='bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border border-orange-200 dark:border-orange-800 rounded-lg p-3'>
+                <div className='bg-primary/5 border border-primary/20 rounded-lg p-3'>
                   <Button
-                    className='w-full h-10 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors'
+                    className='w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-colors'
                     onClick={handleCreateVippsOrder}
                   >
                     {t('payWithVipps')}
                   </Button>
-                  <div className='mt-2 text-xs text-orange-600 dark:text-orange-400 text-center'>
+                  <div className='mt-2 text-xs text-primary text-center'>
                     {t('secureNorwegianPayment')}
                   </div>
                 </div>
@@ -200,25 +200,23 @@ export default function OrderDetailsForm({
               <div className='space-y-3'>
                 <div className='text-xl'>{t('creditCard')}:</div>
                 {stripeLoading ? (
-                  <div className='flex items-center justify-center p-4 bg-white dark:bg-gray-800 rounded-lg'>
-                    <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600'></div>
-                    <span className='ml-2 text-sm text-purple-700 dark:text-purple-300'>
+                  <div className='flex items-center justify-center p-4 bg-card rounded-lg'>
+                    <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-primary'></div>
+                    <span className='ml-2 text-sm text-primary'>
                       {t('loadingPayment')}...
                     </span>
                   </div>
                 ) : stripeClientSecret ? (
-                  <div className='bg-white dark:bg-gray-800 rounded-lg p-3'>
+                  <div className='bg-card rounded-lg p-3'>
                     <Elements
                       options={{
                         clientSecret: stripeClientSecret,
                         appearance: {
                           theme: theme === 'dark' ? 'night' : 'stripe',
                           variables: {
-                            colorPrimary:
-                              theme === 'dark' ? '#a855f7' : '#7c3aed',
-                            colorBackground:
-                              theme === 'dark' ? '#1f2937' : '#ffffff',
-                            colorText: theme === 'dark' ? '#f9fafb' : '#374151',
+                            colorPrimary: 'hsl(var(--primary))',
+                            colorBackground: 'hsl(var(--background))',
+                            colorText: 'hsl(var(--foreground))',
                             fontFamily: 'system-ui, sans-serif',
                             spacingUnit: '3px',
                             borderRadius: '6px',
@@ -232,7 +230,7 @@ export default function OrderDetailsForm({
                         orderId={order._id}
                       />
                     </Elements>
-                    <div className='mt-2 text-xs text-purple-600 dark:text-purple-400 text-center'>
+                    <div className='mt-2 text-xs text-primary text-center'>
                       {t('secureStripePayment')}
                     </div>
                   </div>
@@ -252,7 +250,7 @@ export default function OrderDetailsForm({
             {!isPaid && (
               <div className='space-y-3'>
                 <div className='text-xl'>{t('paypalPayment')}:</div>
-                <div className='bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border border-blue-200 dark:border-blue-800 rounded-lg p-3'>
+                <div className='bg-primary/5 border border-primary/20 rounded-lg p-3'>
                   <PayPalScriptProvider
                     options={{
                       clientId: paypalClientId,
@@ -290,7 +288,7 @@ export default function OrderDetailsForm({
                       }}
                     />
                   </PayPalScriptProvider>
-                  <div className='mt-2 text-xs text-blue-600 dark:text-blue-400 text-center'>
+                  <div className='mt-2 text-xs text-primary text-center'>
                     {t('protectedByPayPal')}
                   </div>
                 </div>
@@ -299,17 +297,17 @@ export default function OrderDetailsForm({
 
             {!isPaid && paymentMethod === 'Cash On Delivery' && (
               <div className='space-y-3'>
-                <h4 className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <h4 className='text-sm font-medium text-muted-foreground'>
                   {t('cashOnDelivery')}
                 </h4>
-                <div className='bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border border-green-200 dark:border-green-800 rounded-lg p-3'>
+                <div className='bg-primary/5 border border-primary/20 rounded-lg p-3'>
                   <Button
-                    className='w-full h-10 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors'
+                    className='w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-colors'
                     onClick={() => router.push(`/account/orders/${order._id}`)}
                   >
                     {t('viewOrderDetails')}
                   </Button>
-                  <div className='mt-2 text-xs text-green-600 dark:text-green-400 text-center'>
+                  <div className='mt-2 text-xs text-primary text-center'>
                     {t('payWhenDelivered')}
                   </div>
                 </div>

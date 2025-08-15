@@ -394,6 +394,7 @@
     "fullName": "الاسم الكامل",
     "enterFullName": "أدخل الاسم الكامل",
     "address": "العنوان",
+    "Invalid order total": "إجمالي الطلب غير صالح",
     "enterAddress": "أدخل العنوان",
     "city": "المدينة",
     "enterCity": "أدخل المدينة",

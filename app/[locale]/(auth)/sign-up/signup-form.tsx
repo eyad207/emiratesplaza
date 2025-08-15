@@ -84,14 +84,14 @@ export default function SignUpForm() {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <FormLabel className='text-sm font-medium text-foreground'>
                   {t('Name')}
                 </FormLabel>
                 <FormControl>
                   <Input
                     placeholder={t('EnterName')}
                     {...field}
-                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
+                    className='h-12 border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200'
                   />
                 </FormControl>
                 <FormMessage />
@@ -104,14 +104,14 @@ export default function SignUpForm() {
             name='email'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <FormLabel className='text-sm font-medium text-foreground'>
                   {t('Email')}
                 </FormLabel>
                 <FormControl>
                   <Input
                     placeholder={t('EnterEmail')}
                     {...field}
-                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
+                    className='h-12 border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200'
                   />
                 </FormControl>
                 <FormMessage />
@@ -124,7 +124,7 @@ export default function SignUpForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <FormLabel className='text-sm font-medium text-foreground'>
                   {t('Password')}
                 </FormLabel>
                 <FormControl>
@@ -132,7 +132,7 @@ export default function SignUpForm() {
                     type='password'
                     placeholder={t('EnterPassword')}
                     {...field}
-                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
+                    className='h-12 border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200'
                   />
                 </FormControl>
                 <FormMessage />
@@ -144,7 +144,7 @@ export default function SignUpForm() {
             name='confirmPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <FormLabel className='text-sm font-medium text-foreground'>
                   {t('ConfirmPassword')}
                 </FormLabel>
                 <FormControl>
@@ -152,7 +152,7 @@ export default function SignUpForm() {
                     type='password'
                     placeholder={t('EnterConfirmPassword')}
                     {...field}
-                    className='h-12 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200'
+                    className='h-12 border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200'
                   />
                 </FormControl>
                 <FormMessage />
@@ -163,23 +163,23 @@ export default function SignUpForm() {
           <div className='space-y-4'>
             <Button
               type='submit'
-              className='w-full h-12 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]'
+              className='w-full h-12 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]'
             >
               {t('SignUp')}
             </Button>
 
-            <div className='text-center text-xs text-gray-500 dark:text-gray-400 leading-relaxed'>
+            <div className='text-center text-xs text-muted-foreground leading-relaxed'>
               {t('ByCreatingAccount', { siteName: site.name })}{' '}
               <Link
                 href='/page/conditions-of-use'
-                className='text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:underline transition-colors duration-200'
+                className='text-primary hover:text-primary/80 hover:underline transition-colors duration-200'
               >
                 {t('ConditionsOfUse')}
               </Link>{' '}
               {t('and')}{' '}
               <Link
                 href='/page/privacy-policy'
-                className='text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 hover:underline transition-colors duration-200'
+                className='text-primary hover:text-primary/80 hover:underline transition-colors duration-200'
               >
                 {t('PrivacyNotice')}
               </Link>
@@ -189,10 +189,10 @@ export default function SignUpForm() {
 
           <div className='relative'>
             <div className='absolute inset-0 flex items-center'>
-              <span className='w-full border-t border-gray-200 dark:border-gray-700' />
+              <span className='w-full border-t border-border' />
             </div>
             <div className='relative flex justify-center text-sm'>
-              <span className='px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400'>
+              <span className='px-4 bg-background text-muted-foreground'>
                 Already have an account?
               </span>
             </div>
@@ -200,7 +200,7 @@ export default function SignUpForm() {
 
           <div className='text-center'>
             <Link
-              className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline transition-colors duration-200'
+              className='text-primary hover:text-primary/80 font-medium hover:underline transition-colors duration-200'
               href={`/sign-in?callbackUrl=${callbackUrl}`}
             >
               {t('SignIn')}

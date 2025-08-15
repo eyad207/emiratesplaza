@@ -42,6 +42,7 @@ import ProductPrice from '@/components/shared/product/product-price'
 import { useTranslations } from 'next-intl'
 import {
   validateCartClientSide,
+  hasInvalidQuantities,
   getInvalidQuantityItems,
 } from '@/lib/cart-validation-client'
 
@@ -135,44 +136,43 @@ const CheckoutForm = () => {
     }
   }, [refreshCartStock, isMounted])
 
-  // Important validation - check for critical cart issues
-  const validateCartForCheckout = () => {
-    const validationErrors = []
+  // Early validation - redirect if cart is invalid
+  useEffect(() => {
+    // Wait for proper initialization
+    if (!isMounted || !hasInitialized || isCartRefreshing) return
 
-    // Check if cart is empty
-    if (items.length === 0) {
-      validationErrors.push(tCart('Your cart is empty'))
+    // Add a small delay to ensure cart store is fully loaded
+    const validateCart = () => {
+      try {
+        if (items.length === 0) {
+          toast({
+            description: tCart('Your cart is empty'),
+            variant: 'destructive',
+          })
+          router.push('/cart?error=empty-cart')
+          return
+        }
+
+        // Check if any items have invalid quantities
+        if (hasInvalidQuantities(items)) {
+          toast({
+            description: tCart('Please fix invalid quantities before checkout'),
+            variant: 'destructive',
+          })
+          router.push('/cart?error=invalid-quantities')
+          return
+        }
+      } catch (error) {
+        console.warn('Cart validation error:', error)
+        // If validation fails, redirect to cart to be safe
+        router.push('/cart')
+      }
     }
 
-    // Check for invalid quantities
-    const invalidQuantityItems = getInvalidQuantityItems(items)
-    if (invalidQuantityItems.length > 0) {
-      validationErrors.push(tCart('Some items have invalid quantities'))
-    }
-
-    // Check for out of stock items
-    const outOfStockItems = items.filter((item) => {
-      const colorVariant = item.colors?.find((c) => c.color === item.color)
-      const sizeVariant = colorVariant?.sizes?.find((s) => s.size === item.size)
-      return !sizeVariant || sizeVariant.countInStock < item.quantity
-    })
-
-    if (outOfStockItems.length > 0) {
-      validationErrors.push(
-        t('Some items are no longer available in the requested quantity')
-      )
-    }
-
-    // Check for price inconsistencies
-    if (totalPrice <= 0) {
-      validationErrors.push(t('Invalid order total'))
-    }
-
-    return {
-      isValid: validationErrors.length === 0,
-      errors: validationErrors,
-    }
-  }
+    // Add a small delay to ensure everything is properly loaded
+    const timeoutId = setTimeout(validateCart, 500)
+    return () => clearTimeout(timeoutId)
+  }, [items, isMounted, hasInitialized, isCartRefreshing, router, tCart, toast])
 
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false)
   const [isItemsSelected, setIsItemsSelected] = useState<boolean>(false)
@@ -180,19 +180,8 @@ const CheckoutForm = () => {
     useState<boolean>(false)
 
   const handlePlaceOrder = async () => {
-    // Important validation - check cart before placing order
-    const cartValidation = validateCartForCheckout()
-
-    if (!cartValidation.isValid) {
-      toast({
-        description: cartValidation.errors.join('; '),
-        variant: 'destructive',
-      })
-      return
-    }
-
-    // Additional comprehensive cart validation
-    const detailedCartValidation = validateCartClientSide({
+    // Comprehensive cart validation
+    const cartValidation = validateCartClientSide({
       items,
       itemsPrice,
       totalPrice,
@@ -200,9 +189,22 @@ const CheckoutForm = () => {
       shippingPrice: shippingPrice || 0,
     })
 
-    if (!detailedCartValidation.isValid) {
+    // Check for invalid quantities
+    const invalidQuantityItems = getInvalidQuantityItems(items)
+
+    if (!cartValidation.isValid || invalidQuantityItems.length > 0) {
+      const errorMessages = [
+        ...cartValidation.errors,
+        ...invalidQuantityItems.map(
+          (item) => `${item.name}: Invalid quantity (${item.quantity})`
+        ),
+      ]
+
       toast({
-        description: detailedCartValidation.errors.join('; '),
+        description:
+          errorMessages.length > 0
+            ? errorMessages.join('; ')
+            : t('Please fix cart issues before placing your order'),
         variant: 'destructive',
       })
       return
@@ -267,11 +269,13 @@ const CheckoutForm = () => {
   }
   const handleSelectPaymentMethod = async () => {
     // Validate cart before proceeding to payment
-    const cartValidation = validateCartForCheckout()
+    const invalidQuantityItems = getInvalidQuantityItems(items)
 
-    if (!cartValidation.isValid) {
+    if (hasInvalidQuantities(items) || invalidQuantityItems.length > 0) {
       toast({
-        description: cartValidation.errors.join('; '),
+        description: t(
+          'Please fix invalid quantities before proceeding to payment'
+        ),
         variant: 'destructive',
       })
       return
@@ -284,11 +288,11 @@ const CheckoutForm = () => {
   }
   const handleSelectItemsAndShipping = () => {
     // Validate cart before proceeding to next step
-    const cartValidation = validateCartForCheckout()
+    const invalidQuantityItems = getInvalidQuantityItems(items)
 
-    if (!cartValidation.isValid) {
+    if (hasInvalidQuantities(items) || invalidQuantityItems.length > 0) {
       toast({
-        description: cartValidation.errors.join('; '),
+        description: t('Please fix invalid quantities before proceeding'),
         variant: 'destructive',
       })
       return
@@ -301,290 +305,163 @@ const CheckoutForm = () => {
     shippingAddressForm.handleSubmit(onSubmitShippingAddress)()
   }
   const CheckoutSummary = () => (
-    <div className='bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:bg-gray-800/70 dark:border-gray-700/50 shadow-sm overflow-hidden'>
-      <div className='p-6'>
+    <Card>
+      <CardContent className='p-4'>
         {!isAddressSelected && (
-          <div className='border-b border-gray-200/50 dark:border-gray-700/50 pb-6 mb-6'>
+          <div className='border-b mb-4'>
             <Button
-              className='w-full rounded-xl bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 text-white font-semibold py-3 transition-all duration-200 shadow-md hover:shadow-lg'
+              className='rounded-full w-full'
               onClick={handleSelectShippingAddress}
             >
               {t('shipToThisAddress')}
             </Button>
-            <p className='text-xs text-center text-muted-foreground mt-3 font-medium'>
+            <p className='text-xs text-center py-2'>
               {t('chooseShippingAddressFirst')}
             </p>
           </div>
         )}
         {isAddressSelected && !isItemsSelected && (
-          <div className='border-b border-gray-200/50 dark:border-gray-700/50 pb-6 mb-6'>
+          <div className=' mb-4'>
             <Button
-              className='w-full rounded-xl bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 text-white font-semibold py-3 transition-all duration-200 shadow-md hover:shadow-lg'
+              className='rounded-full w-full'
               onClick={handleSelectItemsAndShipping}
               disabled={items.some((it) => it.quantity === 0)}
             >
               {t('continueToItems')}
             </Button>
-            <p className='text-xs text-center text-muted-foreground mt-3 font-medium'>
+            <p className='text-xs text-center py-2'>
               {t('reviewItemsAndShipping')}
             </p>
           </div>
         )}
         {isItemsSelected && !isPaymentMethodSelected && (
-          <div className='border-b border-gray-200/50 dark:border-gray-700/50 pb-6 mb-6'>
+          <div className=' mb-4'>
             <Button
-              className='w-full rounded-xl bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 text-white font-semibold py-3 transition-all duration-200 shadow-md hover:shadow-lg'
+              className='rounded-full w-full'
               onClick={handleSelectPaymentMethod}
               disabled={items.some((it) => it.quantity === 0)}
             >
               {t('continueToPayment')}
             </Button>
-            <p className='text-xs text-center text-muted-foreground mt-3 font-medium'>
+            <p className='text-xs text-center py-2'>
               {t('choosePaymentMethodToContinue')}
             </p>
           </div>
         )}
         {isPaymentMethodSelected && isAddressSelected && isItemsSelected && (
-          <div className='border-b border-gray-200/50 dark:border-gray-700/50 pb-6 mb-6'>
+          <div>
             <Button
               onClick={handlePlaceOrder}
-              className='w-full rounded-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 transition-all duration-200 shadow-md hover:shadow-lg text-lg'
+              className='rounded-full w-full'
               disabled={items.some((it) => it.quantity === 0)}
             >
-              🛒 {t('placeYourOrder')}
+              {t('placeYourOrder')}
             </Button>
           </div>
         )}
 
-        {/* Order Summary */}
-        <div className='space-y-4'>
-          <div className='text-xl font-bold text-gray-900 dark:text-gray-100 border-b border-gray-200/50 dark:border-gray-700/50 pb-3'>
-            {t('orderSummary')}
-          </div>
-          <div className='space-y-3'>
-            <div className='flex justify-between items-center py-2'>
-              <span className='text-muted-foreground'>{t('items')}:</span>
-              <span className='font-semibold'>
+        <div>
+          <div className='text-lg font-bold'>{t('orderSummary')}</div>
+          <div className='space-y-2'>
+            <div className='flex justify-between'>
+              <span>{t('items')}:</span>
+              <span>
                 <ProductPrice price={itemsPrice} plain />
               </span>
             </div>
-            <div className='flex justify-between items-center py-2'>
-              <span className='text-muted-foreground'>
-                {t('shippingHandling')}:
-              </span>
-              <span className='font-semibold'>
+            <div className='flex justify-between'>
+              <span>{t('shippingHandling')}:</span>
+              <span>
                 {shippingPrice === undefined ? (
-                  <span className='text-muted-foreground'>--</span>
+                  '--'
                 ) : shippingPrice === 0 ? (
-                  <span className='text-green-600 dark:text-green-400 font-semibold'>
-                    {t('free')}
-                  </span>
+                  t('free')
                 ) : (
                   <ProductPrice price={shippingPrice} plain />
                 )}
               </span>
             </div>
-            <div className='flex justify-between items-center py-2'>
-              <span className='text-muted-foreground'>{t('tax')}:</span>
-              <span className='font-semibold'>
+            <div className='flex justify-between'>
+              <span>{t('tax')}:</span>
+              <span>
                 {taxPrice === undefined ? (
-                  <span className='text-muted-foreground'>--</span>
+                  '--'
                 ) : (
                   <ProductPrice price={taxPrice} plain />
                 )}
               </span>
             </div>
-            <div className='border-t border-gray-200/50 dark:border-gray-700/50 pt-4 mt-4'>
-              <div className='flex justify-between items-center'>
-                <span className='text-lg font-bold text-gray-900 dark:text-gray-100'>
-                  {t('orderTotal')}:
-                </span>
-                <span className='text-xl font-bold bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent'>
-                  <ProductPrice price={totalPrice} plain />
-                </span>
-              </div>
+            <div className='flex justify-between  pt-4 font-bold text-lg'>
+              <span>{t('orderTotal')}:</span>
+              <span>
+                <ProductPrice price={totalPrice} plain />
+              </span>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 
   return (
-    <div className='bg-gradient-to-br from-gray-50/50 via-white to-gray-100/50 dark:from-gray-900/50 dark:via-gray-800/50 dark:to-gray-700/50 min-h-screen'>
+    <main className='max-w-6xl mx-auto highlight-link'>
       {!isMounted || isCartRefreshing || !hasInitialized ? (
-        <div className='flex justify-center items-center py-16'>
+        <div className='flex justify-center items-center py-8'>
           <div className='text-center'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-3 border-primary mx-auto mb-4'></div>
-            <p className='text-lg text-muted-foreground font-medium'>
-              {t('Loading checkout')}
-            </p>
+            <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2'></div>
+            <p className='text-muted-foreground'>{t('Loading checkout')}</p>
           </div>
         </div>
       ) : (
-        <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-          <div className='grid lg:grid-cols-3 gap-8'>
-            {/* Main Checkout Content */}
-            <div className='lg:col-span-2 space-y-8'>
-              {/* Progress Indicator */}
-              <div className='bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:bg-gray-800/70 dark:border-gray-700/50 p-6 shadow-sm'>
-                <div className='flex items-center space-x-4'>
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                      isAddressSelected
-                        ? 'bg-green-500 text-white'
-                        : 'bg-primary text-primary-foreground'
-                    }`}
-                  >
-                    1
+        <div className='grid md:grid-cols-4 gap-6'>
+          <div className='md:col-span-3'>
+            {/* shipping address */}
+            <div>
+              {isAddressSelected && shippingAddress ? (
+                <div className='grid grid-cols-1 md:grid-cols-12    my-3  pb-3'>
+                  <div className='col-span-5 flex text-lg font-bold '>
+                    <span className='w-8'>1 </span>
+                    <span>{t('shippingAddress')}</span>
                   </div>
-                  <div
-                    className={`flex-1 h-1 rounded transition-all ${
-                      isItemsSelected
-                        ? 'bg-green-500'
-                        : isAddressSelected
-                          ? 'bg-primary'
-                          : 'bg-gray-200 dark:bg-gray-600'
-                    }`}
-                  />
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                      isItemsSelected
-                        ? 'bg-green-500 text-white'
-                        : isAddressSelected
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400'
-                    }`}
-                  >
-                    2
+                  <div className='col-span-5 '>
+                    <p>
+                      {shippingAddress.fullName} <br />
+                      {shippingAddress.street} <br />
+                      {`${shippingAddress.city}, ${shippingAddress.province}, ${shippingAddress.postalCode}, ${shippingAddress.country}`}
+                    </p>
                   </div>
-                  <div
-                    className={`flex-1 h-1 rounded transition-all ${
-                      isPaymentMethodSelected
-                        ? 'bg-green-500'
-                        : isItemsSelected
-                          ? 'bg-primary'
-                          : 'bg-gray-200 dark:bg-gray-600'
-                    }`}
-                  />
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                      isPaymentMethodSelected
-                        ? 'bg-green-500 text-white'
-                        : isItemsSelected
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400'
-                    }`}
-                  >
-                    3
+                  <div className='col-span-2'>
+                    <Button
+                      variant={'outline'}
+                      onClick={() => {
+                        setIsAddressSelected(false)
+                        setIsItemsSelected(false)
+                        setIsPaymentMethodSelected(false)
+                      }}
+                    >
+                      {t('change')}
+                    </Button>
                   </div>
                 </div>
-                <div className='flex justify-between mt-3 text-sm font-medium'>
-                  <span
-                    className={
-                      isAddressSelected
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-primary'
-                    }
-                  >
-                    Shipping Address
-                  </span>
-                  <span
-                    className={
-                      isItemsSelected
-                        ? 'text-green-600 dark:text-green-400'
-                        : isAddressSelected
-                          ? 'text-primary'
-                          : 'text-muted-foreground'
-                    }
-                  >
-                    Review Items
-                  </span>
-                  <span
-                    className={
-                      isPaymentMethodSelected
-                        ? 'text-green-600 dark:text-green-400'
-                        : isItemsSelected
-                          ? 'text-primary'
-                          : 'text-muted-foreground'
-                    }
-                  >
-                    Payment
-                  </span>
-                </div>
-              </div>
-              {/* Shipping Address Section */}
-              <div className='bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:bg-gray-800/70 dark:border-gray-700/50 shadow-sm overflow-hidden'>
-                {isAddressSelected && shippingAddress ? (
-                  <div className='p-6'>
-                    <div className='flex items-center justify-between mb-4'>
-                      <div className='flex items-center space-x-3'>
-                        <div className='w-8 h-8 rounded-full bg-green-500 flex items-center justify-center'>
-                          <span className='text-white font-semibold text-sm'>
-                            ✓
-                          </span>
-                        </div>
-                        <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100'>
-                          {t('shippingAddress')}
-                        </h2>
-                      </div>
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        className='rounded-lg'
-                        onClick={() => {
-                          setIsAddressSelected(false)
-                          setIsItemsSelected(false)
-                          setIsPaymentMethodSelected(false)
-                        }}
-                      >
-                        {t('change')}
-                      </Button>
-                    </div>
-                    <div className='bg-gray-50/50 dark:bg-gray-700/50 rounded-xl p-4'>
-                      <div className='text-gray-900 dark:text-gray-100'>
-                        <p className='font-semibold'>
-                          {shippingAddress.fullName}
-                        </p>
-                        <p className='text-muted-foreground'>
-                          {shippingAddress.street}
-                        </p>
-                        <p className='text-muted-foreground'>
-                          {`${shippingAddress.city}, ${shippingAddress.province}, ${shippingAddress.postalCode}`}
-                        </p>
-                        <p className='text-muted-foreground'>
-                          {shippingAddress.country}
-                        </p>
-                        <p className='text-muted-foreground'>
-                          {shippingAddress.phone}
-                        </p>
-                      </div>
-                    </div>
+              ) : (
+                <>
+                  <div className='flex text-primary text-lg font-bold my-2'>
+                    <span className='w-8'>1 </span>
+                    <span>{t('enterShippingAddress')}</span>
                   </div>
-                ) : (
-                  <div className='p-6'>
-                    <div className='flex items-center space-x-3 mb-6'>
-                      <div className='w-8 h-8 rounded-full bg-primary flex items-center justify-center'>
-                        <span className='text-primary-foreground font-semibold text-sm'>
-                          1
-                        </span>
-                      </div>
-                      <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100'>
-                        {t('enterShippingAddress')}
-                      </h2>
-                    </div>
-                    <Form {...shippingAddressForm}>
-                      <form
-                        method='post'
-                        onSubmit={shippingAddressForm.handleSubmit(
-                          onSubmitShippingAddress
-                        )}
-                        className='space-y-6'
-                      >
-                        <div className='bg-gray-50/50 dark:bg-gray-700/50 rounded-xl p-6 space-y-4'>
-                          <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4'>
+                  <Form {...shippingAddressForm}>
+                    <form
+                      method='post'
+                      onSubmit={shippingAddressForm.handleSubmit(
+                        onSubmitShippingAddress
+                      )}
+                      className='space-y-4'
+                    >
+                      <Card className='md:ml-8 my-4'>
+                        <CardContent className='p-4 space-y-2'>
+                          <div className='text-lg font-bold mb-2'>
                             {t('yourAddress')}
-                          </h3>
+                          </div>
 
                           <div className='flex flex-col gap-5 md:flex-row'>
                             <FormField
@@ -592,13 +469,10 @@ const CheckoutForm = () => {
                               name='fullName'
                               render={({ field }) => (
                                 <FormItem className='w-full'>
-                                  <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                                    {t('fullName')}
-                                  </FormLabel>
+                                  <FormLabel>{t('fullName')}</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder={t('enterFullName')}
-                                      className='rounded-xl border-gray-200 dark:border-gray-600 focus:border-primary focus:ring-primary'
                                       {...field}
                                     />
                                   </FormControl>
@@ -613,13 +487,10 @@ const CheckoutForm = () => {
                               name='street'
                               render={({ field }) => (
                                 <FormItem className='w-full'>
-                                  <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                                    {t('address')}
-                                  </FormLabel>
+                                  <FormLabel>{t('address')}</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder={t('enterAddress')}
-                                      className='rounded-xl border-gray-200 dark:border-gray-600 focus:border-primary focus:ring-primary'
                                       {...field}
                                     />
                                   </FormControl>
@@ -634,13 +505,10 @@ const CheckoutForm = () => {
                               name='city'
                               render={({ field }) => (
                                 <FormItem className='w-full'>
-                                  <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                                    {t('city')}
-                                  </FormLabel>
+                                  <FormLabel>{t('city')}</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder={t('enterCity')}
-                                      className='rounded-xl border-gray-200 dark:border-gray-600 focus:border-primary focus:ring-primary'
                                       {...field}
                                     />
                                   </FormControl>
@@ -653,13 +521,10 @@ const CheckoutForm = () => {
                               name='province'
                               render={({ field }) => (
                                 <FormItem className='w-full'>
-                                  <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                                    {t('province')}
-                                  </FormLabel>
+                                  <FormLabel>{t('province')}</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder={t('enterProvince')}
-                                      className='rounded-xl border-gray-200 dark:border-gray-600 focus:border-primary focus:ring-primary'
                                       {...field}
                                     />
                                   </FormControl>
@@ -672,13 +537,10 @@ const CheckoutForm = () => {
                               name='country'
                               render={({ field }) => (
                                 <FormItem className='w-full'>
-                                  <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                                    {t('country')}
-                                  </FormLabel>
+                                  <FormLabel>{t('country')}</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder={t('enterCountry')}
-                                      className='rounded-xl border-gray-200 dark:border-gray-600 focus:border-primary focus:ring-primary'
                                       {...field}
                                     />
                                   </FormControl>
@@ -693,13 +555,10 @@ const CheckoutForm = () => {
                               name='postalCode'
                               render={({ field }) => (
                                 <FormItem className='w-full'>
-                                  <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                                    {t('postalCode')}
-                                  </FormLabel>
+                                  <FormLabel>{t('postalCode')}</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder={t('enterPostalCode')}
-                                      className='rounded-xl border-gray-200 dark:border-gray-600 focus:border-primary focus:ring-primary'
                                       {...field}
                                     />
                                   </FormControl>
@@ -712,13 +571,10 @@ const CheckoutForm = () => {
                               name='phone'
                               render={({ field }) => (
                                 <FormItem className='w-full'>
-                                  <FormLabel className='text-gray-700 dark:text-gray-300 font-medium'>
-                                    {t('phoneNumber')}
-                                  </FormLabel>
+                                  <FormLabel>{t('phoneNumber')}</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder={t('enterPhoneNumber')}
-                                      className='rounded-xl border-gray-200 dark:border-gray-600 focus:border-primary focus:ring-primary'
                                       {...field}
                                     />
                                   </FormControl>
@@ -727,20 +583,20 @@ const CheckoutForm = () => {
                               )}
                             />
                           </div>
-                        </div>
-                        <div className='pt-6'>
+                        </CardContent>
+                        <CardFooter className='  p-4'>
                           <Button
                             type='submit'
-                            className='w-full rounded-xl bg-gradient-to-r from-primary to-orange-500 hover:from-primary/90 hover:to-orange-500/90 text-white font-semibold py-3 transition-all duration-200 shadow-md hover:shadow-lg'
+                            className='rounded-full font-bold'
                           >
                             {t('shipToThisAddress')}
                           </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </div>
-                )}
-              </div>
+                        </CardFooter>
+                      </Card>
+                    </form>
+                  </Form>
+                </>
+              )}
             </div>
             {/* items and delivery date */}
             <div className='border-y'>
@@ -1113,16 +969,12 @@ const CheckoutForm = () => {
               )}
             <CheckoutFooter />
           </div>
-
-          {/* Sidebar - Order Summary */}
-          <div className='lg:col-span-1'>
-            <div className='sticky top-8'>
-              <CheckoutSummary />
-            </div>
+          <div className='hidden md:block'>
+            <CheckoutSummary />
           </div>
-        </main>
+        </div>
       )}
-    </div>
+    </main>
   )
 }
 export default CheckoutForm

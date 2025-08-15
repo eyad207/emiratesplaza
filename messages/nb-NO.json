@@ -425,6 +425,7 @@
     "address": "Adresse",
     "enterAddress": "Skriv inn adresse",
     "city": "By",
+    "Invalid order total": "Ugyldig bestillingstotal",
     "enterCity": "Skriv inn by",
     "province": "Provins",
     "enterProvince": "Skriv inn provins",
