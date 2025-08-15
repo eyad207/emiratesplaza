@@ -96,6 +96,7 @@ const CheckoutForm = () => {
   } = useCartStore()
   const isMounted = useIsMounted()
   const [isCartRefreshing, setIsCartRefreshing] = useState(true)
+  const [hasInitialized, setHasInitialized] = useState(false)
 
   const shippingAddressForm = useForm<ShippingAddress>({
     resolver: zodResolver(ShippingAddressSchema),
@@ -120,35 +121,58 @@ const CheckoutForm = () => {
   useEffect(() => {
     const refreshStock = async () => {
       setIsCartRefreshing(true)
-      await refreshCartStock()
-      setIsCartRefreshing(false)
+      try {
+        await refreshCartStock()
+      } catch (error) {
+        console.warn('Failed to refresh cart stock:', error)
+      } finally {
+        setIsCartRefreshing(false)
+        setHasInitialized(true)
+      }
     }
-    refreshStock()
-  }, [refreshCartStock])
+
+    if (isMounted) {
+      refreshStock()
+    }
+  }, [refreshCartStock, isMounted])
 
   // Early validation - redirect if cart is invalid
   useEffect(() => {
-    if (!isMounted || isCartRefreshing) return
+    // Wait for proper initialization
+    if (!isMounted || !hasInitialized || isCartRefreshing) return
 
-    if (items.length === 0) {
-      toast({
-        description: tCart('Your cart is empty'),
-        variant: 'destructive',
-      })
-      router.push('/cart?error=empty-cart')
-      return
+    // Add a small delay to ensure cart store is fully loaded
+    const validateCart = () => {
+      try {
+        if (items.length === 0) {
+          toast({
+            description: tCart('Your cart is empty'),
+            variant: 'destructive',
+          })
+          router.push('/cart?error=empty-cart')
+          return
+        }
+
+        // Check if any items have invalid quantities
+        if (hasInvalidQuantities(items)) {
+          toast({
+            description: tCart('Please fix invalid quantities before checkout'),
+            variant: 'destructive',
+          })
+          router.push('/cart?error=invalid-quantities')
+          return
+        }
+      } catch (error) {
+        console.warn('Cart validation error:', error)
+        // If validation fails, redirect to cart to be safe
+        router.push('/cart')
+      }
     }
 
-    // Check if any items have invalid quantities
-    if (hasInvalidQuantities(items)) {
-      toast({
-        description: tCart('Please fix invalid quantities before checkout'),
-        variant: 'destructive',
-      })
-      router.push('/cart?error=invalid-quantities')
-      return
-    }
-  }, [items, isMounted, isCartRefreshing, router, tCart, toast])
+    // Add a small delay to ensure everything is properly loaded
+    const timeoutId = setTimeout(validateCart, 500)
+    return () => clearTimeout(timeoutId)
+  }, [items, isMounted, hasInitialized, isCartRefreshing, router, tCart, toast])
 
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false)
   const [isItemsSelected, setIsItemsSelected] = useState<boolean>(false)
@@ -381,7 +405,7 @@ const CheckoutForm = () => {
 
   return (
     <main className='max-w-6xl mx-auto highlight-link'>
-      {isCartRefreshing ? (
+      {!isMounted || isCartRefreshing || !hasInitialized ? (
         <div className='flex justify-center items-center py-8'>
           <div className='text-center'>
             <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2'></div>
