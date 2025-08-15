@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { auth } from '@/auth'
-import { Card, CardContent } from '@/components/ui/card'
+import SeparatorWithOr from '@/components/shared/separator-or'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 import CredentialsSignInForm from './credentials-signin-form'
 import { GoogleSignInForm } from './google-signin-form'
@@ -15,93 +16,48 @@ export const metadata: Metadata = {
   title: 'Sign In',
 }
 
-export default async function SignInPage({
-  searchParams: searchParamsPromise,
-}: {
-  searchParams: Promise<{ callbackUrl?: string }>
+export default async function SignInPage(props: {
+  searchParams: Promise<{
+    callbackUrl: string
+  }>
 }) {
-  const { callbackUrl = '/' } = await searchParamsPromise
+  const searchParams = await props.searchParams
+  const { site } = await getSetting()
+
+  const { callbackUrl = '/' } = searchParams
 
   const session = await auth()
   if (session) {
-    redirect(callbackUrl)
+    return redirect(callbackUrl)
   }
 
-  const [t, { site }] = await Promise.all([
-    getTranslations('SignIn'),
-    getSetting(),
-  ])
+  const t = await getTranslations('SignIn')
 
   return (
-    <div className='w-full max-w-md mx-auto space-y-8'>
-      {/* Welcome Section */}
-      <div className='text-center space-y-4'>
-        <div className='w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full mx-auto flex items-center justify-center shadow-xl'>
-          <svg
-            className='w-10 h-10 text-white'
-            fill='none'
-            stroke='currentColor'
-            viewBox='0 0 24 24'
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth={2}
-              d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
-            />
-          </svg>
-        </div>
-        <div>
-          <h1 className='text-3xl font-bold text-foreground'>{t('SignIn')}</h1>
-          <p className='text-muted-foreground mt-2'>
-            Welcome back! Sign in to your account
-          </p>
-        </div>
-      </div>
-
-      {/* Sign In Form Card */}
-      <div className='space-y-6'>
-        <Card className='border-0 shadow-none bg-transparent'>
-          <CardContent className='p-0 space-y-6'>
+    <div className='w-full'>
+      <Card>
+        <CardHeader>
+          <CardTitle className='text-2xl'>{t('SignIn')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div>
             <CredentialsSignInForm />
-
-            <div className='relative'>
-              <div className='absolute inset-0 flex items-center'>
-                <span className='w-full border-t border-border' />
-              </div>
-              <div className='relative flex justify-center text-sm'>
-                <span className='px-4 mb-2 bg-zinc-900 text-muted-foreground'>
-                  or continue with
-                </span>
-              </div>
+            <SeparatorWithOr />
+            <div className='mt-4'>
+              <GoogleSignInForm />
             </div>
-
-            <GoogleSignInForm />
-          </CardContent>
-        </Card>
-
-        {/* Divider */}
-        <div className='relative'>
-          <div className='absolute inset-0 flex items-center'>
-            <span className='w-full border-t border-border' />
           </div>
-          <div className='relative flex justify-center text-sm'>
-            <span className='px-4 mb-2 bg-zinc-900 text-muted-foreground'>
-              {t('NewToSite', { siteName: site.name })}
-            </span>
-          </div>
-        </div>
+        </CardContent>
+      </Card>
+      <SeparatorWithOr>
+        {t('NewToSite', { siteName: site.name })}
+      </SeparatorWithOr>
 
-        {/* Create Account Button */}
-        <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-          <Button
-            className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg '
-            variant='default'
-          >
-            {t('CreateAccount', { siteName: site.name })}
-          </Button>
-        </Link>
-      </div>
+      <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
+        <Button className='w-full' variant='outline'>
+          {t('CreateAccount', { siteName: site.name })}
+        </Button>
+      </Link>
     </div>
   )
 }
