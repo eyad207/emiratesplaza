@@ -39,7 +39,9 @@ export default async function CheckoutLayout({
 
             {/* Checkout Title */}
             <div className='text-center'>
-              <h1 className='text-2xl md:text-3xl font-bold text-foreground'>Checkout</h1>
+              <h1 className='text-2xl md:text-3xl font-bold text-foreground'>
+                Checkout
+              </h1>
             </div>
 
             {/* Help Link */}
