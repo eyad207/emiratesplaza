@@ -130,7 +130,6 @@ const CheckoutForm = () => {
         description: tCart('Your cart is empty'),
         variant: 'destructive',
       })
-      router.push('/cart?error=empty-cart')
       return
     }
 

@@ -76,6 +76,15 @@ export const createOrder = async (clientSideCart: Cart) => {
       }
     }
 
+    // If payment method is 'Cash On Delivery', mark as placed but not paid
+    if (createdOrder.paymentMethod === 'Cash On Delivery') {
+      return {
+        success: true,
+        message: 'Order placed successfully!',
+        data: { orderId: createdOrder._id.toString() },
+      }
+    }
+
     return {
       success: true,
       message: 'Processing to payment ...',

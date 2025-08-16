@@ -8,7 +8,6 @@ import { formatId } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { ChevronRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
-import CartClearOnOrderView from '@/components/shared/cart-clear-on-order-view'
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>
@@ -25,10 +24,8 @@ export default async function OrderDetailsPage(props: {
   params: Promise<{
     id: string
   }>
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const params = await props.params
-  const searchParams = await props.searchParams
   const { id } = params
 
   const t = await getTranslations()
@@ -39,16 +36,8 @@ export default async function OrderDetailsPage(props: {
 
   const session = await auth()
 
-  // Extract payment-related search params for cart clearing
-  const paymentParams = Object.keys(searchParams || {})
-
   return (
     <>
-      <CartClearOnOrderView
-        orderId={order._id.toString()}
-        isPaid={order.isPaid}
-        paymentParams={paymentParams}
-      />
       {/* Enhanced breadcrumb navigation */}
       <div className='flex items-center gap-2 text-sm text-muted-foreground mb-6'>
         <Link
