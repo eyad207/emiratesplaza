@@ -381,7 +381,7 @@ export default function CartSidebar() {
                     href='/cart'
                     className={cn(
                       buttonVariants({ variant: 'outline', size: 'sm' }),
-                      'w-full',
+                      'w-full bg-zinc-800 text-white hover:bg-zinc-400 hover:text-black',
                       items.length === 0 && 'opacity-50 pointer-events-none' // Disable button if cart is empty
                     )}
                     onClick={closeSidebar}

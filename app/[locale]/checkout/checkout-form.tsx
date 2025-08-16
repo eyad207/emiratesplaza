@@ -316,10 +316,10 @@ const CheckoutForm = () => {
             </p>
           </div>
         )}
-        {isItemsSelected && isAddressSelected && (
+        {isItemsSelected && isAddressSelected && !isPaymentMethodSelected && (
           <div>
             <Button
-              onClick={handlePlaceOrder}
+              onClick={handleSelectPaymentMethod}
               className='rounded-full w-full'
               disabled={items.some((it) => it.quantity === 0)}
             >
@@ -327,7 +327,7 @@ const CheckoutForm = () => {
                 ? t('placeYourOrder')
                 : paymentMethod === 'Cash On Delivery'
                   ? t('placeYourOrder')
-                  : t('continueToPayment')}
+                  : t('useThisPaymentMethod')}
             </Button>
             <p className='text-xs text-center py-2'></p>
           </div>
@@ -834,9 +834,32 @@ const CheckoutForm = () => {
               </div>
             )}
           </div>
-          {/* payment method (simplified) */}
+          {/* payment method */}
           <div>
-            {isItemsSelected && totalPrice > 0 ? (
+            {isPaymentMethodSelected && paymentMethod ? (
+              <div className='grid grid-cols-1 md:grid-cols-12 my-3 pb-3'>
+                <div className='col-span-5 flex text-lg font-bold'>
+                  <span className='w-8'>3 </span>
+                  <span>{t('paymentMethod')}</span>
+                </div>
+                <div className='col-span-5'>
+                  <p>
+                    {paymentMethod === 'Pay Here'
+                      ? t('payHere')
+                      : t('payInStoreCash')}
+                  </p>
+                </div>
+                <div className='col-span-2'>
+                  <Button
+                    onClick={() => {
+                      setIsPaymentMethodSelected(false)
+                    }}
+                  >
+                    {t('change')}
+                  </Button>
+                </div>
+              </div>
+            ) : isItemsSelected && totalPrice > 0 ? (
               <>
                 <div className='flex text-primary text-lg font-bold my-2'>
                   <span className='w-8'>3 </span>
@@ -914,15 +937,21 @@ const CheckoutForm = () => {
               <Card className='hidden md:block '>
                 <CardContent className='p-4 flex flex-col md:flex-row justify-between items-center gap-3'>
                   <Button
-                    onClick={handlePlaceOrder}
+                    onClick={
+                      isPaymentMethodSelected
+                        ? handlePlaceOrder
+                        : handleSelectPaymentMethod
+                    }
                     className='rounded-full'
                     disabled={items.some((it) => it.quantity === 0)}
                   >
-                    {totalPrice === 0
+                    {isPaymentMethodSelected
                       ? t('placeYourOrder')
-                      : paymentMethod === 'Cash On Delivery'
+                      : totalPrice === 0
                         ? t('placeYourOrder')
-                        : t('continueToPayment')}
+                        : paymentMethod === 'Cash On Delivery'
+                          ? t('placeYourOrder')
+                          : t('useThisPaymentMethod')}
                   </Button>
                   <div className='flex-1'>
                     <p className='font-bold text-lg'>
