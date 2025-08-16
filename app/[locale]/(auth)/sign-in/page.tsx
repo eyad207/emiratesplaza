@@ -15,22 +15,22 @@ export const metadata: Metadata = {
   title: 'Sign In',
 }
 
-export default async function SignInPage({
-  searchParams: searchParamsPromise,
-}: {
-  searchParams: Promise<{ callbackUrl?: string }>
+export default async function SignInPage(props: {
+  searchParams: Promise<{
+    callbackUrl: string
+  }>
 }) {
-  const { callbackUrl = '/' } = await searchParamsPromise
+  const searchParams = await props.searchParams
+  const { site } = await getSetting()
+
+  const { callbackUrl = '/' } = searchParams
 
   const session = await auth()
   if (session) {
-    redirect(callbackUrl)
+    return redirect(callbackUrl)
   }
 
-  const [t, { site }] = await Promise.all([
-    getTranslations('SignIn'),
-    getSetting(),
-  ])
+  const t = await getTranslations('SignIn')
 
   return (
     <div className='w-full max-w-md mx-auto space-y-8'>
