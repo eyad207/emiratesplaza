@@ -834,29 +834,9 @@ const CheckoutForm = () => {
               </div>
             )}
           </div>
-          {/* payment method */}
+          {/* payment method (simplified) */}
           <div>
-            {isPaymentMethodSelected && paymentMethod ? (
-              <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
-                <div className='flex text-lg font-bold  col-span-5'>
-                  <span className='w-8'>3 </span>
-                  <span>{t('paymentMethod')}</span>
-                </div>
-                <div className='col-span-5 '>
-                  <p>{paymentMethod}</p>
-                </div>
-                <div className='col-span-2'>
-                  <Button
-                    variant='outline'
-                    onClick={() => {
-                      setIsPaymentMethodSelected(false)
-                    }}
-                  >
-                    {t('change')}
-                  </Button>
-                </div>
-              </div>
-            ) : isItemsSelected && totalPrice > 0 ? (
+            {isItemsSelected && totalPrice > 0 ? (
               <>
                 <div className='flex text-primary text-lg font-bold my-2'>
                   <span className='w-8'>3 </span>
@@ -865,7 +845,7 @@ const CheckoutForm = () => {
                 <Card className='md:ml-8 my-4'>
                   <CardContent className='p-4'>
                     <RadioGroup
-                      value={paymentMethod}
+                      value={'Pay Here'}
                       onValueChange={(value) => setPaymentMethod(value)}
                     >
                       <div className='flex items-center py-1'>
@@ -925,7 +905,7 @@ const CheckoutForm = () => {
               </div>
             )}
           </div>
-          {isPaymentMethodSelected && isAddressSelected && isItemsSelected && (
+          {isAddressSelected && isItemsSelected && (
             <div className='mt-6'>
               <div className='block md:hidden'>
                 <CheckoutSummary />
