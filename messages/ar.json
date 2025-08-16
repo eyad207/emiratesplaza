@@ -431,6 +431,8 @@
     "Your cart is empty": "سلتك فارغة",
     "All items in your cart have invalid quantities Please fix them before checkout": "جميع العناصر في سلتك لها كميات غير صحيحة. يرجى إصلاحها قبل الدفع.",
     "freeShipping": "شحن مجاني",
+    "freeOrder": "طلب مجاني - لا حاجة للدفع",
+    "freeOrderMessage": "هذا الطلب مجاني! يمكنك إجراؤه مباشرة بدون أي دفع.",
     "privacyPolicy": "إشعار الخصوصية",
     "termsOfUse": "شروط الاستخدام",
     "and": "و"

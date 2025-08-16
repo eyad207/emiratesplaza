@@ -30,6 +30,20 @@ export const createOrder = async (clientSideCart: Cart) => {
       clientSideCart,
       session.user.id!
     )
+
+    // If the order total is 0 or payment method is 'Free Order', mark as paid
+    if (
+      createdOrder.totalPrice === 0 ||
+      createdOrder.paymentMethod === 'Free Order'
+    ) {
+      await updateOrderToPaid(createdOrder._id.toString())
+      return {
+        success: true,
+        message: 'Free order placed successfully!',
+        data: { orderId: createdOrder._id.toString() },
+      }
+    }
+
     return {
       success: true,
       message: 'Processing to payment ...',
@@ -84,6 +98,17 @@ export async function updateOrderToPaid(orderId: string) {
       // Mark the order as paid
       order.isPaid = true
       order.paidAt = new Date()
+
+      // For free orders, set a specific payment result to identify them
+      if (order.totalPrice === 0 || order.paymentMethod === 'Free Order') {
+        order.paymentResult = {
+          id: 'FREE_ORDER',
+          status: 'COMPLETED',
+          email_address: order.user?.email || '',
+          pricePaid: '0.00',
+        }
+      }
+
       await order.save(opts)
 
       // Update product stock

@@ -467,6 +467,8 @@
     "removeItem": "Remove item",
     "chooseShippingSpeed": "Choose a shipping speed",
     "freeShipping": "FREE Shipping",
+    "freeOrder": "Free Order - No Payment Required",
+    "freeOrderMessage": "This order is free! You can place it directly without any payment.",
     "privacyPolicy": "privacy notice",
     "Invalid order total": "Invalid order total",
     "termsOfUse": "conditions of use",

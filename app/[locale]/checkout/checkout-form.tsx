@@ -119,9 +119,15 @@ const CheckoutForm = () => {
   // Payment method step removed; we only have two options and default is Pay Here
 
   const handlePlaceOrder = async () => {
+    // If total price is 0, automatically mark as paid and skip payment
+    const isFreeOrder = totalPrice === 0
+
     // Map UI payment choices to stored order payment method
-    const mappedPaymentMethod =
-      paymentMethod === 'Cash On Delivery' ? 'Cash On Delivery' : 'Stripe'
+    const mappedPaymentMethod = isFreeOrder
+      ? 'Free Order'
+      : paymentMethod === 'Cash On Delivery'
+        ? 'Cash On Delivery'
+        : 'Stripe'
 
     const res = await createOrder({
       items,
@@ -144,7 +150,9 @@ const CheckoutForm = () => {
       return
     }
     toast({ description: res.message, variant: 'default' })
-    if (mappedPaymentMethod === 'Cash On Delivery') {
+
+    // For free orders or cash on delivery, go to order page
+    if (isFreeOrder || mappedPaymentMethod === 'Cash On Delivery') {
       router.push(`/account/orders/${res.data?.orderId}`)
     } else {
       router.push(`/checkout/${res.data?.orderId}`)
@@ -194,9 +202,11 @@ const CheckoutForm = () => {
               className='rounded-full w-full'
               disabled={items.some((it) => it.quantity === 0)}
             >
-              {paymentMethod === 'Cash On Delivery'
+              {totalPrice === 0
                 ? t('placeYourOrder')
-                : t('continueToPayment')}
+                : paymentMethod === 'Cash On Delivery'
+                  ? t('placeYourOrder')
+                  : t('continueToPayment')}
             </Button>
             <p className='text-xs text-center py-2'></p>
           </div>
@@ -694,7 +704,7 @@ const CheckoutForm = () => {
           </div>
           {/* payment method (simplified) */}
           <div>
-            {isItemsSelected ? (
+            {isItemsSelected && totalPrice > 0 ? (
               <>
                 <div className='flex text-primary text-lg font-bold my-2'>
                   <span className='w-8'>3 </span>
@@ -734,6 +744,20 @@ const CheckoutForm = () => {
                   </CardContent>
                 </Card>
               </>
+            ) : isItemsSelected && totalPrice === 0 ? (
+              <>
+                <div className='flex text-green-600 text-lg font-bold my-2'>
+                  <span className='w-8'>3 </span>
+                  <span>{t('freeOrder')}</span>
+                </div>
+                <Card className='md:ml-8 my-4'>
+                  <CardContent className='p-4'>
+                    <p className='text-green-600 font-semibold'>
+                      {t('freeOrderMessage')}
+                    </p>
+                  </CardContent>
+                </Card>
+              </>
             ) : (
               <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
                 <span className='w-8'>3 </span>
@@ -754,9 +778,11 @@ const CheckoutForm = () => {
                     className='rounded-full'
                     disabled={items.some((it) => it.quantity === 0)}
                   >
-                    {paymentMethod === 'Cash On Delivery'
+                    {totalPrice === 0
                       ? t('placeYourOrder')
-                      : t('continueToPayment')}
+                      : paymentMethod === 'Cash On Delivery'
+                        ? t('placeYourOrder')
+                        : t('continueToPayment')}
                   </Button>
                   <div className='flex-1'>
                     <p className='font-bold text-lg'>

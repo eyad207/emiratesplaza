@@ -452,6 +452,8 @@
     "removeItem": "Fjern vare",
     "chooseShippingSpeed": "Velg en frakthastighet",
     "freeShipping": "GRATIS frakt",
+    "freeOrder": "Gratis bestilling - Ingen betaling påkrevd",
+    "freeOrderMessage": "Denne bestillingen er gratis! Du kan legge den inn direkte uten betaling.",
     "privacyPolicy": "personvernerklæring",
     "termsOfUse": "bruksvilkår",
     "and": "og"

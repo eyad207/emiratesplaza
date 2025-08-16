@@ -61,8 +61,18 @@ export default function OrderDetailsForm({
 
   // Function to determine the actual payment method used
   const getActualPaymentMethod = () => {
+    // Special handling for Free Orders first
+    if (paymentMethod === 'Free Order' || totalPrice === 0) {
+      return 'Free Order'
+    }
+
     if (!isPaid || !paymentResult) {
       return paymentMethod // Return the selected method if not paid yet
+    }
+
+    // Check for free order payment result
+    if (paymentResult.id === 'FREE_ORDER') {
+      return 'Free Order'
     }
 
     // For paid orders, determine the actual payment method from paymentResult
