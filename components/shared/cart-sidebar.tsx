@@ -4,7 +4,7 @@ import useCartStore from '@/hooks/use-cart-store'
 import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/currency'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Button, buttonVariants } from '../ui/button'
 import { ScrollArea } from '../ui/scroll-area'
 import Image from 'next/image'
@@ -22,9 +22,11 @@ import { useLocale, useTranslations } from 'next-intl'
 import { getDirection } from '@/i18n-config'
 import { useCartSidebarStore } from '@/hooks/use-cart-sidebar-store'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation'
-import { toast } from '@/hooks/use-toast'
-import type { OrderItem } from '@/types'
+import {
+  hasInvalidQuantities,
+  getInvalidQuantityItems,
+} from '@/lib/cart-validation-client'
+import { useToast } from '@/hooks/use-toast'
 
 export default function CartSidebar() {
   const { isOpen, closeSidebar } = useCartSidebarStore()
@@ -33,8 +35,7 @@ export default function CartSidebar() {
     updateItem,
     removeItem,
     clearCart,
-    refreshCartStock,
-    refreshCartPrices,
+    refreshCartStock, // Use refreshCartStock from useCartStore
   } = useCartStore()
   const {
     setting: {
@@ -45,85 +46,42 @@ export default function CartSidebar() {
   const t = useTranslations()
   const locale = useLocale()
   const rtl = getDirection(locale) === 'rtl'
-  const router = useRouter()
+  const { toast } = useToast()
 
-  const [priceChangeInfo, setPriceChangeInfo] = useState<{
-    hasChanges: boolean
-    priceChanges: Array<{
-      item: OrderItem
-      oldPrice: number
-      newPrice: number
-      priceChange: number
-      changeType: 'increase' | 'decrease'
-    }>
-  } | null>(null)
-
-  const checkPricesAndStock = React.useCallback(async () => {
-    try {
-      // Check for price changes first
-      const priceResult = await refreshCartPrices()
-
-      if (priceResult.hasChanges) {
-        setPriceChangeInfo(priceResult)
-
-        // Show professional notification
-        const totalIncreases = priceResult.priceChanges.filter(
-          (c) => c.changeType === 'increase'
-        ).length
-        const totalDecreases = priceResult.priceChanges.filter(
-          (c) => c.changeType === 'decrease'
-        ).length
-
-        if (totalIncreases > 0 && totalDecreases > 0) {
-          toast({
-            title: t('Cart.Price Changes Detected'),
-            description: t(
-              'Cart.Some items have price changes Please review below'
-            ),
-            variant: 'default',
-          })
-        } else if (totalIncreases > 0) {
-          toast({
-            title: t('Cart.Price Increases Detected'),
-            description: t('Cart.Some items have increased in price'),
-            variant: 'destructive',
-          })
-        } else {
-          toast({
-            title: t('Cart.Price Decreases Detected'),
-            description: t('Cart.Good news Some items have decreased in price'),
-            variant: 'default',
-          })
-        }
-      }
-
-      // Then refresh stock
-      await refreshCartStock()
-    } catch (error) {
-      console.error('Failed to check prices and stock:', error)
-      toast({
-        title: t('Cart.Update Failed'),
-        description: t('Cart.Failed to check current prices Please try again'),
-        variant: 'destructive',
-      })
-    } finally {
-    }
-  }, [refreshCartPrices, refreshCartStock, t])
-
-  const dismissPriceChanges = () => {
-    setPriceChangeInfo(null)
-    toast({
-      title: t('Cart.Price Changes Accepted'),
-      description: t('Cart.Your cart has been updated with current prices'),
-      variant: 'default',
-    })
-  }
+  // Calculate total quantity in cart
+  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
+  const invalidItems = getInvalidQuantityItems(items)
+  const canProceedToCheckout = totalQuantity > 0 && !hasInvalidQuantities(items)
 
   useEffect(() => {
     if (isOpen) {
-      checkPricesAndStock()
+      refreshCartStock() // Correctly call refreshCartStock from useCartStore
     }
-  }, [isOpen, checkPricesAndStock])
+  }, [isOpen, refreshCartStock])
+
+  // Handle checkout click with validation
+  const handleCheckoutClick = (e: React.MouseEvent) => {
+    if (!canProceedToCheckout) {
+      e.preventDefault()
+
+      if (totalQuantity === 0) {
+        toast({
+          description: t('Cart.Your cart is empty'),
+          variant: 'destructive',
+        })
+        return
+      }
+
+      if (invalidItems.length > 0) {
+        toast({
+          description: t('Cart.Please fix invalid quantities before checkout'),
+          variant: 'destructive',
+        })
+        return
+      }
+    }
+    closeSidebar()
+  }
 
   if (!isOpen) {
     return null // Sidebar is not open, so don't render it
@@ -139,7 +97,7 @@ export default function CartSidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeSidebar}
-            className='fixed inset-0 bg-black/30 dark:bg-black/50 z-[100] backdrop-blur-sm'
+            className='fixed inset-0 bg-black/30 dark:bg-black/50 z-40 backdrop-blur-sm'
           />
 
           {/* Sidebar */}
@@ -149,7 +107,7 @@ export default function CartSidebar() {
             exit={{ x: rtl ? -320 : 320 }}
             transition={{ type: 'spring', damping: 20 }}
             className={cn(
-              'fixed top-0 bottom-0 z-[101] w-full max-w-[280px] xs:max-w-[320px] bg-background shadow-xl',
+              'fixed top-0 bottom-0 z-50 w-full max-w-[280px] xs:max-w-[320px] bg-background shadow-xl',
               rtl ? 'left-0' : 'right-0',
               'border-l border-border/30'
             )}
@@ -179,52 +137,6 @@ export default function CartSidebar() {
                 </div>
               </div>
 
-              {/* Price Change Notification */}
-              {priceChangeInfo?.hasChanges && (
-                <div className='p-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800'>
-                  <div className='flex items-start gap-2'>
-                    <AlertTriangle className='h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0' />
-                    <div className='flex-1 min-w-0'>
-                      <h3 className='text-sm font-medium text-amber-800 dark:text-amber-200 mb-1'>
-                        {t('Cart.Price Changes Detected')}
-                      </h3>
-                      <div className='space-y-1 mb-2'>
-                        {priceChangeInfo.priceChanges.map((change, index) => (
-                          <div
-                            key={index}
-                            className='text-xs text-amber-700 dark:text-amber-300'
-                          >
-                            <span className='font-medium'>
-                              {change.item.name}
-                            </span>
-                            {' - '}
-                            <span
-                              className={cn(
-                                'font-medium',
-                                change.changeType === 'increase'
-                                  ? 'text-red-600 dark:text-red-400'
-                                  : 'text-green-600 dark:text-green-400'
-                              )}
-                            >
-                              {change.changeType === 'increase' ? '+' : '-'}
-                              {formatPrice(change.priceChange)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      <Button
-                        size='sm'
-                        variant='outline'
-                        onClick={dismissPriceChanges}
-                        className='h-6 px-2 text-xs bg-white dark:bg-amber-900/50 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/70'
-                      >
-                        {t('Cart.Accept Changes')}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Cart Items */}
               <ScrollArea className='flex-1 overflow-y-auto py-2'>
                 <div className='flex flex-col divide-y divide-border/30'>
@@ -233,95 +145,108 @@ export default function CartSidebar() {
                       {t('Cart.Your Shopping Cart is empty')}
                     </div>
                   ) : (
-                    items.map((item) => (
-                      <div
-                        key={item.clientId}
-                        className='p-3 hover:bg-muted/20 transition-colors'
-                      >
-                        <div className='flex gap-3 items-center'>
-                          <Link
-                            href={`/product/${item.slug}`}
-                            className='shrink-0'
-                            onClick={closeSidebar}
-                          >
-                            <div className='relative h-16 w-16 rounded-md overflow-hidden border border-border/30'>
-                              <Image
-                                src={item.image}
-                                alt={item.name}
-                                fill
-                                sizes='64px'
-                                className='object-contain'
-                              />
-                            </div>
-                          </Link>
-                          <div className='flex-1 min-w-0'>
+                    items.map((item) => {
+                      const isInvalidItem = invalidItems.includes(item)
+                      return (
+                        <div
+                          key={item.clientId}
+                          className={cn(
+                            'p-3 hover:bg-muted/20 transition-colors',
+                            isInvalidItem &&
+                              'bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800'
+                          )}
+                        >
+                          <div className='flex gap-3 items-center'>
                             <Link
                               href={`/product/${item.slug}`}
-                              className='font-medium text-sm line-clamp-1 hover:text-primary transition-colors'
+                              className='shrink-0'
                               onClick={closeSidebar}
                             >
-                              {item.name}
-                            </Link>
-                            <div className='text-muted-foreground text-xs mt-1'>
-                              {item.color && (
-                                <span className='mr-2'>
-                                  {t('Cart.Color')}: {item.color}
-                                </span>
-                              )}
-                              {item.size && (
-                                <span>
-                                  {t('Cart.Size')}: {item.size}
-                                </span>
-                              )}
-                            </div>
-                            <div className='flex items-center justify-between mt-2'>
-                              <div className='font-medium text-sm'>
-                                <ProductPrice price={item.price} plain />
+                              <div className='relative h-16 w-16 rounded-md overflow-hidden border border-border/30'>
+                                <Image
+                                  src={item.image}
+                                  alt={item.name}
+                                  fill
+                                  sizes='64px'
+                                  className='object-contain'
+                                />
                               </div>
-                              <div className='flex items-center gap-2'>
-                                <Select
-                                  value={item.quantity.toString()}
-                                  onValueChange={(value) => {
-                                    const newQuantity = Number(value)
-                                    updateItem(item, newQuantity) // Automatically removes the item if quantity is 0
-                                  }}
-                                >
-                                  <SelectTrigger className='text-xs h-7 w-14 px-2'>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {Array.from({
-                                      length:
-                                        item.colors
-                                          .find((c) => c.color === item.color)
-                                          ?.sizes.find(
-                                            (s) => s.size === item.size
-                                          )?.countInStock || 0,
-                                    }).map((_, i) => (
-                                      <SelectItem
-                                        value={(i + 1).toString()}
-                                        key={i + 1}
-                                      >
-                                        {i + 1}
-                                      </SelectItem>
-                                    ))}
-                                    <SelectItem value='0'>Remove</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Button
-                                  variant='ghost'
-                                  size='sm'
-                                  className='h-7 w-7 p-0 text-muted-foreground hover:text-destructive'
-                                  onClick={() => removeItem(item)}
-                                >
-                                  <TrashIcon className='w-4 h-4' />
-                                </Button>
+                            </Link>
+                            <div className='flex-1 min-w-0'>
+                              <Link
+                                href={`/product/${item.slug}`}
+                                className='font-medium text-sm line-clamp-1 hover:text-primary transition-colors'
+                                onClick={closeSidebar}
+                              >
+                                {item.name}
+                              </Link>
+                              <div className='text-muted-foreground text-xs mt-1'>
+                                {item.color && (
+                                  <span className='mr-2'>
+                                    {t('Cart.Color')}: {item.color}
+                                  </span>
+                                )}
+                                {item.size && (
+                                  <span>
+                                    {t('Cart.Size')}: {item.size}
+                                  </span>
+                                )}
+                              </div>
+                              {isInvalidItem && (
+                                <div className='text-red-600 dark:text-red-400 text-xs mt-1 flex items-center gap-1'>
+                                  <AlertTriangle className='h-3 w-3' />
+                                  {t('Cart.Invalid quantity')}
+                                </div>
+                              )}
+                              <div className='flex items-center justify-between mt-2'>
+                                <div className='font-medium text-sm'>
+                                  <ProductPrice price={item.price} plain />
+                                </div>
+                                <div className='flex items-center gap-2'>
+                                  <Select
+                                    value={item.quantity.toString()}
+                                    onValueChange={(value) => {
+                                      const newQuantity = Number(value)
+                                      updateItem(item, newQuantity) // Automatically removes the item if quantity is 0
+                                    }}
+                                  >
+                                    <SelectTrigger className='text-xs h-7 w-14 px-2'>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {Array.from({
+                                        length:
+                                          item.colors
+                                            .find((c) => c.color === item.color)
+                                            ?.sizes.find(
+                                              (s) => s.size === item.size
+                                            )?.countInStock || 0,
+                                      }).map((_, i) => (
+                                        <SelectItem
+                                          value={(i + 1).toString()}
+                                          key={i + 1}
+                                        >
+                                          {i + 1}
+                                        </SelectItem>
+                                      ))}
+                                      <SelectItem value='0'>Remove</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button
+                                    variant='ghost'
+                                    size='sm'
+                                    className='h-7 w-7 p-0 text-muted-foreground hover:text-destructive'
+                                    onClick={() => removeItem(item)}
+                                  >
+                                    <TrashIcon className='w-4 h-4' />
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      )
+                    })
                   )}
                 </div>
               </ScrollArea>
@@ -362,27 +287,23 @@ export default function CartSidebar() {
 
                 {/* Buttons */}
                 <div className='space-y-2'>
-                  <Button
-                    type='button'
-                    onClick={() => {
-                      closeSidebar()
-                      router.push('/checkout')
-                    }}
+                  <Link
+                    href='/checkout'
                     className={cn(
                       buttonVariants({ size: 'sm' }),
                       'w-full',
-                      items.length === 0 && 'opacity-50 pointer-events-none' // Disable if empty
+                      !canProceedToCheckout && 'opacity-50 pointer-events-none'
                     )}
-                    disabled={items.length === 0}
+                    onClick={handleCheckoutClick}
                   >
                     {t('Cart.Proceed to Checkout')}
-                  </Button>
+                  </Link>
                   <Link
                     href='/cart'
                     className={cn(
                       buttonVariants({ variant: 'outline', size: 'sm' }),
-                      'w-full',
-                      items.length === 0 && 'opacity-50 pointer-events-none' // Disable button if cart is empty
+                      'w-full bg-gray-900 hover:bg-gray-800 text-white',
+                      totalQuantity === 0 && 'opacity-50 pointer-events-none'
                     )}
                     onClick={closeSidebar}
                   >
