@@ -93,6 +93,7 @@ const CheckoutForm = () => {
     removeItem,
     setDeliveryDateIndex,
     refreshCartStock,
+    clearCart,
   } = useCartStore()
   const isMounted = useIsMounted()
 
@@ -241,6 +242,7 @@ const CheckoutForm = () => {
 
       // For free orders or cash on delivery, go to order page
       if (isFreeOrder || mappedPaymentMethod === 'Cash On Delivery') {
+        clearCart() // Clear cart for free orders and cash on delivery
         router.push(`/account/orders/${res.data?.orderId}`)
       } else {
         router.push(`/checkout/${res.data?.orderId}`)
@@ -406,7 +408,6 @@ const CheckoutForm = () => {
                 </div>
                 <div className='col-span-2'>
                   <Button
-                    variant={'outline'}
                     onClick={() => {
                       setIsAddressSelected(false)
                       setIsItemsSelected(false)
@@ -645,7 +646,6 @@ const CheckoutForm = () => {
                 </div>
                 <div className='col-span-2'>
                   <Button
-                    variant={'outline'}
                     onClick={() => {
                       setIsItemsSelected(false)
                       setIsPaymentMethodSelected(false)

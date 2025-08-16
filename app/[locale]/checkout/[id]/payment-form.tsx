@@ -106,7 +106,7 @@ export default function OrderDetailsForm({
         description: res.message,
         variant: res.success ? 'default' : 'destructive',
       })
-      router.push(`/account/orders/${order._id}`)
+      router.push(`/account/orders/${order._id}?payment=paypal`)
     }
   }
 

@@ -4,6 +4,7 @@ import Stripe from 'stripe'
 
 import { Button } from '@/components/ui/button'
 import { getOrderById } from '@/lib/actions/order.actions'
+import CartClearOnPaymentSuccess from '@/components/shared/cart-clear-on-payment-success'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
@@ -34,6 +35,7 @@ export default async function SuccessPage(props: {
   if (!isSuccess) return redirect(`/checkout/${id}`)
   return (
     <div className='max-w-4xl w-full mx-auto space-y-8'>
+      <CartClearOnPaymentSuccess />
       <div className='flex flex-col gap-6 items-center '>
         <h1 className='font-bold text-2xl lg:text-3xl'>
           Thanks for your purchase

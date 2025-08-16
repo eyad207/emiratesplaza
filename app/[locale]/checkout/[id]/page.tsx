@@ -26,7 +26,7 @@ const CheckoutPaymentPage = async (props: {
   if (order.paymentMethod === 'Vipps' && !order.isPaid) {
     const res = await approveVippsOrder(order._id)
     if (res.success) {
-      redirect(`/account/orders/${order._id}`)
+      redirect(`/account/orders/${order._id}?payment=vipps`)
     }
   }
 
