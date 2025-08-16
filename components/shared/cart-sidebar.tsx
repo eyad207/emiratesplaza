@@ -61,6 +61,8 @@ export default function CartSidebar() {
 
   // Handle checkout click with validation
   const handleCheckoutClick = (e: React.MouseEvent) => {
+    closeSidebar()
+
     if (!canProceedToCheckout) {
       e.preventDefault()
 
@@ -80,7 +82,6 @@ export default function CartSidebar() {
         return
       }
     }
-    closeSidebar()
   }
 
   if (!isOpen) {
