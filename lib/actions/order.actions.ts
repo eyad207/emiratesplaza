@@ -18,7 +18,6 @@ import { sendEmail } from '@/lib/email'
 import { vipps } from '../vipps'
 import Stripe from 'stripe'
 import type { SortOrder } from 'mongoose'
-import { validateCart } from '../cart-validation'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -44,56 +43,15 @@ export const createOrderFromCart = async (
   clientSideCart: Cart,
   userId: string
 ) => {
-  // ✅ Comprehensive cart validation with database checks
-  const validation = await validateCart(clientSideCart)
-
-  if (!validation.isValid) {
-    const errorMessage =
-      validation.errors.length > 0
-        ? validation.errors.join('; ')
-        : 'Cart validation failed'
-    throw new Error(errorMessage)
-  }
-
-  // If there are invalid items, only proceed with valid items
-  if (validation.invalidItems.length > 0) {
-    console.warn(
-      'Found invalid items in cart:',
-      validation.invalidItems.map((item) => ({
-        name: item.name,
-        quantity: item.quantity,
-        color: item.color,
-        size: item.size,
-      }))
-    )
-  }
-
-  // Additional validation for required fields
-  if (!clientSideCart.shippingAddress) {
-    throw new Error('Shipping address is required')
-  }
-
-  if (!clientSideCart.paymentMethod) {
-    throw new Error('Payment method is required')
-  }
-
-  // Use only valid items for order creation
-  const validCart = {
-    ...clientSideCart,
-    items: validation.validItems,
-  }
-
-  // ✅ Recalculate delivery date & prices on server
   const cart = {
-    ...validCart,
+    ...clientSideCart,
     ...calcDeliveryDateAndPrice({
-      items: validCart.items,
-      shippingAddress: validCart.shippingAddress,
-      deliveryDateIndex: validCart.deliveryDateIndex,
+      items: clientSideCart.items,
+      shippingAddress: clientSideCart.shippingAddress,
+      deliveryDateIndex: clientSideCart.deliveryDateIndex,
     }),
   }
 
-  // ✅ Parse & validate full order
   const order = OrderInputSchema.parse({
     user: userId,
     items: cart.items,
@@ -105,7 +63,6 @@ export const createOrderFromCart = async (
     totalPrice: cart.totalPrice,
     expectedDeliveryDate: cart.expectedDeliveryDate,
   })
-
   return await Order.create(order)
 }
 
@@ -919,44 +876,6 @@ export const markOrderAsViewed = async (orderId: string) => {
     await Order.findByIdAndUpdate(orderId, { viewed: true })
   } catch {
     // Silently handle errors
-  }
-}
-
-export const updateOrderAdminNotes = async (
-  orderId: string,
-  adminNotes: string
-) => {
-  try {
-    await connectToDatabase()
-    const session = await auth()
-
-    if (!session || session.user.role !== 'Admin') {
-      throw new Error('Unauthorized: Admin access required')
-    }
-
-    const order = await Order.findById(orderId)
-
-    if (!order) {
-      throw new Error('Order not found')
-    }
-
-    order.adminNotes = adminNotes
-    await order.save()
-
-    revalidatePath('/admin/orders')
-    revalidatePath(`/admin/orders/${orderId}`)
-    revalidatePath(`/account/orders/${orderId}`)
-
-    return {
-      success: true,
-      message: 'Admin notes updated successfully',
-    }
-  } catch (error) {
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : 'Failed to update admin notes',
-    }
   }
 }
 
