@@ -868,7 +868,7 @@ const CheckoutForm = () => {
                 <Card className='md:ml-8 my-4'>
                   <CardContent className='p-4'>
                     <RadioGroup
-                      value={'Pay Here'}
+                      value={paymentMethod}
                       onValueChange={(value) => setPaymentMethod(value)}
                     >
                       <div className='flex items-center py-1'>
