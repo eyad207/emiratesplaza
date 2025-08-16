@@ -91,9 +91,7 @@ export default function CartSidebar() {
         } else {
           toast({
             title: t('Cart.Price Decreases Detected'),
-            description: t(
-              'Cart.Good news Some items have decreased in price'
-            ),
+            description: t('Cart.Good news Some items have decreased in price'),
             variant: 'default',
           })
         }
@@ -105,9 +103,7 @@ export default function CartSidebar() {
       console.error('Failed to check prices and stock:', error)
       toast({
         title: t('Cart.Update Failed'),
-        description: t(
-          'Cart.Failed to check current prices Please try again'
-        ),
+        description: t('Cart.Failed to check current prices Please try again'),
         variant: 'destructive',
       })
     } finally {
