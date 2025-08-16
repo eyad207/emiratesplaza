@@ -28,6 +28,16 @@ interface CartState {
   setPaymentMethod: (paymentMethod: string) => void
   setDeliveryDateIndex: (index: number) => Promise<void>
   refreshCartStock: () => Promise<void>
+  refreshCartPrices: () => Promise<{
+    hasChanges: boolean
+    priceChanges: Array<{
+      item: OrderItem
+      oldPrice: number
+      newPrice: number
+      priceChange: number
+      changeType: 'increase' | 'decrease'
+    }>
+  }>
 }
 
 const useCartStore = create(
@@ -248,6 +258,83 @@ const useCartStore = create(
             items: filteredItems,
           },
         })
+      },
+      refreshCartPrices: async () => {
+        const { items, shippingAddress } = get().cart
+        const priceChanges: Array<{
+          item: OrderItem
+          oldPrice: number
+          newPrice: number
+          priceChange: number
+          changeType: 'increase' | 'decrease'
+        }> = []
+
+        const updatedItems = await Promise.all(
+          items.map(async (item) => {
+            try {
+              const response = await fetch(`/api/products/${item.product}`)
+              if (!response.ok) {
+                // If the product is not found, keep original item
+                return item
+              }
+              const data = await response.json()
+
+              // Get current price from database
+              const newPrice = data.price
+              const oldPrice = item.price
+
+              // Check if price has changed
+              if (newPrice !== oldPrice) {
+                const changeAmount = newPrice - oldPrice
+                priceChanges.push({
+                  item,
+                  oldPrice,
+                  newPrice,
+                  priceChange: Math.abs(changeAmount),
+                  changeType: changeAmount > 0 ? 'increase' : 'decrease',
+                })
+              }
+
+              // Update stock information as well
+              const colorObj = data.colors.find(
+                (c: { color: string }) => c.color === item.color
+              )
+              const sizeObj = colorObj?.sizes.find(
+                (s: { size: string; countInStock: number }) =>
+                  s.size === item.size
+              )
+
+              return {
+                ...item,
+                price: newPrice, // Update to new price
+                colors: data.colors,
+                quantity: Math.min(item.quantity, sizeObj?.countInStock || 0),
+              }
+            } catch {
+              // Handle fetch errors by keeping original item
+              return item
+            }
+          })
+        )
+
+        // Update cart with new prices
+        if (priceChanges.length > 0) {
+          set({
+            cart: {
+              ...get().cart,
+              items: updatedItems,
+              ...(await calcDeliveryDateAndPrice({
+                items: updatedItems,
+                shippingAddress,
+              })),
+            },
+          })
+        }
+
+        return {
+          hasChanges: priceChanges.length > 0,
+          priceChanges,
+        }
       },
       init: () => set({ cart: initialState }),
     }),

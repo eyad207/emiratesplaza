@@ -159,7 +159,19 @@
     "Your cart is empty": "Your cart is empty",
     "Please fix invalid quantities before checkout": "Please fix invalid quantities before checkout",
     "Invalid cart data Please refresh and try again": "Invalid cart data. Please refresh and try again.",
-    "Unable to proceed to checkout Please check your cart": "Unable to proceed to checkout. Please check your cart."
+    "Unable to proceed to checkout Please check your cart": "Unable to proceed to checkout. Please check your cart.",
+    "Price Changes Detected": "Price Changes Detected",
+    "Price Increases Detected": "Price Increases Detected",
+    "Price Decreases Detected": "Price Decreases Detected",
+    "Some items have price changes Please review below": "Some items have price changes. Please review below.",
+    "Some items have increased in price": "Some items have increased in price.",
+    "Good news Some items have decreased in price": "Good news! Some items have decreased in price.",
+    "Update Failed": "Update Failed",
+    "Failed to check current prices Please try again": "Failed to check current prices. Please try again.",
+    "Price Changes Accepted": "Price Changes Accepted",
+    "Your cart has been updated with current prices": "Your cart has been updated with current prices.",
+    "Accept Changes": "Accept Changes",
+    "Checking for updates": "Checking for updates..."
   },  "Search": {
     "for": "for",
     "Search": "Search",

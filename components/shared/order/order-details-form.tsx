@@ -198,6 +198,11 @@ export default function OrderDetailsForm({
                   </svg>
                   {t('Orders.ReceiptSent')}
                 </p>
+                {typeof order.user === 'object' && order.user?.email && (
+                  <p className='text-green-700 dark:text-green-300 text-sm mt-2 ml-6'>
+                    {order.user.email}
+                  </p>
+                )}
               </div>
 
               <div className='space-y-2'>

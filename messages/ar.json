@@ -155,7 +155,19 @@
     "Your cart is empty": "سلتك فارغة",
     "Please fix invalid quantities before checkout": "يرجى إصلاح الكميات غير الصحيحة قبل الدفع",
     "Invalid cart data Please refresh and try again": "بيانات السلة غير صحيحة. يرجى التحديث والمحاولة مرة أخرى.",
-    "Unable to proceed to checkout Please check your cart": "غير قادر على المتابعة للدفع. يرجى التحقق من سلتك."
+    "Unable to proceed to checkout Please check your cart": "غير قادر على المتابعة للدفع. يرجى التحقق من سلتك.",
+    "Price Changes Detected": "تم اكتشاف تغييرات في الأسعار",
+    "Price Increases Detected": "تم اكتشاف زيادات في الأسعار",
+    "Price Decreases Detected": "تم اكتشاف انخفاضات في الأسعار",
+    "Some items have price changes Please review below": "بعض العناصر لديها تغييرات في الأسعار. يرجى المراجعة أدناه.",
+    "Some items have increased in price": "بعض العناصر ازدادت في السعر.",
+    "Good news Some items have decreased in price": "أخبار جيدة! بعض العناصر انخفضت في السعر.",
+    "Update Failed": "فشل التحديث",
+    "Failed to check current prices Please try again": "فشل في التحقق من الأسعار الحالية. يرجى المحاولة مرة أخرى.",
+    "Price Changes Accepted": "تم قبول تغييرات الأسعار",
+    "Your cart has been updated with current prices": "تم تحديث سلتك بالأسعار الحالية.",
+    "Accept Changes": "قبول التغييرات",
+    "Checking for updates": "جارٍ التحقق من التحديثات..."
   },  "Search": {
     "for": "لـ",
     "Search": "بحث",

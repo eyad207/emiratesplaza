@@ -4,7 +4,7 @@ import useCartStore from '@/hooks/use-cart-store'
 import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/currency'
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, buttonVariants } from '../ui/button'
 import { ScrollArea } from '../ui/scroll-area'
 import Image from 'next/image'
@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { ShoppingBag, TrashIcon, X } from 'lucide-react'
+import { ShoppingBag, TrashIcon, X, AlertTriangle } from 'lucide-react'
 import useSettingStore from '@/hooks/use-setting-store'
 import ProductPrice from './product/product-price'
 import { useLocale, useTranslations } from 'next-intl'
@@ -23,6 +23,8 @@ import { getDirection } from '@/i18n-config'
 import { useCartSidebarStore } from '@/hooks/use-cart-sidebar-store'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { toast } from '@/hooks/use-toast'
+import type { OrderItem } from '@/types'
 
 export default function CartSidebar() {
   const { isOpen, closeSidebar } = useCartSidebarStore()
@@ -31,7 +33,8 @@ export default function CartSidebar() {
     updateItem,
     removeItem,
     clearCart,
-    refreshCartStock, // Use refreshCartStock from useCartStore
+    refreshCartStock,
+    refreshCartPrices,
   } = useCartStore()
   const {
     setting: {
@@ -44,11 +47,87 @@ export default function CartSidebar() {
   const rtl = getDirection(locale) === 'rtl'
   const router = useRouter()
 
+  const [priceChangeInfo, setPriceChangeInfo] = useState<{
+    hasChanges: boolean
+    priceChanges: Array<{
+      item: OrderItem
+      oldPrice: number
+      newPrice: number
+      priceChange: number
+      changeType: 'increase' | 'decrease'
+    }>
+  } | null>(null)
+
+  const checkPricesAndStock = React.useCallback(async () => {
+    try {
+      // Check for price changes first
+      const priceResult = await refreshCartPrices()
+
+      if (priceResult.hasChanges) {
+        setPriceChangeInfo(priceResult)
+
+        // Show professional notification
+        const totalIncreases = priceResult.priceChanges.filter(
+          (c) => c.changeType === 'increase'
+        ).length
+        const totalDecreases = priceResult.priceChanges.filter(
+          (c) => c.changeType === 'decrease'
+        ).length
+
+        if (totalIncreases > 0 && totalDecreases > 0) {
+          toast({
+            title: t('Cart.Price Changes Detected'),
+            description: t(
+              'Cart.Some items have price changes Please review below'
+            ),
+            variant: 'default',
+          })
+        } else if (totalIncreases > 0) {
+          toast({
+            title: t('Cart.Price Increases Detected'),
+            description: t('Cart.Some items have increased in price'),
+            variant: 'destructive',
+          })
+        } else {
+          toast({
+            title: t('Cart.Price Decreases Detected'),
+            description: t(
+              'Cart.Good news Some items have decreased in price'
+            ),
+            variant: 'default',
+          })
+        }
+      }
+
+      // Then refresh stock
+      await refreshCartStock()
+    } catch (error) {
+      console.error('Failed to check prices and stock:', error)
+      toast({
+        title: t('Cart.Update Failed'),
+        description: t(
+          'Cart.Failed to check current prices Please try again'
+        ),
+        variant: 'destructive',
+      })
+    } finally {
+    }
+  }, [refreshCartPrices, refreshCartStock, t])
+
+  const dismissPriceChanges = () => {
+    setPriceChangeInfo(null)
+    toast({
+      title: t('Cart.Price Changes Accepted'),
+      description: t('Cart.Your cart has been updated with current prices'),
+      variant: 'default',
+    })
+  }
+
   useEffect(() => {
     if (isOpen) {
-      refreshCartStock() // Correctly call refreshCartStock from useCartStore
+      checkPricesAndStock()
     }
-  }, [isOpen, refreshCartStock])
+  }, [isOpen, checkPricesAndStock])
 
   if (!isOpen) {
     return null // Sidebar is not open, so don't render it
@@ -64,7 +143,7 @@ export default function CartSidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeSidebar}
-            className='fixed inset-0 bg-black/30 dark:bg-black/50 z-40 backdrop-blur-sm'
+            className='fixed inset-0 bg-black/30 dark:bg-black/50 z-[100] backdrop-blur-sm'
           />
 
           {/* Sidebar */}
@@ -74,7 +153,7 @@ export default function CartSidebar() {
             exit={{ x: rtl ? -320 : 320 }}
             transition={{ type: 'spring', damping: 20 }}
             className={cn(
-              'fixed top-0 bottom-0 z-50 w-full max-w-[280px] xs:max-w-[320px] bg-background shadow-xl',
+              'fixed top-0 bottom-0 z-[101] w-full max-w-[280px] xs:max-w-[320px] bg-background shadow-xl',
               rtl ? 'left-0' : 'right-0',
               'border-l border-border/30'
             )}
@@ -103,6 +182,52 @@ export default function CartSidebar() {
                   </Button>
                 </div>
               </div>
+
+              {/* Price Change Notification */}
+              {priceChangeInfo?.hasChanges && (
+                <div className='p-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800'>
+                  <div className='flex items-start gap-2'>
+                    <AlertTriangle className='h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0' />
+                    <div className='flex-1 min-w-0'>
+                      <h3 className='text-sm font-medium text-amber-800 dark:text-amber-200 mb-1'>
+                        {t('Cart.Price Changes Detected')}
+                      </h3>
+                      <div className='space-y-1 mb-2'>
+                        {priceChangeInfo.priceChanges.map((change, index) => (
+                          <div
+                            key={index}
+                            className='text-xs text-amber-700 dark:text-amber-300'
+                          >
+                            <span className='font-medium'>
+                              {change.item.name}
+                            </span>
+                            {' - '}
+                            <span
+                              className={cn(
+                                'font-medium',
+                                change.changeType === 'increase'
+                                  ? 'text-red-600 dark:text-red-400'
+                                  : 'text-green-600 dark:text-green-400'
+                              )}
+                            >
+                              {change.changeType === 'increase' ? '+' : '-'}
+                              {formatPrice(change.priceChange)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <Button
+                        size='sm'
+                        variant='outline'
+                        onClick={dismissPriceChanges}
+                        className='h-6 px-2 text-xs bg-white dark:bg-amber-900/50 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/70'
+                      >
+                        {t('Cart.Accept Changes')}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Cart Items */}
               <ScrollArea className='flex-1 overflow-y-auto py-2'>

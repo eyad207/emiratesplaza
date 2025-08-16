@@ -159,7 +159,19 @@
     "Your cart is empty": "Handlekurven din er tom",
     "Please fix invalid quantities before checkout": "Vennligst fiks ugyldige antall før utsjekking",
     "Invalid cart data Please refresh and try again": "Ugyldig handlekurvdata. Vennligst oppdater og prøv igjen.",
-    "Unable to proceed to checkout Please check your cart": "Kan ikke fortsette til utsjekking. Vennligst sjekk handlekurven din."
+    "Unable to proceed to checkout Please check your cart": "Kan ikke fortsette til utsjekking. Vennligst sjekk handlekurven din.",
+    "Price Changes Detected": "Prisendringer oppdaget",
+    "Price Increases Detected": "Prisøkninger oppdaget",
+    "Price Decreases Detected": "Prisreduksjoner oppdaget",
+    "Some items have price changes Please review below": "Noen varer har prisendringer. Vennligst gjennomgå nedenfor.",
+    "Some items have increased in price": "Noen varer har økt i pris.",
+    "Good news Some items have decreased in price": "Gode nyheter! Noen varer har gått ned i pris.",
+    "Update Failed": "Oppdatering mislyktes",
+    "Failed to check current prices Please try again": "Kunne ikke sjekke aktuelle priser. Vennligst prøv igjen.",
+    "Price Changes Accepted": "Prisendringer akseptert",
+    "Your cart has been updated with current prices": "Handlekurven din har blitt oppdatert med aktuelle priser.",
+    "Accept Changes": "Aksepter endringer",
+    "Checking for updates": "Sjekker for oppdateringer..."
   },  "Search": {
     "for": "for",
     "Search": "Søk",
