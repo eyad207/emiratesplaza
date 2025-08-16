@@ -879,6 +879,44 @@ export const markOrderAsViewed = async (orderId: string) => {
   }
 }
 
+export const updateOrderAdminNotes = async (
+  orderId: string,
+  adminNotes: string
+) => {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+
+    if (!session || session.user.role !== 'Admin') {
+      throw new Error('Unauthorized: Admin access required')
+    }
+
+    const order = await Order.findById(orderId)
+
+    if (!order) {
+      throw new Error('Order not found')
+    }
+
+    order.adminNotes = adminNotes
+    await order.save()
+
+    revalidatePath('/admin/orders')
+    revalidatePath(`/admin/orders/${orderId}`)
+    revalidatePath(`/account/orders/${orderId}`)
+
+    return {
+      success: true,
+      message: 'Admin notes updated successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : 'Failed to update admin notes',
+    }
+  }
+}
+
 export const deleteAllOrders = async () => {
   await connectToDatabase()
   await Order.deleteMany({})

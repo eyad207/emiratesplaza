@@ -22,6 +22,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { getDirection } from '@/i18n-config'
 import { useCartSidebarStore } from '@/hooks/use-cart-sidebar-store'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 export default function CartSidebar() {
   const { isOpen, closeSidebar } = useCartSidebarStore()
@@ -41,6 +42,7 @@ export default function CartSidebar() {
   const t = useTranslations()
   const locale = useLocale()
   const rtl = getDirection(locale) === 'rtl'
+  const router = useRouter()
 
   useEffect(() => {
     if (isOpen) {
@@ -239,17 +241,21 @@ export default function CartSidebar() {
 
                 {/* Buttons */}
                 <div className='space-y-2'>
-                  <Link
-                    href='/checkout'
+                  <Button
+                    type='button'
+                    onClick={() => {
+                      closeSidebar()
+                      router.push('/checkout')
+                    }}
                     className={cn(
                       buttonVariants({ size: 'sm' }),
                       'w-full',
-                      items.length === 0 && 'opacity-50 pointer-events-none' // Disable button if cart is empty
+                      items.length === 0 && 'opacity-50 pointer-events-none' // Disable if empty
                     )}
-                    onClick={closeSidebar}
+                    disabled={items.length === 0}
                   >
                     {t('Cart.Proceed to Checkout')}
-                  </Link>
+                  </Button>
                   <Link
                     href='/cart'
                     className={cn(
