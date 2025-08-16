@@ -40,6 +40,11 @@ import useCartStore from '@/hooks/use-cart-store'
 import useSettingStore from '@/hooks/use-setting-store'
 import ProductPrice from '@/components/shared/product/product-price'
 import { useTranslations } from 'next-intl'
+import {
+  validateCartClientSide,
+  hasInvalidQuantities,
+  getInvalidQuantityItems,
+} from '@/lib/cart-validation-client'
 
 const shippingAddressDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -64,6 +69,7 @@ const shippingAddressDefaultValues =
 
 const CheckoutForm = () => {
   const t = useTranslations('Checkout')
+  const tCart = useTranslations('Cart')
   const { toast } = useToast()
   const router = useRouter()
   const {
@@ -114,9 +120,34 @@ const CheckoutForm = () => {
     refreshCartStock()
   }, [refreshCartStock])
 
+  // Early validation - redirect if cart is invalid
+  useEffect(() => {
+    if (!isMounted) return
+
+    if (items.length === 0) {
+      toast({
+        description: tCart('Your cart is empty'),
+        variant: 'destructive',
+      })
+      router.push('/cart?error=empty-cart')
+      return
+    }
+
+    // Check if any items have invalid quantities
+    if (hasInvalidQuantities(items)) {
+      toast({
+        description: tCart('Please fix invalid quantities before checkout'),
+        variant: 'destructive',
+      })
+      router.push('/cart?error=invalid-quantities')
+      return
+    }
+  }, [items, isMounted, router, tCart, toast])
+
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false)
   const [isItemsSelected, setIsItemsSelected] = useState<boolean>(false)
-  // Payment method step removed; we only have two options and default is Pay Here
+  const [isPaymentMethodSelected, setIsPaymentMethodSelected] =
+    useState<boolean>(false)
 
   const handlePlaceOrder = async () => {
     // If total price is 0, automatically mark as paid and skip payment
@@ -129,6 +160,61 @@ const CheckoutForm = () => {
         ? 'Cash On Delivery'
         : 'Stripe'
 
+    // Comprehensive cart validation
+    const cartValidation = validateCartClientSide({
+      items,
+      itemsPrice,
+      totalPrice,
+      taxPrice: taxPrice || 0,
+      shippingPrice: shippingPrice || 0,
+    })
+
+    // Check for invalid quantities
+    const invalidQuantityItems = getInvalidQuantityItems(items)
+
+    if (!cartValidation.isValid || invalidQuantityItems.length > 0) {
+      const errorMessages = [
+        ...cartValidation.errors,
+        ...invalidQuantityItems.map(
+          (item) => `${item.name}: Invalid quantity (${item.quantity})`
+        ),
+      ]
+
+      toast({
+        description:
+          errorMessages.length > 0
+            ? errorMessages.join('; ')
+            : t('Please fix cart issues before placing your order'),
+        variant: 'destructive',
+      })
+      return
+    }
+
+    // Check required fields
+    if (!shippingAddress) {
+      toast({
+        description: t('Shipping address is required'),
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (!paymentMethod) {
+      toast({
+        description: t('Payment method is required'),
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (deliveryDateIndex === undefined) {
+      toast({
+        description: t('Delivery date is required'),
+        variant: 'destructive',
+      })
+      return
+    }
+
     const res = await createOrder({
       items,
       shippingAddress,
@@ -136,7 +222,7 @@ const CheckoutForm = () => {
         availableDeliveryDates[deliveryDateIndex!].daysToDeliver
       ),
       deliveryDateIndex,
-      paymentMethod: mappedPaymentMethod,
+      paymentMethod,
       itemsPrice,
       shippingPrice,
       taxPrice,
@@ -147,18 +233,51 @@ const CheckoutForm = () => {
         description: res.message,
         variant: 'destructive',
       })
-      return
-    }
-    toast({ description: res.message, variant: 'default' })
-
-    // For free orders or cash on delivery, go to order page
-    if (isFreeOrder || mappedPaymentMethod === 'Cash On Delivery') {
-      router.push(`/account/orders/${res.data?.orderId}`)
     } else {
-      router.push(`/checkout/${res.data?.orderId}`)
+      toast({
+        description: res.message,
+        variant: 'default',
+      })
+
+      // For free orders or cash on delivery, go to order page
+      if (isFreeOrder || mappedPaymentMethod === 'Cash On Delivery') {
+        router.push(`/account/orders/${res.data?.orderId}`)
+      } else {
+        router.push(`/checkout/${res.data?.orderId}`)
+      }
     }
   }
+  const handleSelectPaymentMethod = async () => {
+    // Validate cart before proceeding to payment
+    const invalidQuantityItems = getInvalidQuantityItems(items)
+
+    if (hasInvalidQuantities(items) || invalidQuantityItems.length > 0) {
+      toast({
+        description: t(
+          'Please fix invalid quantities before proceeding to payment'
+        ),
+        variant: 'destructive',
+      })
+      return
+    }
+
+    // Just set the payment method as selected
+    setIsAddressSelected(true)
+    setIsItemsSelected(true)
+    setIsPaymentMethodSelected(true)
+  }
   const handleSelectItemsAndShipping = () => {
+    // Validate cart before proceeding to next step
+    const invalidQuantityItems = getInvalidQuantityItems(items)
+
+    if (hasInvalidQuantities(items) || invalidQuantityItems.length > 0) {
+      toast({
+        description: t('Please fix invalid quantities before proceeding'),
+        variant: 'destructive',
+      })
+      return
+    }
+
     setIsAddressSelected(true)
     setIsItemsSelected(true)
   }
@@ -209,6 +328,17 @@ const CheckoutForm = () => {
                   : t('continueToPayment')}
             </Button>
             <p className='text-xs text-center py-2'></p>
+          </div>
+        )}
+        {isPaymentMethodSelected && isAddressSelected && isItemsSelected && (
+          <div>
+            <Button
+              onClick={handlePlaceOrder}
+              className='rounded-full w-full'
+              disabled={items.some((it) => it.quantity === 0)}
+            >
+              {t('placeYourOrder')}
+            </Button>
           </div>
         )}
 
@@ -280,6 +410,7 @@ const CheckoutForm = () => {
                     onClick={() => {
                       setIsAddressSelected(false)
                       setIsItemsSelected(false)
+                      setIsPaymentMethodSelected(false)
                     }}
                   >
                     {t('change')}
@@ -517,6 +648,7 @@ const CheckoutForm = () => {
                     variant={'outline'}
                     onClick={() => {
                       setIsItemsSelected(false)
+                      setIsPaymentMethodSelected(false)
                     }}
                   >
                     {t('change')}
@@ -702,9 +834,29 @@ const CheckoutForm = () => {
               </div>
             )}
           </div>
-          {/* payment method (simplified) */}
+          {/* payment method */}
           <div>
-            {isItemsSelected && totalPrice > 0 ? (
+            {isPaymentMethodSelected && paymentMethod ? (
+              <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
+                <div className='flex text-lg font-bold  col-span-5'>
+                  <span className='w-8'>3 </span>
+                  <span>{t('paymentMethod')}</span>
+                </div>
+                <div className='col-span-5 '>
+                  <p>{paymentMethod}</p>
+                </div>
+                <div className='col-span-2'>
+                  <Button
+                    variant='outline'
+                    onClick={() => {
+                      setIsPaymentMethodSelected(false)
+                    }}
+                  >
+                    {t('change')}
+                  </Button>
+                </div>
+              </div>
+            ) : isItemsSelected && totalPrice > 0 ? (
               <>
                 <div className='flex text-primary text-lg font-bold my-2'>
                   <span className='w-8'>3 </span>
@@ -713,7 +865,7 @@ const CheckoutForm = () => {
                 <Card className='md:ml-8 my-4'>
                   <CardContent className='p-4'>
                     <RadioGroup
-                      value={'Pay Here'}
+                      value={paymentMethod}
                       onValueChange={(value) => setPaymentMethod(value)}
                     >
                       <div className='flex items-center py-1'>
@@ -742,6 +894,14 @@ const CheckoutForm = () => {
                       </div>
                     </RadioGroup>
                   </CardContent>
+                  <CardFooter className='p-4'>
+                    <Button
+                      onClick={handleSelectPaymentMethod}
+                      className='rounded-full font-bold'
+                    >
+                      {t('useThisPaymentMethod')}
+                    </Button>
+                  </CardFooter>
                 </Card>
               </>
             ) : isItemsSelected && totalPrice === 0 ? (
@@ -765,7 +925,7 @@ const CheckoutForm = () => {
               </div>
             )}
           </div>
-          {isAddressSelected && isItemsSelected && (
+          {isPaymentMethodSelected && isAddressSelected && isItemsSelected && (
             <div className='mt-6'>
               <div className='block md:hidden'>
                 <CheckoutSummary />

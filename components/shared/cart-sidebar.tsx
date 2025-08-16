@@ -302,7 +302,7 @@ export default function CartSidebar() {
                     href='/cart'
                     className={cn(
                       buttonVariants({ variant: 'outline', size: 'sm' }),
-                      'w-full bg-gray-900 hover:bg-gray-800 text-white',
+                      'w-full',
                       totalQuantity === 0 && 'opacity-50 pointer-events-none'
                     )}
                     onClick={closeSidebar}

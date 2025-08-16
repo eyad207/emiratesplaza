@@ -18,6 +18,7 @@ import { sendEmail } from '@/lib/email'
 import { vipps } from '../vipps'
 import Stripe from 'stripe'
 import type { SortOrder } from 'mongoose'
+import { validateCart } from '../cart-validation'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -53,19 +54,62 @@ export const createOrder = async (clientSideCart: Cart) => {
     return { success: false, message: 'Failed to create order' }
   }
 }
+
+// Create order from cart
 export const createOrderFromCart = async (
   clientSideCart: Cart,
   userId: string
 ) => {
-  const cart = {
+  // ✅ Comprehensive cart validation with database checks
+  const validation = await validateCart(clientSideCart)
+
+  if (!validation.isValid) {
+    const errorMessage =
+      validation.errors.length > 0
+        ? validation.errors.join('; ')
+        : 'Cart validation failed'
+    throw new Error(errorMessage)
+  }
+
+  // If there are invalid items, only proceed with valid items
+  if (validation.invalidItems.length > 0) {
+    console.warn(
+      'Found invalid items in cart:',
+      validation.invalidItems.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+        color: item.color,
+        size: item.size,
+      }))
+    )
+  }
+
+  // Additional validation for required fields
+  if (!clientSideCart.shippingAddress) {
+    throw new Error('Shipping address is required')
+  }
+
+  if (!clientSideCart.paymentMethod) {
+    throw new Error('Payment method is required')
+  }
+
+  // Use only valid items for order creation
+  const validCart = {
     ...clientSideCart,
+    items: validation.validItems,
+  }
+
+  // ✅ Recalculate delivery date & prices on server
+  const cart = {
+    ...validCart,
     ...calcDeliveryDateAndPrice({
-      items: clientSideCart.items,
-      shippingAddress: clientSideCart.shippingAddress,
-      deliveryDateIndex: clientSideCart.deliveryDateIndex,
+      items: validCart.items,
+      shippingAddress: validCart.shippingAddress,
+      deliveryDateIndex: validCart.deliveryDateIndex,
     }),
   }
 
+  // ✅ Parse & validate full order
   const order = OrderInputSchema.parse({
     user: userId,
     items: cart.items,
@@ -77,6 +121,7 @@ export const createOrderFromCart = async (
     totalPrice: cart.totalPrice,
     expectedDeliveryDate: cart.expectedDeliveryDate,
   })
+
   return await Order.create(order)
 }
 
