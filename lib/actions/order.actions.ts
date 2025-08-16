@@ -32,7 +32,7 @@ export const createOrder = async (clientSideCart: Cart) => {
     )
     return {
       success: true,
-      message: 'Order placed successfully',
+      message: 'Processing to payment ...',
       data: { orderId: createdOrder._id.toString() },
     }
   } catch {

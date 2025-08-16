@@ -116,10 +116,13 @@ const CheckoutForm = () => {
 
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false)
   const [isItemsSelected, setIsItemsSelected] = useState<boolean>(false)
-  const [isPaymentMethodSelected, setIsPaymentMethodSelected] =
-    useState<boolean>(false)
+  // Payment method step removed; we only have two options and default is Pay Here
 
   const handlePlaceOrder = async () => {
+    // Map UI payment choices to stored order payment method
+    const mappedPaymentMethod =
+      paymentMethod === 'Cash On Delivery' ? 'Cash On Delivery' : 'Stripe'
+
     const res = await createOrder({
       items,
       shippingAddress,
@@ -127,7 +130,7 @@ const CheckoutForm = () => {
         availableDeliveryDates[deliveryDateIndex!].daysToDeliver
       ),
       deliveryDateIndex,
-      paymentMethod,
+      paymentMethod: mappedPaymentMethod,
       itemsPrice,
       shippingPrice,
       taxPrice,
@@ -138,53 +141,13 @@ const CheckoutForm = () => {
         description: res.message,
         variant: 'destructive',
       })
-    } else {
-      toast({
-        description: res.message,
-        variant: 'default',
-      })
-
-      // For Cash On Delivery, redirect to order confirmation instead of payment
-      if (paymentMethod === 'Cash On Delivery') {
-        router.push(`/account/orders/${res.data?.orderId}`)
-      } else {
-        router.push(`/checkout/${res.data?.orderId}`)
-      }
+      return
     }
-  }
-  const handleSelectPaymentMethod = async () => {
-    setIsAddressSelected(true)
-    setIsItemsSelected(true)
-    setIsPaymentMethodSelected(true)
-
-    // If "Pay Here" is selected, proceed to payment form
-    if (paymentMethod === 'Pay Here') {
-      // Create order first, then redirect to payment
-      const res = await createOrder({
-        items,
-        shippingAddress,
-        expectedDeliveryDate: calculateFutureDate(
-          availableDeliveryDates[deliveryDateIndex!].daysToDeliver
-        ),
-        deliveryDateIndex,
-        paymentMethod: 'Stripe', // Default to Stripe for Pay Here
-        itemsPrice,
-        shippingPrice,
-        taxPrice,
-        totalPrice,
-      })
-      if (!res.success) {
-        toast({
-          description: res.message,
-          variant: 'destructive',
-        })
-      } else {
-        router.push(`/checkout/${res.data?.orderId}`)
-      }
-    } else if (paymentMethod === 'Cash On Delivery') {
-      // For "Pay in Store (Cash)", set the payment method to Cash On Delivery
-      // The user will see the "Place Your Order" button to complete the order
-      setPaymentMethod('Cash On Delivery')
+    toast({ description: res.message, variant: 'default' })
+    if (mappedPaymentMethod === 'Cash On Delivery') {
+      router.push(`/account/orders/${res.data?.orderId}`)
+    } else {
+      router.push(`/checkout/${res.data?.orderId}`)
     }
   }
   const handleSelectItemsAndShipping = () => {
@@ -224,29 +187,18 @@ const CheckoutForm = () => {
             </p>
           </div>
         )}
-        {isItemsSelected && !isPaymentMethodSelected && (
-          <div className=' mb-4'>
-            <Button
-              className='rounded-full w-full'
-              onClick={handleSelectPaymentMethod}
-              disabled={items.some((it) => it.quantity === 0)}
-            >
-              {t('continueToPayment')}
-            </Button>
-            <p className='text-xs text-center py-2'>
-              {t('choosePaymentMethodToContinue')}
-            </p>
-          </div>
-        )}
-        {isPaymentMethodSelected && isAddressSelected && isItemsSelected && (
+        {isItemsSelected && isAddressSelected && (
           <div>
             <Button
               onClick={handlePlaceOrder}
               className='rounded-full w-full'
               disabled={items.some((it) => it.quantity === 0)}
             >
-              {t('placeYourOrder')}
+              {paymentMethod === 'Cash On Delivery'
+                ? t('placeYourOrder')
+                : t('continueToPayment')}
             </Button>
+            <p className='text-xs text-center py-2'></p>
           </div>
         )}
 
@@ -318,7 +270,6 @@ const CheckoutForm = () => {
                     onClick={() => {
                       setIsAddressSelected(false)
                       setIsItemsSelected(false)
-                      setIsPaymentMethodSelected(false)
                     }}
                   >
                     {t('change')}
@@ -556,7 +507,6 @@ const CheckoutForm = () => {
                     variant={'outline'}
                     onClick={() => {
                       setIsItemsSelected(false)
-                      setIsPaymentMethodSelected(false)
                     }}
                   >
                     {t('change')}
@@ -742,29 +692,9 @@ const CheckoutForm = () => {
               </div>
             )}
           </div>
-          {/* payment method */}
+          {/* payment method (simplified) */}
           <div>
-            {isPaymentMethodSelected && paymentMethod ? (
-              <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
-                <div className='flex text-lg font-bold  col-span-5'>
-                  <span className='w-8'>3 </span>
-                  <span>{t('paymentMethod')}</span>
-                </div>
-                <div className='col-span-5 '>
-                  <p>{paymentMethod}</p>
-                </div>
-                <div className='col-span-2'>
-                  <Button
-                    variant='outline'
-                    onClick={() => {
-                      setIsPaymentMethodSelected(false)
-                    }}
-                  >
-                    {t('change')}
-                  </Button>
-                </div>
-              </div>
-            ) : isItemsSelected ? (
+            {isItemsSelected ? (
               <>
                 <div className='flex text-primary text-lg font-bold my-2'>
                   <span className='w-8'>3 </span>
@@ -773,7 +703,7 @@ const CheckoutForm = () => {
                 <Card className='md:ml-8 my-4'>
                   <CardContent className='p-4'>
                     <RadioGroup
-                      value={paymentMethod}
+                      value={'Pay Here'}
                       onValueChange={(value) => setPaymentMethod(value)}
                     >
                       <div className='flex items-center py-1'>
@@ -802,14 +732,6 @@ const CheckoutForm = () => {
                       </div>
                     </RadioGroup>
                   </CardContent>
-                  <CardFooter className='p-4'>
-                    <Button
-                      onClick={handleSelectPaymentMethod}
-                      className='rounded-full font-bold'
-                    >
-                      {t('useThisPaymentMethod')}
-                    </Button>
-                  </CardFooter>
                 </Card>
               </>
             ) : (
@@ -819,7 +741,7 @@ const CheckoutForm = () => {
               </div>
             )}
           </div>
-          {isPaymentMethodSelected && isAddressSelected && isItemsSelected && (
+          {isAddressSelected && isItemsSelected && (
             <div className='mt-6'>
               <div className='block md:hidden'>
                 <CheckoutSummary />
@@ -832,7 +754,9 @@ const CheckoutForm = () => {
                     className='rounded-full'
                     disabled={items.some((it) => it.quantity === 0)}
                   >
-                    {t('placeYourOrder')}
+                    {paymentMethod === 'Cash On Delivery'
+                      ? t('placeYourOrder')
+                      : t('continueToPayment')}
                   </Button>
                   <div className='flex-1'>
                     <p className='font-bold text-lg'>
