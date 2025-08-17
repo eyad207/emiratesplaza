@@ -409,7 +409,11 @@ export default function OrderDetailsForm({
                           </div>
                         </div>
                         <div className='text-sm font-semibold text-gray-900 dark:text-gray-100'>
-                          <ProductPrice price={item.price} plain />
+                          <ProductPrice
+                            price={item.price}
+                            discountedPrice={item.discountedPrice}
+                            plain
+                          />
                         </div>
                       </div>
                     </div>

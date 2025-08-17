@@ -577,17 +577,11 @@ export default function OrderDetailsForm({
                       <TableCell className='text-right py-4'>
                         <div className='space-y-1'>
                           <div className='font-semibold'>
-                            <ProductPrice price={item.price} plain />
+                            <ProductPrice
+                              price={itemsPrice / item.quantity}
+                              plain
+                            />
                           </div>
-                          {item.quantity > 1 && (
-                            <div className='text-xs text-muted-foreground'>
-                              <ProductPrice
-                                price={item.price / item.quantity}
-                                plain
-                              />{' '}
-                              each
-                            </div>
-                          )}
                         </div>
                       </TableCell>
                     </TableRow>
