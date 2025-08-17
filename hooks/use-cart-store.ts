@@ -405,17 +405,23 @@ const useCartStore = create(
               }
               const data = await response.json()
 
-              // Get current price from database
-              const newPrice = data.price
-              const oldPrice = item.price
+              // Calculate current effective price (considering discounts)
+              const newBasePrice = data.price
+              const newDiscountedPrice = data.discountedPrice
+              const newEffectivePrice = newDiscountedPrice ?? newBasePrice
+              
+              // Calculate old effective price from cart item
+              const oldBasePrice = item.price
+              const oldDiscountedPrice = item.discountedPrice
+              const oldEffectivePrice = oldDiscountedPrice ?? oldBasePrice
 
-              // Check if price has changed
-              if (newPrice !== oldPrice) {
-                const changeAmount = newPrice - oldPrice
+              // Check if the effective price has changed (this includes discount changes)
+              if (newEffectivePrice !== oldEffectivePrice) {
+                const changeAmount = newEffectivePrice - oldEffectivePrice
                 priceChanges.push({
                   item,
-                  oldPrice,
-                  newPrice,
+                  oldPrice: oldEffectivePrice,
+                  newPrice: newEffectivePrice,
                   priceChange: Math.abs(changeAmount),
                   changeType: changeAmount > 0 ? 'increase' : 'decrease',
                 })
@@ -432,7 +438,9 @@ const useCartStore = create(
 
               return {
                 ...item,
-                price: newPrice, // Update to new price
+                price: newBasePrice, // Update base price
+                discountedPrice: newDiscountedPrice, // Update discounted price
+                discount: data.discount, // Update discount percentage
                 colors: data.colors,
                 quantity: Math.min(item.quantity, sizeObj?.countInStock || 0),
               }

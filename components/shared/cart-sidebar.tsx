@@ -225,22 +225,22 @@ export default function CartSidebar() {
 
         if (totalIncreases > 0 && totalDecreases > 0) {
           toast({
-            title: t('Cart.Price Changes Detected'),
+            title: t('Cart.Price and Discount Changes Detected'),
             description: `${totalIncreases} ${t('Cart.items increased')}, ${totalDecreases} ${t('Cart.items decreased')}. ${t('Cart.Net change')}: ${formatPrice(totalIncrease - totalDecrease)}`,
             variant: 'default',
             duration: 6000,
           })
         } else if (totalIncreases > 0) {
           toast({
-            title: t('Cart.Price Increases Detected'),
-            description: `${totalIncreases} ${t('Cart.items have increased by')} ${formatPrice(totalIncrease)}`,
+            title: t('Cart.Price Changes Detected'),
+            description: `${totalIncreases} ${t('Cart.items have increased by')} ${formatPrice(totalIncrease)} ${t('Cart.due to price or discount changes')}`,
             variant: 'destructive',
             duration: 6000,
           })
         } else {
           toast({
-            title: t('Cart.Price Decreases Detected'),
-            description: `${totalDecreases} ${t('Cart.items have decreased by')} ${formatPrice(totalDecrease)}`,
+            title: t('Cart.Price Changes Detected'),
+            description: `${totalDecreases} ${t('Cart.items have decreased by')} ${formatPrice(totalDecrease)} ${t('Cart.due to price or discount changes')}`,
             variant: 'default',
             duration: 6000,
           })
@@ -263,6 +263,13 @@ export default function CartSidebar() {
       setPriceChangeInfo((prev) => ({ ...prev, isProcessing: false }))
     }
   }, [items.length, refreshCartPrices, refreshCartStock, t])
+
+  // Auto-refresh prices when cart sidebar opens
+  useEffect(() => {
+    if (isOpen && items.length > 0) {
+      checkPricesAndStock()
+    }
+  }, [isOpen, items.length, checkPricesAndStock])
 
   const dismissPriceChanges = useCallback(() => {
     setPriceChangeInfo({

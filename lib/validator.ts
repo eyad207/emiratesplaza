@@ -87,6 +87,8 @@ export const OrderItemSchema = z.object({
   colors: z.array(ColorSchema).default([]),
   image: z.string().min(1, 'Image is required'),
   price: Price('Price'),
+  discountedPrice: Price('Discounted Price').optional(),
+  discount: z.number().optional(),
   size: z.string().optional(),
   color: z.string().optional(),
 })
