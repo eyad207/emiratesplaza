@@ -19,10 +19,16 @@ import { SignOut } from '@/lib/actions/user.actions'
 import CurrencySwitcher from './currency-switcher'
 import { useRouter } from 'next/navigation'
 
-const Menu = ({ forAdmin = false, session }: { forAdmin?: boolean; session?: { user: { role: string } } | null }) => {
+const Menu = ({
+  forAdmin = false,
+  session,
+}: {
+  forAdmin?: boolean
+  session?: { user: { role: string } } | null
+}) => {
   const t = useTranslations()
   const router = useRouter()
-  
+
   const handleNavigation = (path: string) => {
     router.push(path)
   }
