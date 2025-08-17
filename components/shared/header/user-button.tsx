@@ -143,53 +143,6 @@ export default async function UserButton() {
           </DropdownMenuContent>
         )}
       </DropdownMenu>
-
-      {/* Mobile Links */}
-      <div className='nav:hidden flex flex-col text-xs space-y-2 mt-4'>
-        <h3 className='text-sm font-semibold uppercase tracking-wider text-white/70'>
-          {t('Header.Your Account')}
-        </h3>
-        <Link
-          href='/account'
-          className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
-        >
-          {t('Header.Your account')}
-        </Link>
-        <Link
-          href='/account/orders'
-          className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
-        >
-          {t('Header.Your orders')}
-        </Link>
-        {session?.user.role === 'Admin' && (
-          <Link
-            href='/admin/overview'
-            className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
-          >
-            {t('Header.Admin')}
-          </Link>
-        )}
-        {session ? (
-          <form action={SignOut} className='w-full'>
-            <Button
-              className='w-full py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
-              variant='ghost'
-              type='submit'
-              aria-label='Sign out of your account'
-            >
-              {t('Header.Sign out')}
-            </Button>
-          </form>
-        ) : (
-          <Link
-            href='/sign-in'
-            className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors'
-            aria-label='Go to sign in page'
-          >
-            {t('Header.Sign in')}
-          </Link>
-        )}
-      </div>
     </div>
   )
 }

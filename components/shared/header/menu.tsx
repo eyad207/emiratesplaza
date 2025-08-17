@@ -11,12 +11,16 @@ import CartButton from './cart-button'
 import UserButton from './user-button'
 import ThemeSwitcher from './theme-switcher'
 import LanguageSwitcher from './language-switcher'
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { SignOut } from '@/lib/actions/user.actions'
 import CurrencySwitcher from './currency-switcher'
 
-const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
-  const t = useTranslations()
+const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
+  const t = await getTranslations()
+  // fetch current user session for mobile menu actions
+  const session = await import('@/auth').then((mod) => mod.auth())
   return (
     <div className='flex items-center'>
       {/* Desktop menu - visible above 1000px */}
@@ -51,11 +55,63 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
             </SheetHeader>
 
             <div className='mt-6 flex flex-col gap-5 flex-1'>
-              {/* User Account Section */}
+              {/* Account Section */}
               <div className='space-y-4'>
-                <div className='space-y-3'>
-                  <UserButton />
-                  {!forAdmin}
+                <h3 className='text-sm font-semibold uppercase tracking-wider text-white/70'>
+                  {t('Header.Your Account')}
+                </h3>
+                <div className='space-y-3 flex flex-col'>
+                  <SheetClose asChild>
+                    <Link
+                      href='/account'
+                      className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors text-sm'
+                    >
+                      {t('Header.Your account')}
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
+                      href='/account/orders'
+                      className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors text-sm'
+                    >
+                      {t('Header.Your orders')}
+                    </Link>
+                  </SheetClose>
+                  {/* Admin dashboard link */}
+                  {session?.user.role === 'Admin' && (
+                    <SheetClose asChild>
+                      <Link
+                        href='/admin/overview'
+                        className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors text-sm'
+                      >
+                        {t('Header.Admin')}
+                      </Link>
+                    </SheetClose>
+                  )}
+                  {/* Sign out button */}
+                  {session ? (
+                    <SheetClose asChild>
+                      <form action={SignOut} className='w-full'>
+                        <Button
+                          className='w-full py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors text-sm'
+                          variant='ghost'
+                          type='submit'
+                        >
+                          {t('Header.Sign out')}
+                        </Button>
+                      </form>
+                    </SheetClose>
+                  ) : (
+                    <SheetClose asChild>
+                      <Link
+                        href='/sign-in'
+                        className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors text-sm'
+                        aria-label={t('Header.Sign in')}
+                      >
+                        {t('Header.Sign in')}
+                      </Link>
+                    </SheetClose>
+                  )}
                 </div>
               </div>
 
