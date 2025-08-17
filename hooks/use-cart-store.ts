@@ -409,7 +409,7 @@ const useCartStore = create(
               const newBasePrice = data.price
               const newDiscountedPrice = data.discountedPrice
               const newEffectivePrice = newDiscountedPrice ?? newBasePrice
-              
+
               // Calculate old effective price from cart item
               const oldBasePrice = item.price
               const oldDiscountedPrice = item.discountedPrice
