@@ -459,7 +459,7 @@ export default function CartSidebar() {
                             <span className='font-medium'>
                               {change.item.name}
                             </span>
-                            {' - '}
+                            {'  '}
                             <span
                               className={cn(
                                 'font-medium',
@@ -588,7 +588,17 @@ export default function CartSidebar() {
 
                               <div className='flex items-center justify-between mt-2'>
                                 <div className='font-medium text-sm'>
-                                  <ProductPrice price={item.price} plain />
+                                  <ProductPrice
+                                    price={item.price}
+                                    discountedPrice={item.discountedPrice}
+                                    plain
+                                  />
+                                  {item.discountedPrice && item.discount && (
+                                    <div className='text-xs text-green-600 mt-1'>
+                                      {item.discount}%{' '}
+                                      {t('Cart.discount applied')}
+                                    </div>
+                                  )}
                                 </div>
 
                                 <div className='flex items-center gap-2'>

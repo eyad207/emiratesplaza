@@ -604,7 +604,10 @@ export const calcDeliveryDateAndPrice = async ({
 }) => {
   const { availableDeliveryDates } = await getSetting()
   const itemsPrice = round2(
-    items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    items.reduce((acc, item) => {
+      const effectivePrice = item.discountedPrice ?? item.price
+      return acc + effectivePrice * item.quantity
+    }, 0)
   )
 
   const deliveryDate =
