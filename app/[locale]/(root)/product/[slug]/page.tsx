@@ -75,8 +75,8 @@ export default async function ProductDetails(props: {
     <div className='dark:bg-zinc-900 dark:text-white'>
       <AddToBrowsingHistory id={product._id} category={product.category} />
       <section>
-        <div className='grid grid-cols-1 md:grid-cols-5  '>
-          <div className='col-span-2'>
+        <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 '>
+          <div className='md:col-span-3 md:mb-6 lg:col-span-2'>
             <ProductGallery images={product.images} />
           </div>
 
@@ -134,7 +134,7 @@ export default async function ProductDetails(props: {
           </div>
           <div>
             <Card>
-              <CardContent className='p-4 flex flex-col  gap-4'>
+              <CardContent className='p-4 flex flex-col gap-4'>
                 <ProductPrice
                   price={product.price}
                   discountedPrice={product.discountedPrice ?? undefined}

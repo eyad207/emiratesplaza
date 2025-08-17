@@ -387,18 +387,18 @@ const CheckoutForm = () => {
   )
 
   return (
-    <main className='max-w-6xl mx-auto highlight-link'>
-      <div className='grid md:grid-cols-4 gap-6'>
-        <div className='md:col-span-3'>
+    <main className='max-w-6xl mx-auto px-4 md:px-6 highlight-link'>
+      <div className='grid md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>
+        <div className='md:col-span-2 lg:col-span-3'>
           {/* shipping address */}
           <div>
             {isAddressSelected && shippingAddress ? (
-              <div className='grid grid-cols-1 md:grid-cols-12    my-3  pb-3'>
-                <div className='col-span-5 flex text-lg font-bold '>
+              <div className='grid grid-cols-1 md:grid-cols-8 lg:grid-cols-12 my-3 pb-3'>
+                <div className='col-span-4 md:col-span-3 lg:col-span-5 flex text-lg font-bold'>
                   <span className='w-8'>1 </span>
                   <span>{t('shippingAddress')}</span>
                 </div>
-                <div className='col-span-5 '>
+                <div className='col-span-4 md:col-span-3 lg:col-span-5'>
                   <p>
                     {shippingAddress.fullName} <br />
                     {shippingAddress.street} <br />
@@ -412,6 +412,7 @@ const CheckoutForm = () => {
                       setIsItemsSelected(false)
                       setIsPaymentMethodSelected(false)
                     }}
+                    className='w-full md:w-auto'
                   >
                     {t('change')}
                   </Button>
@@ -575,12 +576,12 @@ const CheckoutForm = () => {
           {/* items and delivery date */}
           <div className='border-y'>
             {isItemsSelected && deliveryDateIndex != undefined ? (
-              <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
-                <div className='flex text-lg font-bold  col-span-5'>
+              <div className='grid grid-cols-1 md:grid-cols-8 lg:grid-cols-12 my-3 pb-3'>
+                <div className='flex text-lg font-bold col-span-4 md:col-span-3 lg:col-span-5'>
                   <span className='w-8'>2 </span>
                   <span>{t('itemsAndShipping')}</span>
                 </div>
-                <div className='col-span-5'>
+                <div className='col-span-4 md:col-span-3 lg:col-span-5'>
                   <p>
                     {t('deliveryDate')}:{' '}
                     {

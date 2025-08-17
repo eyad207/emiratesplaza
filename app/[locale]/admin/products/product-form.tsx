@@ -116,388 +116,400 @@ const ProductForm = ({
   })
 
   return (
-    <Form {...form}>
-      <form
-        method='post'
-        onSubmit={form.handleSubmit(onSubmit)}
-        className='space-y-10 max-w-4xl mx-auto'
-      >
-        {/* General Info */}
-        <div className='space-y-5'>
-          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            {t('generalInformation')}
-          </h2>
-          <div className='flex flex-col gap-5 md:flex-row'>
+    <div className='max-w-6xl mx-auto px-4 md:px-6 py-6'>
+      <Form {...form}>
+        <form
+          method='post'
+          onSubmit={form.handleSubmit(onSubmit)}
+          className='space-y-8 md:space-y-10'
+        >
+          {/* General Info */}
+          <div className='space-y-4 md:space-y-5'>
+            <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+              {t('generalInformation')}
+            </h2>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5'>
+              <FormField
+                control={form.control}
+                name='name'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>{t('name')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('enterProductName')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='slug'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>{t('slug')}</FormLabel>
+                    <FormControl>
+                      <div className='relative'>
+                        <Input
+                          placeholder={t('enterProductSlug')}
+                          className='pl-8'
+                          {...field}
+                        />
+                        <button
+                          type='button'
+                          onClick={() => {
+                            form.setValue(
+                              'slug',
+                              toSlug(form.getValues('name'))
+                            )
+                          }}
+                          className='absolute right-2 mt-2 bg-slate-500 hover:bg-slate-600 text-white rounded-md p-1'
+                        >
+                          {t('generate')}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5'>
+              <FormField
+                control={form.control}
+                name='category'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>{t('category')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('enterCategory')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='brand'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>{t('brand')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('enterProductBrand')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name='name'
+              name='price'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>{t('name')}</FormLabel>
+                  <FormLabel>{t('netPrice')} (in $)</FormLabel>
                   <FormControl>
-                    <Input placeholder={t('enterProductName')} {...field} />
+                    <Input placeholder={t('enterProductPrice')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
+
+          {/* Images */}
+          <div className='space-y-5'>
+            <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+              {t('images')}
+            </h2>
             <FormField
               control={form.control}
-              name='slug'
-              render={({ field }) => (
+              name='images'
+              render={() => (
                 <FormItem className='w-full'>
-                  <FormLabel>{t('slug')}</FormLabel>
-                  <FormControl>
-                    <div className='relative'>
-                      <Input
-                        placeholder={t('enterProductSlug')}
-                        className='pl-8'
-                        {...field}
-                      />
-                      <button
-                        type='button'
-                        onClick={() => {
-                          form.setValue('slug', toSlug(form.getValues('name')))
+                  <FormDescription>{t('firstImageIsMain')}</FormDescription>
+                  <Card>
+                    <CardContent className='space-y-4 mt-2'>
+                      <div className='flex flex-wrap gap-4'>
+                        {images.map((image: string, index: number) => (
+                          <div key={index} className='relative w-24 h-24'>
+                            <Image
+                              src={image}
+                              alt='product image'
+                              fill
+                              className={`rounded border object-cover ${
+                                index === 0 ? 'border-2 border-primary' : ''
+                              }`}
+                            />
+                            {index === 0 && (
+                              <span className='absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded'>
+                                {t('main')}
+                              </span>
+                            )}
+                            <button
+                              type='button'
+                              onClick={() => {
+                                const updatedImages = images.filter(
+                                  (_, i) => i !== index
+                                )
+                                form.setValue('images', updatedImages)
+                              }}
+                              className='absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center'
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <UploadButton
+                        endpoint='imageUploader'
+                        onClientUploadComplete={(res: { url: string }[]) => {
+                          const newImages =
+                            images.length === 0
+                              ? [res[0].url]
+                              : [...images, res[0].url]
+                          form.setValue('images', newImages)
                         }}
-                        className='absolute right-2 mt-2 bg-slate-500 hover:bg-slate-600 text-white rounded-md p-1'
+                        onUploadError={(error: Error) => {
+                          toast({
+                            variant: 'destructive',
+                            description: `ERROR! ${error.message}`,
+                          })
+                        }}
+                      />
+                    </CardContent>
+                  </Card>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Colors and Sizes */}
+          <div className='space-y-5'>
+            <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+              {t('colorsAndSizes')}
+            </h2>
+            {colorFields.map((colorField, colorIndex) => (
+              <div
+                key={colorField.id}
+                className='border p-4 rounded space-y-4 bg-muted/10'
+              >
+                <div className='flex items-center gap-4'>
+                  <FormField
+                    control={form.control}
+                    name={`colors.${colorIndex}.color`}
+                    render={({ field }) => (
+                      <FormItem className='w-full'>
+                        <FormLabel>{t('color')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('enterColor')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    variant='destructive'
+                    onClick={() => removeColor(colorIndex)}
+                  >
+                    {t('removeColor')}
+                  </Button>
+                </div>
+
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
+                  {(form.watch(`colors.${colorIndex}.sizes`) || []).map(
+                    (size, sizeIndex) => (
+                      <div
+                        key={sizeIndex}
+                        className='border p-3 rounded bg-white dark:bg-zinc-800 space-y-2'
                       >
-                        {t('generate')}
-                      </button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className='flex flex-col gap-5 md:flex-row'>
-            <FormField
-              control={form.control}
-              name='category'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormLabel>{t('category')}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t('enterCategory')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='brand'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormLabel>{t('brand')}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t('enterProductBrand')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name='price'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormLabel>{t('netPrice')} (in $)</FormLabel>
-                <FormControl>
-                  <Input placeholder={t('enterProductPrice')} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Images */}
-        <div className='space-y-5'>
-          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            {t('images')}
-          </h2>
-          <FormField
-            control={form.control}
-            name='images'
-            render={() => (
-              <FormItem className='w-full'>
-                <FormDescription>{t('firstImageIsMain')}</FormDescription>
-                <Card>
-                  <CardContent className='space-y-4 mt-2'>
-                    <div className='flex flex-wrap gap-4'>
-                      {images.map((image: string, index: number) => (
-                        <div key={index} className='relative w-24 h-24'>
-                          <Image
-                            src={image}
-                            alt='product image'
-                            fill
-                            className={`rounded border object-cover ${
-                              index === 0 ? 'border-2 border-primary' : ''
-                            }`}
-                          />
-                          {index === 0 && (
-                            <span className='absolute top-1 left-1 bg-primary text-white text-xs px-1 rounded'>
-                              {t('main')}
-                            </span>
+                        <FormField
+                          control={form.control}
+                          name={`colors.${colorIndex}.sizes.${sizeIndex}.size`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('size')}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder={t('enterSize')}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
                           )}
-                          <button
-                            type='button'
-                            onClick={() => {
-                              const updatedImages = images.filter(
-                                (_, i) => i !== index
-                              )
-                              form.setValue('images', updatedImages)
-                            }}
-                            className='absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center'
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    <UploadButton
-                      endpoint='imageUploader'
-                      onClientUploadComplete={(res: { url: string }[]) => {
-                        const newImages =
-                          images.length === 0
-                            ? [res[0].url]
-                            : [...images, res[0].url]
-                        form.setValue('images', newImages)
-                      }}
-                      onUploadError={(error: Error) => {
-                        toast({
-                          variant: 'destructive',
-                          description: `ERROR! ${error.message}`,
-                        })
-                      }}
-                    />
-                  </CardContent>
-                </Card>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Colors and Sizes */}
-        <div className='space-y-5'>
-          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            {t('colorsAndSizes')}
-          </h2>
-          {colorFields.map((colorField, colorIndex) => (
-            <div
-              key={colorField.id}
-              className='border p-4 rounded space-y-4 bg-muted/10'
-            >
-              <div className='flex items-center gap-4'>
-                <FormField
-                  control={form.control}
-                  name={`colors.${colorIndex}.color`}
-                  render={({ field }) => (
-                    <FormItem className='w-full'>
-                      <FormLabel>{t('color')}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t('enterColor')} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`colors.${colorIndex}.sizes.${sizeIndex}.countInStock`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('countInStock')}</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type='number'
+                                  placeholder={t('enterCountInStock')}
+                                  {...field}
+                                  onChange={(e) => {
+                                    const value = parseInt(e.target.value, 10)
+                                    if (value >= 0) {
+                                      field.onChange(value)
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button
+                          type='button'
+                          variant='outline'
+                          onClick={() => {
+                            const currentSizes = [
+                              ...(form.getValues(
+                                `colors.${colorIndex}.sizes`
+                              ) || []),
+                            ]
+                            currentSizes.splice(sizeIndex, 1)
+                            form.setValue(
+                              `colors.${colorIndex}.sizes`,
+                              currentSizes
+                            )
+                          }}
+                        >
+                          {t('removeSize')}
+                        </Button>
+                      </div>
+                    )
                   )}
-                />
+                </div>
+
                 <Button
-                  variant='destructive'
-                  onClick={() => removeColor(colorIndex)}
+                  type='button'
+                  onClick={() => {
+                    const currentSizes = [
+                      ...(form.getValues(`colors.${colorIndex}.sizes`) || []),
+                    ]
+                    currentSizes.push({ size: '', countInStock: 0 })
+                    form.setValue(`colors.${colorIndex}.sizes`, currentSizes)
+                  }}
                 >
-                  {t('removeColor')}
+                  {t('addSize')}
                 </Button>
               </div>
+            ))}
+            <Button
+              type='button'
+              onClick={() =>
+                appendColor({
+                  color: '',
+                  sizes: [{ size: '', countInStock: 0 }],
+                })
+              }
+            >
+              {t('addColor')}
+            </Button>
+          </div>
 
-              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
-                {(form.watch(`colors.${colorIndex}.sizes`) || []).map(
-                  (size, sizeIndex) => (
-                    <div
-                      key={sizeIndex}
-                      className='border p-3 rounded bg-white dark:bg-zinc-800 space-y-2'
-                    >
-                      <FormField
-                        control={form.control}
-                        name={`colors.${colorIndex}.sizes.${sizeIndex}.size`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('size')}</FormLabel>
-                            <FormControl>
-                              <Input placeholder={t('enterSize')} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={`colors.${colorIndex}.sizes.${sizeIndex}.countInStock`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('countInStock')}</FormLabel>
-                            <FormControl>
-                              <Input
-                                type='number'
-                                placeholder={t('enterCountInStock')}
-                                {...field}
-                                onChange={(e) => {
-                                  const value = parseInt(e.target.value, 10)
-                                  if (value >= 0) {
-                                    field.onChange(value)
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button
-                        type='button'
-                        variant='outline'
-                        onClick={() => {
-                          const currentSizes = [
-                            ...(form.getValues(`colors.${colorIndex}.sizes`) ||
-                              []),
-                          ]
-                          currentSizes.splice(sizeIndex, 1)
-                          form.setValue(
-                            `colors.${colorIndex}.sizes`,
-                            currentSizes
-                          )
-                        }}
-                      >
-                        {t('removeSize')}
-                      </Button>
+          {/* Tags */}
+          <div className='space-y-5'>
+            <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+              {t('tags')}
+            </h2>
+            <FormField
+              control={form.control}
+              name='tags'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormControl>
+                    <div className='flex flex-wrap gap-3'>
+                      {availableTags.map((tag) => (
+                        <label
+                          key={tag._id}
+                          className='flex items-center space-x-2 bg-muted/20 px-2 py-1 rounded'
+                        >
+                          <Checkbox
+                            checked={field.value.includes(tag._id)}
+                            onCheckedChange={(checked) => {
+                              const newTags = checked
+                                ? [...field.value, tag._id]
+                                : field.value.filter((t) => t !== tag._id)
+                              field.onChange(newTags)
+                            }}
+                          />
+                          <span>{tag.name}</span>
+                        </label>
+                      ))}
                     </div>
-                  )
-                )}
-              </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-              <Button
-                type='button'
-                onClick={() => {
-                  const currentSizes = [
-                    ...(form.getValues(`colors.${colorIndex}.sizes`) || []),
-                  ]
-                  currentSizes.push({ size: '', countInStock: 0 })
-                  form.setValue(`colors.${colorIndex}.sizes`, currentSizes)
-                }}
-              >
-                {t('addSize')}
-              </Button>
-            </div>
-          ))}
-          <Button
-            type='button'
-            onClick={() =>
-              appendColor({ color: '', sizes: [{ size: '', countInStock: 0 }] })
-            }
-          >
-            {t('addColor')}
-          </Button>
-        </div>
+          {/* Description */}
+          <div className='space-y-5'>
+            <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
+              {t('description')}
+            </h2>
+            <FormField
+              control={form.control}
+              name='description'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormControl>
+                    <Textarea
+                      placeholder={t('enterProductDescription')}
+                      className='resize-none'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-        {/* Tags */}
-        <div className='space-y-5'>
-          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            {t('tags')}
-          </h2>
-          <FormField
-            control={form.control}
-            name='tags'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormControl>
-                  <div className='flex flex-wrap gap-3'>
-                    {availableTags.map((tag) => (
-                      <label
-                        key={tag._id}
-                        className='flex items-center space-x-2 bg-muted/20 px-2 py-1 rounded'
-                      >
-                        <Checkbox
-                          checked={field.value.includes(tag._id)}
-                          onCheckedChange={(checked) => {
-                            const newTags = checked
-                              ? [...field.value, tag._id]
-                              : field.value.filter((t) => t !== tag._id)
-                            field.onChange(newTags)
-                          }}
-                        />
-                        <span>{tag.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          {/* Publish Toggle */}
+          <div className='space-y-5'>
+            <FormField
+              control={form.control}
+              name='isPublished'
+              render={({ field }) => (
+                <FormItem className='flex items-center space-x-3'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel>{t('isPublished')}</FormLabel>
+                </FormItem>
+              )}
+            />
+          </div>
 
-        {/* Description */}
-        <div className='space-y-5'>
-          <h2 className='text-xl font-bold text-gray-800 dark:text-gray-100'>
-            {t('description')}
-          </h2>
-          <FormField
-            control={form.control}
-            name='description'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormControl>
-                  <Textarea
-                    placeholder={t('enterProductDescription')}
-                    className='resize-none'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Publish Toggle */}
-        <div className='space-y-5'>
-          <FormField
-            control={form.control}
-            name='isPublished'
-            render={({ field }) => (
-              <FormItem className='flex items-center space-x-3'>
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <FormLabel>{t('isPublished')}</FormLabel>
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Submit */}
-        <div>
-          <Button
-            type='submit'
-            size='lg'
-            disabled={form.formState.isSubmitting}
-            className='w-full text-lg font-bold'
-          >
-            {form.formState.isSubmitting
-              ? t('submitting')
-              : `${type === 'Create' ? t('createProduct') : t('updateProduct')}`}
-          </Button>
-        </div>
-      </form>
-    </Form>
+          {/* Submit */}
+          <div>
+            <Button
+              type='submit'
+              size='lg'
+              disabled={form.formState.isSubmitting}
+              className='w-full text-lg font-bold'
+            >
+              {form.formState.isSubmitting
+                ? t('submitting')
+                : `${type === 'Create' ? t('createProduct') : t('updateProduct')}`}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   )
 }
 

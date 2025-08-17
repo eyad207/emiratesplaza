@@ -189,7 +189,7 @@ export default async function SearchPage(props: {
           <div className='mb-8'>
             <Card className='shadow-lg border-0 bg-white/70 dark:bg-zinc-800/70 backdrop-blur-sm'>
               <CardContent className='p-6'>
-                <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6'>
+                <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 md:gap-6'>
                   {/* Results Summary */}
                   <div className='space-y-3'>
                     <div className='flex items-center gap-3'>
@@ -360,12 +360,12 @@ export default async function SearchPage(props: {
           </div>
 
           {/* Main Content Layout */}
-          <div className='grid lg:grid-cols-4 xl:grid-cols-5 gap-8'>
+          <div className='grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8'>
             {/* Filters Sidebar */}
-            <div className='lg:col-span-1'>
+            <div className='md:col-span-1 lg:col-span-1'>
               <CollapsibleOnMobile title={t('Search.Filters')}>
                 <Card className='sticky top-6 shadow-lg border-0 bg-white/70 dark:bg-zinc-800/70 backdrop-blur-sm'>
-                  <CardContent className='p-6 space-y-6'>
+                  <CardContent className='p-4 md:p-6 space-y-4 md:space-y-6'>
                     {/* Filters Header */}
                     <div className='flex items-center gap-3 pb-4 border-b border-gray-200 dark:border-gray-700'>
                       <div className='p-2 bg-primary/10 rounded-lg'>
@@ -384,7 +384,7 @@ export default async function SearchPage(props: {
                       </h3>
                       <div className='space-y-2 max-h-48 overflow-y-auto'>
                         <Link
-                          className={`flex items-center justify-between p-2 rounded-lg text-sm transition-all duration-200 hover:bg-primary/10 ${
+                          className={`flex items-center justify-between p-2 rounded-lg text-xs md:text-sm transition-all duration-200 hover:bg-primary/10 ${
                             'all' === category || '' === category
                               ? 'bg-primary/10 text-primary font-semibold border border-primary/20'
                               : 'text-gray-700 dark:text-gray-300 hover:text-primary'
@@ -504,10 +504,10 @@ export default async function SearchPage(props: {
             </div>
 
             {/* Products Grid */}
-            <div className='lg:col-span-3 xl:col-span-4'>
+            <div className='md:col-span-2 lg:col-span-3 xl:col-span-4'>
               {data.products.length === 0 ? (
                 <Card className='shadow-lg border-0 bg-white/70 dark:bg-zinc-800/70 backdrop-blur-sm'>
-                  <CardContent className='p-12 text-center'>
+                  <CardContent className='p-8 md:p-12 text-center'>
                     <div className='max-w-md mx-auto space-y-6'>
                       <div className='p-6 bg-gray-100 dark:bg-zinc-700 rounded-full w-24 h-24 mx-auto flex items-center justify-center'>
                         <SearchIcon className='h-12 w-12 text-gray-400' />
@@ -537,9 +537,9 @@ export default async function SearchPage(props: {
                   </CardContent>
                 </Card>
               ) : (
-                <div className='space-y-8'>
+                <div className='space-y-6 md:space-y-8'>
                   {/* Products Grid */}
-                  <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6'>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 md:gap-6'>
                     {data.products.map((product: IProduct) => (
                       <div
                         key={product._id}

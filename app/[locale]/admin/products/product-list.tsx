@@ -150,60 +150,68 @@ const ProductList = () => {
   }, [])
 
   return (
-    <div className='space-y-6'>
-      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
-        <div className='flex flex-col md:flex-row items-center gap-2'>
-          <h1 className='font-bold text-2xl'>Products</h1>
-          <Input
-            className='w-full md:w-auto'
-            type='text'
-            value={inputValue}
-            onChange={handleInputChange}
-            placeholder='Search products...'
-          />
-          <select
-            className='w-full md:w-auto border rounded-md px-2 py-1'
-            value={selectedCategory}
-            onChange={(e) => handleCategoryChange(e.target.value)}
-          >
-            <option value=''>All Categories</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-          <div className='flex items-center gap-4'>
+    <div className='space-y-4 md:space-y-6 px-4 md:px-6'>
+      <div className='flex flex-col lg:flex-row lg:items-center justify-between gap-4'>
+        <div className='flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4'>
+          <h1 className='font-bold text-xl md:text-2xl'>Products</h1>
+          <div className='flex flex-col sm:flex-row gap-2 w-full md:w-auto'>
+            <Input
+              className='w-full sm:w-auto md:min-w-[200px]'
+              type='text'
+              value={inputValue}
+              onChange={handleInputChange}
+              placeholder='Search products...'
+            />
+            <select
+              className='w-full sm:w-auto border rounded-md px-2 py-1 bg-background'
+              value={selectedCategory}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+            >
+              <option value=''>All Categories</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className='flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full md:w-auto'>
             <Input
               type='number'
               min='1'
               value={bulkQuantity}
               onChange={(e) => setBulkQuantity(parseInt(e.target.value, 10))}
               placeholder='Enter quantity'
+              className='w-full sm:w-24'
             />
             <Button
               variant='default'
               onClick={handleUpdateQuantities}
               disabled={selectedProducts.length === 0}
+              className='w-full sm:w-auto'
             >
               Update Quantities
             </Button>
           </div>
         </div>
-        <div className='flex items-center gap-4'>
-          <Button variant='outline' onClick={handleToggleAll}>
+        <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto'>
+          <Button
+            variant='outline'
+            onClick={handleToggleAll}
+            className='w-full sm:w-auto'
+          >
             {isAllChecked ? 'Uncheck All' : 'Check All'}
           </Button>
-          <Button asChild variant='default'>
+          <Button asChild variant='default' className='w-full sm:w-auto'>
             <Link href='/admin/products/create'>Create Product</Link>
           </Button>
         </div>
       </div>
-      <div className='overflow-x-auto'>
+      <div className='overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow'>
         <Table className='min-w-full'>
           <TableHeader>
             <TableRow>
-              <TableHead>Select</TableHead>
+              <TableHead className='w-12 px-4 py-3'>Select</TableHead>
               <TableHead
                 onClick={() => handleSort('_id')}
                 className='cursor-pointer'
@@ -244,13 +252,13 @@ const ProductList = () => {
                 Last Update{' '}
                 {sortField === 'updatedAt' && (sortOrder === 'asc' ? '↑' : '↓')}
               </TableHead>
-              <TableHead className='w-[100px]'>Actions</TableHead>
+              <TableHead className='min-w-[150px] px-4 py-3'>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data?.products.map((product: IProduct) => (
               <TableRow key={product._id}>
-                <TableCell>
+                <TableCell className='px-4 py-3'>
                   <input
                     type='checkbox'
                     checked={selectedProducts.includes(product._id)}
@@ -259,36 +267,55 @@ const ProductList = () => {
                     }
                   />
                 </TableCell>
-                <TableCell>{formatId(product._id)}</TableCell>
-                <TableCell>
-                  <Link href={`/admin/products/${product._id}`}>
+                <TableCell className='px-4 py-3'>
+                  {formatId(product._id)}
+                </TableCell>
+                <TableCell className='px-4 py-3'>
+                  <Link
+                    href={`/admin/products/${product._id}`}
+                    className='hover:underline text-blue-600 dark:text-blue-400'
+                  >
                     {product.name}
                   </Link>
                 </TableCell>
-                <TableCell className='text-right'>
+                <TableCell className='text-right px-4 py-3'>
                   {formatPrice(product.price)}
                 </TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{getTotalCountInStock(product)}</TableCell>
-                <TableCell>
+                <TableCell className='px-4 py-3'>{product.category}</TableCell>
+                <TableCell className='px-4 py-3'>
+                  {getTotalCountInStock(product)}
+                </TableCell>
+                <TableCell className='px-4 py-3'>
                   {formatDateTime(product.updatedAt).dateTime}
                 </TableCell>
-                <TableCell className='flex gap-1'>
-                  <Button asChild variant='outline' size='sm'>
-                    <Link href={`/admin/products/${product._id}`}>Edit</Link>
-                  </Button>
-                  <Button asChild variant='outline' size='sm'>
-                    <Link target='_blank' href={`/product/${product.slug}`}>
-                      View
-                    </Link>
-                  </Button>
-                  <DeleteDialog
-                    id={product._id}
-                    action={deleteProduct}
-                    callbackAction={() =>
-                      fetchProducts(inputValue, page, selectedCategory)
-                    }
-                  />
+                <TableCell className='px-4 py-3'>
+                  <div className='flex flex-col sm:flex-row gap-1'>
+                    <Button
+                      asChild
+                      variant='outline'
+                      size='sm'
+                      className='w-full sm:w-auto'
+                    >
+                      <Link href={`/admin/products/${product._id}`}>Edit</Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant='outline'
+                      size='sm'
+                      className='w-full sm:w-auto'
+                    >
+                      <Link target='_blank' href={`/product/${product.slug}`}>
+                        View
+                      </Link>
+                    </Button>
+                    <DeleteDialog
+                      id={product._id}
+                      action={deleteProduct}
+                      callbackAction={() =>
+                        fetchProducts(inputValue, page, selectedCategory)
+                      }
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -296,25 +323,25 @@ const ProductList = () => {
         </Table>
       </div>
       {(data?.totalPages ?? 0) > 1 && (
-        <div className='flex items-center justify-between gap-2'>
+        <div className='flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 px-4'>
           <Button
             variant='outline'
             onClick={() => handlePageChange('prev')}
             disabled={Number(page) <= 1}
-            className='w-24'
+            className='w-full sm:w-32 order-2 sm:order-1'
           >
-            <ChevronLeft /> Previous
+            <ChevronLeft className='w-4 h-4 mr-2' /> Previous
           </Button>
-          <span>
+          <span className='order-1 sm:order-2 text-sm md:text-base'>
             Page {page} of {data?.totalPages}
           </span>
           <Button
             variant='outline'
             onClick={() => handlePageChange('next')}
             disabled={Number(page) >= (data?.totalPages ?? 0)}
-            className='w-24'
+            className='w-full sm:w-32 order-3'
           >
-            Next <ChevronRight />
+            Next <ChevronRight className='w-4 h-4 ml-2' />
           </Button>
         </div>
       )}

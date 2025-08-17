@@ -322,16 +322,16 @@ export default function OrderDetailsForm({
   )
 
   return (
-    <main className='max-w-6xl mx-auto'>
-      <div className='grid md:grid-cols-4 gap-6'>
-        <div className='md:col-span-3'>
+    <main className='max-w-6xl mx-auto px-4 md:px-6'>
+      <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-20'>
+        <div className='md:col-span-2 lg:col-span-2'>
           {/* Shipping Address */}
           <div>
-            <div className='grid md:grid-cols-3 my-3 pb-3'>
-              <div className='text-lg font-bold'>
+            <div className='grid grid-cols-1 md:grid-cols-5 lg:grid-cols-3 my-3 pb-3'>
+              <div className='text-lg font-bold md:col-span-2 lg:col-span-1'>
                 <span>{t('shippingAddress')}</span>
               </div>
-              <div className='col-span-2'>
+              <div className='md:col-span-3 lg:col-span-2'>
                 <p>
                   {shippingAddress.fullName} <br />
                   {shippingAddress.street} <br />
@@ -343,11 +343,11 @@ export default function OrderDetailsForm({
 
           {/* payment method */}
           <div className='border-y'>
-            <div className='grid md:grid-cols-3 my-3 pb-3'>
-              <div className='text-lg font-bold'>
+            <div className='grid grid-cols-1 md:grid-cols-5 lg:grid-cols-3 my-3 pb-3'>
+              <div className='text-lg font-bold md:col-span-2 lg:col-span-1'>
                 <span>{t('paymentMethod')}</span>
               </div>
-              <div className='col-span-2'>
+              <div className='md:col-span-3 lg:col-span-2'>
                 <p>{paymentMethod}</p>
               </div>
             </div>
@@ -425,10 +425,12 @@ export default function OrderDetailsForm({
           <div className='block md:hidden'>
             <CheckoutSummary />
           </div>
-
+          <div className='hidden md:block lg:hidden'>
+            <CheckoutSummary />
+          </div>
           <CheckoutFooter />
         </div>
-        <div className='hidden md:block'>
+        <div className='hidden lg:block w-max'>
           <CheckoutSummary />
         </div>
       </div>
