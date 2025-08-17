@@ -1,4 +1,3 @@
-'use client'
 import { Menu as MenuIcon } from 'lucide-react'
 import {
   Sheet,
@@ -12,26 +11,17 @@ import CartButton from './cart-button'
 import UserButton from './user-button'
 import ThemeSwitcher from './theme-switcher'
 import LanguageSwitcher from './language-switcher'
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { SignOut } from '@/lib/actions/user.actions'
 import CurrencySwitcher from './currency-switcher'
-import { useRouter } from 'next/navigation'
+import { NavigationButton } from './navigation-button'
 
-const Menu = ({
-  forAdmin = false,
-  session,
-}: {
-  forAdmin?: boolean
-  session?: { user: { role: string } } | null
-}) => {
-  const t = useTranslations()
-  const router = useRouter()
-
-  const handleNavigation = (path: string) => {
-    router.push(path)
-  }
+const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
+  const t = await getTranslations()
+  // fetch current user session for mobile menu actions
+  const session = await import('@/auth').then((mod) => mod.auth())
   return (
     <div className='flex items-center'>
       {/* Desktop menu - visible above 1000px */}
@@ -73,22 +63,20 @@ const Menu = ({
                 </h3>
                 <div className='space-y-3 flex flex-col'>
                   <SheetClose asChild>
-                    <Button
-                      variant='ghost'
+                    <NavigationButton
+                      href='/account'
                       className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors text-sm justify-start'
-                      onClick={() => handleNavigation('/account')}
                     >
                       {t('Header.Your account')}
-                    </Button>
+                    </NavigationButton>
                   </SheetClose>
                   <SheetClose asChild>
-                    <Button
-                      variant='ghost'
+                    <NavigationButton
+                      href='/account/orders'
                       className='py-2 px-4 bg-white/10 rounded-md hover:bg-primary/10 transition-colors text-sm justify-start'
-                      onClick={() => handleNavigation('/account/orders')}
                     >
                       {t('Header.Your orders')}
-                    </Button>
+                    </NavigationButton>
                   </SheetClose>
                   {/* Admin dashboard link */}
                   {session?.user.role === 'Admin' && (
