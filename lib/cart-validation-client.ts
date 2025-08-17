@@ -5,19 +5,34 @@ export interface CartValidationResult {
   errors: string[]
   validItems: OrderItem[]
   invalidItems: OrderItem[]
+  warnings: string[]
 }
 
 export interface CartValidationError {
   itemId: string
   itemName: string
   error: string
+  severity: 'error' | 'warning'
+}
+
+export interface StockValidationResult {
+  isValid: boolean
+  stockIssues: Array<{
+    itemId: string
+    itemName: string
+    availableStock: number
+    requestedQuantity: number
+    color: string
+    size: string
+  }>
 }
 
 /**
- * Client-side cart validation (without database checks)
+ * Enhanced client-side cart validation with comprehensive checks
  */
 export function validateCartClientSide(cart: Cart): CartValidationResult {
   const errors: string[] = []
+  const warnings: string[] = []
   const validItems: OrderItem[] = []
   const invalidItems: OrderItem[] = []
 
@@ -28,11 +43,27 @@ export function validateCartClientSide(cart: Cart): CartValidationResult {
       errors: ['Cart is empty'],
       validItems: [],
       invalidItems: [],
+      warnings: [],
     }
+  }
+
+  // Validate cart structure
+  if (typeof cart.itemsPrice !== 'number' || cart.itemsPrice < 0) {
+    warnings.push('Cart pricing information may be outdated')
   }
 
   for (const item of cart.items) {
     const itemErrors: string[] = []
+    const itemWarnings: string[] = []
+
+    // Validate item structure
+    if (!item.product || !item.name || !item.slug) {
+      itemErrors.push(
+        `Invalid item structure for ${item.name || 'unknown item'}`
+      )
+      invalidItems.push(item)
+      continue
+    }
 
     // Check quantity validity
     if (
@@ -52,22 +83,82 @@ export function validateCartClientSide(cart: Cart): CartValidationResult {
       continue
     }
 
-    // Check stock availability based on item data
-    const colorObj = item.colors?.find((c) => c.color === item.color)
-    if (colorObj) {
-      const sizeObj = colorObj.sizes?.find((s) => s.size === item.size)
-      if (sizeObj && sizeObj.countInStock < item.quantity) {
+    // Check maximum reasonable quantity (prevent abuse)
+    if (item.quantity > 99) {
+      itemWarnings.push(`Large quantity (${item.quantity}) for ${item.name}`)
+    }
+
+    // Validate price
+    if (typeof item.price !== 'number' || item.price < 0) {
+      itemErrors.push(`Invalid price for ${item.name}`)
+      invalidItems.push(item)
+      continue
+    }
+
+    // Check if color and size are selected for items that require them
+    if (item.colors && item.colors.length > 0) {
+      if (!item.color) {
+        itemErrors.push(`Color not selected for ${item.name}`)
+        invalidItems.push(item)
+        continue
+      }
+
+      const colorObj = item.colors.find((c) => c.color === item.color)
+      if (!colorObj) {
         itemErrors.push(
-          `Insufficient stock for ${item.name}. Available: ${sizeObj.countInStock}, Requested: ${item.quantity}`
+          `Selected color (${item.color}) not available for ${item.name}`
         )
         invalidItems.push(item)
         continue
       }
+
+      // Check size if sizes are available
+      if (colorObj.sizes && colorObj.sizes.length > 0) {
+        if (!item.size) {
+          itemErrors.push(`Size not selected for ${item.name}`)
+          invalidItems.push(item)
+          continue
+        }
+
+        const sizeObj = colorObj.sizes.find((s) => s.size === item.size)
+        if (!sizeObj) {
+          itemErrors.push(
+            `Selected size (${item.size}) not available for ${item.name}`
+          )
+          invalidItems.push(item)
+          continue
+        }
+
+        // Check stock availability
+        if (sizeObj.countInStock < item.quantity) {
+          itemErrors.push(
+            `Insufficient stock for ${item.name}. Available: ${sizeObj.countInStock}, Requested: ${item.quantity}`
+          )
+          invalidItems.push(item)
+          continue
+        }
+
+        // Warn if stock is low
+        if (
+          sizeObj.countInStock <= 3 &&
+          sizeObj.countInStock >= item.quantity
+        ) {
+          itemWarnings.push(
+            `Low stock for ${item.name} (${sizeObj.countInStock} remaining)`
+          )
+        }
+      }
     }
 
-    // If we reach here, the item is valid
+    // Validate image URL
+    if (!item.image || typeof item.image !== 'string') {
+      itemWarnings.push(`Missing or invalid image for ${item.name}`)
+    }
+
+    // If we reach here, the item passed all validations
     validItems.push(item)
     errors.push(...itemErrors)
+    warnings.push(...itemWarnings)
   }
 
   return {
@@ -75,6 +166,40 @@ export function validateCartClientSide(cart: Cart): CartValidationResult {
     errors,
     validItems,
     invalidItems,
+    warnings,
+  }
+}
+
+/**
+ * Validate stock availability for cart items
+ */
+export function validateCartStock(items: OrderItem[]): StockValidationResult {
+  const stockIssues: StockValidationResult['stockIssues'] = []
+
+  for (const item of items) {
+    if (!item.colors || !item.color || !item.size) continue
+
+    const colorObj = item.colors.find((c) => c.color === item.color)
+    if (!colorObj || !colorObj.sizes) continue
+
+    const sizeObj = colorObj.sizes.find((s) => s.size === item.size)
+    if (!sizeObj) continue
+
+    if (sizeObj.countInStock < item.quantity) {
+      stockIssues.push({
+        itemId: item.clientId || item.product,
+        itemName: item.name,
+        availableStock: sizeObj.countInStock,
+        requestedQuantity: item.quantity,
+        color: item.color,
+        size: item.size,
+      })
+    }
+  }
+
+  return {
+    isValid: stockIssues.length === 0,
+    stockIssues,
   }
 }
 
@@ -105,9 +230,39 @@ export function getInvalidQuantityItems(items: OrderItem[]): OrderItem[] {
 }
 
 /**
- * Check if cart is ready for checkout (has valid items and no invalid quantities)
+ * Enhanced checkout readiness validation
  */
 export function isCartReadyForCheckout(cart: Cart): boolean {
   if (!cart.items || cart.items.length === 0) return false
-  return !hasInvalidQuantities(cart.items)
+
+  const validation = validateCartClientSide(cart)
+  const stockValidation = validateCartStock(cart.items)
+
+  return (
+    validation.isValid &&
+    stockValidation.isValid &&
+    !hasInvalidQuantities(cart.items)
+  )
+}
+
+/**
+ * Get cart summary with validation status
+ */
+export function getCartSummary(cart: Cart) {
+  const validation = validateCartClientSide(cart)
+  const stockValidation = validateCartStock(cart.items)
+  const totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0)
+
+  return {
+    totalItems,
+    validItemsCount: validation.validItems.length,
+    invalidItemsCount: validation.invalidItems.length,
+    hasErrors: !validation.isValid,
+    hasWarnings: validation.warnings.length > 0,
+    hasStockIssues: !stockValidation.isValid,
+    canCheckout: isCartReadyForCheckout(cart),
+    errors: validation.errors,
+    warnings: validation.warnings,
+    stockIssues: stockValidation.stockIssues,
+  }
 }

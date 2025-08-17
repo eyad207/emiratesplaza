@@ -47,6 +47,22 @@ const useCartStore = create(
 
       addItem: async (item: OrderItem, quantity: number) => {
         const { items, shippingAddress } = get().cart
+
+        // Enhanced validation before adding
+        if (quantity <= 0 || !Number.isInteger(quantity)) {
+          return {
+            success: false,
+            message: 'Invalid quantity. Must be a positive whole number.',
+          }
+        }
+
+        if (quantity > 10) {
+          return {
+            success: false,
+            message: 'Maximum quantity per item is 10.',
+          }
+        }
+
         const existItem = items.find(
           (x) =>
             x.product === item.product &&
@@ -54,28 +70,43 @@ const useCartStore = create(
             x.size === item.size
         )
 
-        // Check stock availability
+        // Enhanced stock validation
         const colorObj = item.colors.find((c) => c.color === item.color)
         const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
 
         if (!sizeObj) {
-          return { success: false, message: 'Size not available' }
+          return {
+            success: false,
+            message: 'Selected size is not available for this color.',
+          }
         }
 
-        if (existItem) {
-          // Check if adding to existing item would exceed stock
-          if (sizeObj.countInStock < quantity + existItem.quantity) {
-            return {
-              success: false,
-              message: 'You cant add it to cart, change color or size',
-            }
+        if (sizeObj.countInStock === 0) {
+          return {
+            success: false,
+            message: 'This item is currently out of stock.',
           }
-        } else {
-          // Check if new item quantity exceeds stock
-          if (sizeObj.countInStock < quantity) {
+        }
+
+        const totalRequestedQuantity = existItem
+          ? existItem.quantity + quantity
+          : quantity
+
+        if (sizeObj.countInStock < totalRequestedQuantity) {
+          const available = sizeObj.countInStock
+          const canAdd = existItem
+            ? Math.max(0, available - existItem.quantity)
+            : available
+
+          if (canAdd === 0) {
             return {
               success: false,
-              message: 'You cant add it to cart, change color or size',
+              message: `No more items can be added. You already have the maximum available quantity (${available}) in your cart.`,
+            }
+          } else {
+            return {
+              success: false,
+              message: `Only ${canAdd} more can be added to your cart. ${available} total available.`,
             }
           }
         }
@@ -90,29 +121,34 @@ const useCartStore = create(
             )
           : [...items, { ...item, quantity }]
 
-        set({
-          cart: {
-            ...get().cart,
-            items: updatedCartItems,
-            ...(await calcDeliveryDateAndPrice({
+        try {
+          set({
+            cart: {
+              ...get().cart,
               items: updatedCartItems,
-              shippingAddress,
-            })),
-          },
-        })
+              ...(await calcDeliveryDateAndPrice({
+                items: updatedCartItems,
+                shippingAddress,
+              })),
+            },
+          })
 
-        const foundItem = updatedCartItems.find(
-          (x) =>
-            x.product === item.product &&
-            x.color === item.color &&
-            x.size === item.size
-        )
+          const foundItem = updatedCartItems.find(
+            (x) =>
+              x.product === item.product &&
+              x.color === item.color &&
+              x.size === item.size
+          )
 
-        if (!foundItem) {
-          return { success: false, message: 'Item not found in cart' }
+          if (!foundItem) {
+            return { success: false, message: 'Failed to add item to cart.' }
+          }
+
+          return { success: true, clientId: foundItem.clientId }
+        } catch (error) {
+          console.error('Error adding item to cart:', error)
+          return { success: false, message: 'Failed to add item to cart.' }
         }
-
-        return { success: true, clientId: foundItem.clientId }
       },
       updateItem: async (item: OrderItem, quantity: number) => {
         const { items, shippingAddress } = get().cart
@@ -122,7 +158,22 @@ const useCartStore = create(
             x.color === item.color &&
             x.size === item.size
         )
-        if (!exist) return
+
+        if (!exist) {
+          console.warn('Attempted to update non-existent cart item')
+          return
+        }
+
+        // Enhanced validation for quantity updates
+        if (quantity < 0 || !Number.isInteger(quantity)) {
+          console.warn('Invalid quantity for update:', quantity)
+          return
+        }
+
+        if (quantity > 10) {
+          console.warn('Quantity exceeds maximum allowed:', quantity)
+          return
+        }
 
         let updatedCartItems
         if (quantity === 0) {
@@ -134,6 +185,18 @@ const useCartStore = create(
               x.size !== item.size
           )
         } else {
+          // Validate stock before updating
+          const colorObj = item.colors?.find((c) => c.color === item.color)
+          const sizeObj = colorObj?.sizes?.find((s) => s.size === item.size)
+
+          if (sizeObj && sizeObj.countInStock < quantity) {
+            console.warn(
+              `Insufficient stock for update. Available: ${sizeObj.countInStock}, Requested: ${quantity}`
+            )
+            // Set to maximum available instead of failing
+            quantity = sizeObj.countInStock
+          }
+
           // Update the item quantity
           updatedCartItems = items.map((x) =>
             x.product === item.product &&
@@ -144,16 +207,20 @@ const useCartStore = create(
           )
         }
 
-        set({
-          cart: {
-            ...get().cart,
-            items: updatedCartItems,
-            ...(await calcDeliveryDateAndPrice({
+        try {
+          set({
+            cart: {
+              ...get().cart,
               items: updatedCartItems,
-              shippingAddress,
-            })),
-          },
-        })
+              ...(await calcDeliveryDateAndPrice({
+                items: updatedCartItems,
+                shippingAddress,
+              })),
+            },
+          })
+        } catch (error) {
+          console.error('Error updating cart item:', error)
+        }
       },
       removeItem: async (item: OrderItem) => {
         const { items, shippingAddress } = get().cart
@@ -219,45 +286,104 @@ const useCartStore = create(
       },
       refreshCartStock: async () => {
         const { items } = get().cart
-        const updatedItems = await Promise.all(
-          items.map(async (item) => {
-            try {
-              const response = await fetch(`/api/products/${item.product}`)
-              if (!response.ok) {
-                // If the product is not found, return null
-                return null
-              }
-              const data = await response.json()
-              const colorObj:
-                | {
+
+        if (items.length === 0) return
+
+        try {
+          const updatedItems = await Promise.all(
+            items.map(async (item) => {
+              try {
+                const response = await fetch(`/api/products/${item.product}`, {
+                  method: 'GET',
+                  headers: {
+                    'Cache-Control': 'no-cache',
+                  },
+                })
+
+                if (!response.ok) {
+                  console.warn(
+                    `Product ${item.product} not found, removing from cart`
+                  )
+                  return null
+                }
+
+                const data = await response.json()
+
+                // Validate product is still available
+                if (!data.isPublished) {
+                  console.warn(`Product ${item.name} is no longer available`)
+                  return null
+                }
+
+                const colorObj = data.colors.find(
+                  (c: {
                     color: string
                     sizes: { size: string; countInStock: number }[]
-                  }
-                | undefined = data.colors.find(
-                (c: { color: string }) => c.color === item.color
-              )
-              const sizeObj = colorObj?.sizes.find((s) => s.size === item.size)
-              return {
-                ...item,
-                colors: data.colors,
-                quantity: Math.min(item.quantity, sizeObj?.countInStock || 0),
+                  }) => c.color === item.color
+                )
+
+                if (!colorObj) {
+                  console.warn(
+                    `Color ${item.color} no longer available for ${item.name}`
+                  )
+                  return null
+                }
+
+                const sizeObj = colorObj.sizes.find(
+                  (s: { size: string; countInStock: number }) =>
+                    s.size === item.size
+                )
+
+                if (!sizeObj) {
+                  console.warn(
+                    `Size ${item.size} no longer available for ${item.name}`
+                  )
+                  return null
+                }
+
+                // Update with current data and adjust quantity if needed
+                return {
+                  ...item,
+                  colors: data.colors,
+                  category: data.category,
+                  quantity: Math.min(item.quantity, sizeObj.countInStock),
+                  // Keep original price for price change detection
+                }
+              } catch (error) {
+                console.error(`Error refreshing item ${item.name}:`, error)
+                return item // Keep original item if refresh fails
               }
-            } catch {
-              // Handle fetch errors by returning null
-              return null
-            }
+            })
+          )
+
+          // Filter out null items (removed products) and items with 0 quantity
+          const filteredItems = updatedItems
+            .filter((item): item is OrderItem => item !== null)
+            .filter((item) => item.quantity > 0)
+
+          const { shippingAddress } = get().cart
+
+          set({
+            cart: {
+              ...get().cart,
+              items: filteredItems,
+              ...(await calcDeliveryDateAndPrice({
+                items: filteredItems,
+                shippingAddress,
+              })),
+            },
           })
-        )
 
-        // Filter out items that are null (deleted products)
-        const filteredItems = updatedItems.filter((item) => item !== null)
-
-        set({
-          cart: {
-            ...get().cart,
-            items: filteredItems,
-          },
-        })
+          // Notify about removed items
+          const removedCount = items.length - filteredItems.length
+          if (removedCount > 0) {
+            console.info(
+              `${removedCount} item(s) removed from cart due to availability changes`
+            )
+          }
+        } catch (error) {
+          console.error('Error refreshing cart stock:', error)
+        }
       },
       refreshCartPrices: async () => {
         const { items, shippingAddress } = get().cart
