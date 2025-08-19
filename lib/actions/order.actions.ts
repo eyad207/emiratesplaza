@@ -26,11 +26,16 @@ export const createOrder = async (clientSideCart: Cart) => {
     await connectToDatabase()
     const session = await auth()
     if (!session) throw new Error('User not authenticated')
-    // recalculate price and delivery date on the server
-    const createdOrder = await createOrderFromCart(
-      clientSideCart,
-      session.user.id!
-    )
+
+    // Additional validation for required fields
+    if (!clientSideCart.shippingAddress) {
+      throw new Error('Shipping address is required')
+    }
+
+    if (!clientSideCart.paymentMethod) {
+      throw new Error('Payment method is required')
+    }
+
     // ✅ Comprehensive cart validation with database checks
     const validation = await validateCart(clientSideCart)
 
@@ -55,14 +60,11 @@ export const createOrder = async (clientSideCart: Cart) => {
       )
     }
 
-    // Additional validation for required fields
-    if (!clientSideCart.shippingAddress) {
-      throw new Error('Shipping address is required')
-    }
-
-    if (!clientSideCart.paymentMethod) {
-      throw new Error('Payment method is required')
-    }
+    // recalculate price and delivery date on the server
+    const createdOrder = await createOrderFromCart(
+      clientSideCart,
+      session.user.id!
+    )
     // If the order total is 0 or payment method is 'Free Order', mark as paid
     if (
       createdOrder.totalPrice === 0 ||
@@ -90,26 +92,48 @@ export const createOrder = async (clientSideCart: Cart) => {
       message: 'Processing to payment ...',
       data: { orderId: createdOrder._id.toString() },
     }
-  } catch {
-    return { success: false, message: 'Failed to create order' }
+  } catch (error) {
+    console.error('Error creating order:', error)
+
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+
+    return {
+      success: false,
+      message: 'Failed to create order: An unexpected error occurred',
+    }
   }
 }
 export const createOrderFromCart = async (
   clientSideCart: Cart,
   userId: string
 ) => {
+  const cartCalculations = await calcDeliveryDateAndPrice({
+    items: clientSideCart.items,
+    shippingAddress: clientSideCart.shippingAddress,
+    deliveryDateIndex: clientSideCart.deliveryDateIndex,
+  })
+
   const cart = {
     ...clientSideCart,
-    ...calcDeliveryDateAndPrice({
-      items: clientSideCart.items,
-      shippingAddress: clientSideCart.shippingAddress,
-      deliveryDateIndex: clientSideCart.deliveryDateIndex,
-    }),
+    ...cartCalculations,
   }
 
   const order = OrderInputSchema.parse({
     user: userId,
-    items: cart.items,
+    items: cart.items.map((item) => ({
+      ...item,
+      // Ensure price fields are properly formatted - use the same logic as the validator
+      price: Math.round((item.price + Number.EPSILON) * 100) / 100,
+      discountedPrice: item.discountedPrice
+        ? Math.round((item.discountedPrice + Number.EPSILON) * 100) / 100
+        : undefined,
+    })),
     shippingAddress: cart.shippingAddress,
     paymentMethod: cart.paymentMethod,
     itemsPrice: cart.itemsPrice,
@@ -630,6 +654,12 @@ export const calcDeliveryDateAndPrice = async ({
       (shippingPrice ? round2(shippingPrice) : 0) +
       (taxPrice ? round2(taxPrice) : 0)
   )
+
+  // Calculate expected delivery date
+  const expectedDeliveryDate = deliveryDate
+    ? new Date(Date.now() + deliveryDate.daysToDeliver * 24 * 60 * 60 * 1000)
+    : undefined
+
   return {
     availableDeliveryDates,
     deliveryDateIndex:
@@ -640,6 +670,7 @@ export const calcDeliveryDateAndPrice = async ({
     shippingPrice,
     taxPrice,
     totalPrice,
+    expectedDeliveryDate,
   }
 }
 

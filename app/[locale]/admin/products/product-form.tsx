@@ -55,7 +55,7 @@ const ProductForm = ({
   product?: IProduct
   productId?: string
 }) => {
-  const t = useTranslations('admin')
+  const t = useTranslations('Admin')
   const router = useRouter()
   const [availableTags, setAvailableTags] = useState<
     { name: string; _id: string }[]
@@ -209,7 +209,7 @@ const ProductForm = ({
               name='price'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>{t('netPrice')} (in $)</FormLabel>
+                  <FormLabel>{t('price')}</FormLabel>
                   <FormControl>
                     <Input placeholder={t('enterProductPrice')} {...field} />
                   </FormControl>

@@ -2,7 +2,7 @@
 import { ISettingInput } from '@/types'
 import data from '../data'
 import Setting from '../db/models/setting.model'
-import { connectToDatabase } from '../db/connection-pool' // Use optimized connection
+import { connectToDatabase } from '../db' // Use regular connection for consistency
 import {} from '../utils'
 import { cookies } from 'next/headers'
 

@@ -632,6 +632,7 @@
     "colorsAndSizes": "الألوان والأحجام",
     "tags": "العلامات",
     "description": "الوصف",
+    "price": "السعر",
     "isPublished": "هل تم النشر؟",
     "submitting": "جاري الإرسال...",
     "createProduct": "إنشاء منتج",

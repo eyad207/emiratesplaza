@@ -167,6 +167,10 @@ export default async function ProductDetails(props: {
                         slug: product.slug,
                         category: product.category,
                         price: round2(product.price),
+                        discountedPrice: product.discountedPrice
+                          ? round2(product.discountedPrice)
+                          : undefined,
+                        discount: product.discount || undefined,
                         quantity: 1,
                         image: product.images[0],
                         size: selectedSize,

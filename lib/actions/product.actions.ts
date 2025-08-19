@@ -8,9 +8,9 @@ import {} from '../utils'
 import { toSlug } from '../utils' // Add this import for toSlug
 import { ProductInputSchema, ProductUpdateSchema } from '../validator'
 import { IProductInput } from '@/types'
+import mongoose from 'mongoose'
 import { z } from 'zod'
 import { getSetting } from './setting.actions'
-import mongoose from 'mongoose' // Add this import
 import {
   processMultilingualSearch,
   createMultilingualSearchFilter,
@@ -549,51 +549,73 @@ async function resolveTagIds(tagNamesOrIds: string[]): Promise<string[]> {
 export async function getAllCategoriesWithTranslation(
   locale: 'ar' | 'en-US' | 'nb-NO' = 'en-US'
 ) {
-  await connectToDatabase()
-  const categories = await Product.find({ isPublished: true }).distinct(
-    'category'
-  )
-
-  // Import here to avoid circular dependency
-  const { translateCategoriesForDisplay } = await import(
-    '../multilingual-search'
-  )
-
   try {
-    const translatedCategories = await translateCategoriesForDisplay(
-      categories,
-      locale
+    await connectToDatabase()
+
+    // Ensure connection is ready before querying
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error('Database connection not ready')
+    }
+
+    const categories = await Product.find({ isPublished: true }).distinct(
+      'category'
     )
-    return translatedCategories
-  } catch {
-    // Fallback to original categories if translation fails
-    return categories.map((category) => ({
-      original: category,
-      translated: category,
-    }))
+
+    // Import here to avoid circular dependency
+    const { translateCategoriesForDisplay } = await import(
+      '../multilingual-search'
+    )
+
+    try {
+      const translatedCategories = await translateCategoriesForDisplay(
+        categories,
+        locale
+      )
+      return translatedCategories
+    } catch {
+      // Fallback to original categories if translation fails
+      return categories.map((category) => ({
+        original: category,
+        translated: category,
+      }))
+    }
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return []
   }
 }
 
 export async function getAllTagsWithTranslation(
   locale: 'ar' | 'en-US' | 'nb-NO' = 'en-US'
 ) {
-  await connectToDatabase()
-  const tags = await Tag.find().sort({ name: 1 }).lean()
-
-  // Import here to avoid circular dependency
-  const { translateTagsForDisplay } = await import('../multilingual-search')
-
   try {
-    const translatedTags = await translateTagsForDisplay(
-      tags.map((tag) => ({ _id: tag._id.toString(), name: tag.name })),
-      locale
-    )
-    return translatedTags
-  } catch {
-    return tags.map((tag) => ({
-      _id: tag._id.toString(),
-      original: tag.name,
-      translated: tag.name,
-    }))
+    await connectToDatabase()
+
+    // Ensure connection is ready before querying
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error('Database connection not ready')
+    }
+
+    const tags = await Tag.find().sort({ name: 1 }).lean()
+
+    // Import here to avoid circular dependency
+    const { translateTagsForDisplay } = await import('../multilingual-search')
+
+    try {
+      const translatedTags = await translateTagsForDisplay(
+        tags.map((tag) => ({ _id: tag._id.toString(), name: tag.name })),
+        locale
+      )
+      return translatedTags
+    } catch {
+      return tags.map((tag) => ({
+        _id: tag._id.toString(),
+        original: tag.name,
+        translated: tag.name,
+      }))
+    }
+  } catch (error) {
+    console.error('Error fetching tags:', error)
+    return []
   }
 }

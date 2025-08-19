@@ -585,6 +585,9 @@
     "Error": "Error",
     "and": "and"
   },
+  "admin": {
+    "price": "Price"
+  },
   "SignUp": {
     "CreateAccount": "Create account",
     "Name": "Name",

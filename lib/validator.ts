@@ -9,10 +9,16 @@ const MongoId = z
 const Price = (field: string) =>
   z.coerce
     .number()
-    .refine(
-      (value) => /^\d+(\.\d{2})?$/.test(formatNumberWithDecimal(value)),
-      `${field} must have exactly two decimal places (e.g., 49.99)`
-    )
+    .refine((value) => {
+      // Convert to number, round to 2 decimal places, then check format
+      const rounded = Math.round((value + Number.EPSILON) * 100) / 100
+      const formatted = formatNumberWithDecimal(rounded)
+      return /^\d+\.\d{2}$/.test(formatted)
+    }, `${field} must have exactly two decimal places (e.g., 49.99)`)
+    .transform((value) => {
+      // Always return properly rounded value
+      return Math.round((value + Number.EPSILON) * 100) / 100
+    })
 
 const SizeSchema = z.object({
   size: z.string(),
