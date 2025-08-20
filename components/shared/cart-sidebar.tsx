@@ -4,7 +4,7 @@ import useCartStore from '@/hooks/use-cart-store'
 import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/currency'
 import Link from 'next/link'
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { Button, buttonVariants } from '../ui/button'
 import { ScrollArea } from '../ui/scroll-area'
 import Image from 'next/image'
@@ -37,6 +37,76 @@ import {
   isCartReadyForCheckout,
 } from '@/lib/cart-validation-client'
 import { Badge } from '../ui/badge'
+
+// Memoized quantity selector component to prevent unnecessary re-renders
+const QuantitySelector = memo(
+  ({
+    item,
+    hasValidationIssue,
+    isRefreshing,
+    onQuantityUpdate,
+    t,
+  }: {
+    item: OrderItem
+    hasValidationIssue: boolean
+    isRefreshing: boolean
+    onQuantityUpdate: (item: OrderItem, quantity: number) => void
+    t: (key: string) => string
+  }) => {
+    const maxStock = Math.min(
+      item.colors
+        ?.find((c) => c.color === item.color)
+        ?.sizes.find((s) => s.size === item.size)?.countInStock || 0,
+      10 // Limit to 10 for UX
+    )
+
+    const handleValueChange = useCallback(
+      (value: string) => {
+        onQuantityUpdate(item, Number(value))
+      },
+      [item, onQuantityUpdate]
+    )
+
+    return (
+      <Select
+        value={item.quantity.toString()}
+        onValueChange={handleValueChange}
+        disabled={isRefreshing}
+      >
+        <SelectTrigger
+          className={cn(
+            'text-xs h-7 w-14 px-2',
+            hasValidationIssue && 'border-red-300 bg-red-50 dark:bg-red-900/20'
+          )}
+          onFocus={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent
+          className='z-[999] bg-white dark:bg-gray-900'
+          position='popper'
+          side='bottom'
+          align='center'
+          sideOffset={4}
+          avoidCollisions={true}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
+          {Array.from({ length: maxStock }).map((_, i) => (
+            <SelectItem value={(i + 1).toString()} key={i + 1}>
+              {i + 1}
+            </SelectItem>
+          ))}
+          <SelectItem value='0' className='text-red-600'>
+            {t('Cart.Remove')}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    )
+  }
+)
+
+QuantitySelector.displayName = 'QuantitySelector'
 
 // Enhanced validation interfaces
 interface ValidationState {
@@ -526,12 +596,22 @@ export default function CartSidebar() {
 
                       return (
                         <div
-                          key={item.clientId}
+                          key={`${item.clientId}-${item.quantity}`}
                           className={cn(
                             'p-3 hover:bg-muted/20 transition-colors',
                             hasValidationIssue &&
                               'bg-red-50/50 dark:bg-red-900/10'
                           )}
+                          onMouseDown={(e) => {
+                            // Prevent mouse events from interfering with Select
+                            if (
+                              (e.target as HTMLElement).closest(
+                                '[data-radix-select-trigger]'
+                              )
+                            ) {
+                              e.stopPropagation()
+                            }
+                          }}
                         >
                           <div className='flex gap-3 items-center'>
                             <Link
@@ -602,50 +682,13 @@ export default function CartSidebar() {
                                 </div>
 
                                 <div className='flex items-center gap-2'>
-                                  <Select
-                                    value={item.quantity.toString()}
-                                    onValueChange={(value) =>
-                                      handleQuantityUpdate(item, Number(value))
-                                    }
-                                    disabled={isRefreshing}
-                                  >
-                                    <SelectTrigger
-                                      className={cn(
-                                        'text-xs h-7 w-14 px-2',
-                                        hasValidationIssue &&
-                                          'border-red-300 bg-red-50 dark:bg-red-900/20'
-                                      )}
-                                    >
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {Array.from({
-                                        length: Math.min(
-                                          item.colors
-                                            ?.find(
-                                              (c) => c.color === item.color
-                                            )
-                                            ?.sizes.find(
-                                              (s) => s.size === item.size
-                                            )?.countInStock || 0,
-                                          10 // Limit to 10 for UX
-                                        ),
-                                      }).map((_, i) => (
-                                        <SelectItem
-                                          value={(i + 1).toString()}
-                                          key={i + 1}
-                                        >
-                                          {i + 1}
-                                        </SelectItem>
-                                      ))}
-                                      <SelectItem
-                                        value='0'
-                                        className='text-red-600'
-                                      >
-                                        {t('Cart.Remove')}
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                  <QuantitySelector
+                                    item={item}
+                                    hasValidationIssue={hasValidationIssue}
+                                    isRefreshing={isRefreshing}
+                                    onQuantityUpdate={handleQuantityUpdate}
+                                    t={t}
+                                  />
 
                                   <Button
                                     variant='ghost'
