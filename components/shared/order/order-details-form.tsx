@@ -474,17 +474,11 @@ export default function OrderDetailsForm({
                           </div>
                           <div className='text-right'>
                             <div className='text-lg font-bold'>
-                              <ProductPrice price={item.price} plain />
+                              <ProductPrice
+                                price={itemsPrice / item.quantity}
+                                plain
+                              />{' '}
                             </div>
-                            {item.quantity > 1 && (
-                              <div className='text-xs text-muted-foreground'>
-                                <ProductPrice
-                                  price={item.price / item.quantity}
-                                  plain
-                                />{' '}
-                                each
-                              </div>
-                            )}
                           </div>
                         </div>
                       </div>
