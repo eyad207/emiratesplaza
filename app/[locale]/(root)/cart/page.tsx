@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import useCartStore from '@/hooks/use-cart-store'
-import { TrashIcon } from 'lucide-react'
+import { TrashIcon, RefreshCw, Loader2, AlertTriangle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
@@ -25,15 +25,115 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { formatPrice } from '@/lib/currency'
-import { useEffect } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
+import ProductPrice from '@/components/shared/product/product-price'
 import { useSearchParams, useRouter } from 'next/navigation'
 import {
   isCartReadyForCheckout,
-  hasInvalidQuantities,
-  getInvalidQuantityItems,
+  validateCartClientSide,
 } from '@/lib/cart-validation-client'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import type { OrderItem } from '@/types'
+
+// Enhanced validation interfaces - same as cart sidebar
+interface ValidationState {
+  isValidating: boolean
+  hasErrors: boolean
+  errors: string[]
+  invalidItems: string[]
+  stockIssues: Array<{
+    itemId: string
+    itemName: string
+    availableStock: number
+    requestedQuantity: number
+  }>
+}
+
+// Enhanced price change state interface
+interface PriceChangeState {
+  hasChanges: boolean
+  isProcessing: boolean
+  priceChanges: Array<{
+    item: OrderItem
+    oldPrice: number
+    newPrice: number
+    priceChange: number
+    changeType: 'increase' | 'decrease'
+  }>
+}
+
+// Custom validation hook - same as cart sidebar
+const useCartValidation = (items: OrderItem[]): ValidationState => {
+  const [validationState, setValidationState] = useState<ValidationState>({
+    isValidating: false,
+    hasErrors: false,
+    errors: [],
+    invalidItems: [],
+    stockIssues: [],
+  })
+
+  const validateCart = useCallback(async () => {
+    if (items.length === 0) {
+      setValidationState({
+        isValidating: false,
+        hasErrors: false,
+        errors: [],
+        invalidItems: [],
+        stockIssues: [],
+      })
+      return
+    }
+
+    setValidationState((prev) => ({ ...prev, isValidating: true }))
+
+    const clientValidation = validateCartClientSide({
+      items,
+      itemsPrice: 0, // Will be calculated
+      totalPrice: 0, // Will be calculated
+      taxPrice: undefined,
+      shippingPrice: undefined,
+      paymentMethod: undefined,
+      shippingAddress: undefined,
+      deliveryDateIndex: undefined,
+    })
+
+    const stockIssues: ValidationState['stockIssues'] = []
+
+    // Enhanced stock validation
+    items.forEach((item) => {
+      const colorObj = item.colors?.find((c) => c.color === item.color)
+      const sizeObj = colorObj?.sizes?.find((s) => s.size === item.size)
+
+      if (sizeObj && sizeObj.countInStock < item.quantity) {
+        stockIssues.push({
+          itemId: item.clientId || item.product,
+          itemName: item.name,
+          availableStock: sizeObj.countInStock,
+          requestedQuantity: item.quantity,
+        })
+      }
+    })
+
+    setValidationState({
+      isValidating: false,
+      hasErrors: !clientValidation.isValid || stockIssues.length > 0,
+      errors: [...clientValidation.errors, ...clientValidation.warnings],
+      invalidItems: clientValidation.invalidItems.map(
+        (item) => item.clientId || item.product
+      ),
+      stockIssues,
+    })
+  }, [items])
+
+  useEffect(() => {
+    validateCart()
+  }, [validateCart])
+
+  return validationState
+}
 
 export default function Cart() {
   const {
@@ -41,6 +141,7 @@ export default function Cart() {
     removeItem,
     updateItem,
     refreshCartStock,
+    refreshCartPrices,
   } = useCartStore()
 
   const t = useTranslations()
@@ -48,7 +149,18 @@ export default function Cart() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  // Validate cart state
+  // Enhanced state management
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [priceChangeInfo, setPriceChangeInfo] = useState<PriceChangeState>({
+    hasChanges: false,
+    isProcessing: false,
+    priceChanges: [],
+  })
+
+  // Enhanced validation hook - same as cart sidebar
+  const validation = useCartValidation(items)
+
+  // Legacy cart validation for backward compatibility
   const cartIsReady = isCartReadyForCheckout({
     items,
     itemsPrice,
@@ -56,12 +168,99 @@ export default function Cart() {
     taxPrice: taxPrice || 0,
     shippingPrice: shippingPrice || 0,
   })
-  const invalidQuantityItems = getInvalidQuantityItems(items)
-  const hasInvalidItems = hasInvalidQuantities(items)
 
+  // Enhanced price and stock checking - same as cart sidebar
+  const checkPricesAndStock = useCallback(async () => {
+    if (items.length === 0) return
+
+    setIsRefreshing(true)
+    setPriceChangeInfo((prev) => ({ ...prev, isProcessing: true }))
+
+    try {
+      // Check for price changes first
+      const priceResult = await refreshCartPrices()
+
+      if (priceResult.hasChanges) {
+        setPriceChangeInfo({
+          hasChanges: true,
+          isProcessing: false,
+          priceChanges: priceResult.priceChanges,
+        })
+
+        // Enhanced notification based on changes
+        const totalIncreases = priceResult.priceChanges.filter(
+          (c) => c.changeType === 'increase'
+        ).length
+        const totalDecreases = priceResult.priceChanges.filter(
+          (c) => c.changeType === 'decrease'
+        ).length
+        const totalIncrease = priceResult.priceChanges
+          .filter((c) => c.changeType === 'increase')
+          .reduce((sum, c) => sum + c.priceChange, 0)
+        const totalDecrease = priceResult.priceChanges
+          .filter((c) => c.changeType === 'decrease')
+          .reduce((sum, c) => sum + c.priceChange, 0)
+
+        if (totalIncreases > 0 && totalDecreases > 0) {
+          toast({
+            title: t('Cart.Price and Discount Changes Detected'),
+            description: `${totalIncreases} ${t('Cart.items increased')}, ${totalDecreases} ${t('Cart.items decreased')}. ${t('Cart.Net change')}: ${formatPrice(totalIncrease - totalDecrease)}`,
+            variant: 'default',
+            duration: 6000,
+          })
+        } else if (totalIncreases > 0) {
+          toast({
+            title: t('Cart.Price Changes Detected'),
+            description: `${totalIncreases} ${t('Cart.items have increased by')} ${formatPrice(totalIncrease)} ${t('Cart.due to price or discount changes')}`,
+            variant: 'destructive',
+            duration: 6000,
+          })
+        } else {
+          toast({
+            title: t('Cart.Price Changes Detected'),
+            description: `${totalDecreases} ${t('Cart.items have decreased by')} ${formatPrice(totalDecrease)} ${t('Cart.due to price or discount changes')}`,
+            variant: 'default',
+            duration: 6000,
+          })
+        }
+      } else {
+        setPriceChangeInfo((prev) => ({ ...prev, isProcessing: false }))
+      }
+
+      // Then refresh stock
+      await refreshCartStock()
+    } catch (error) {
+      console.error('Failed to check prices and stock:', error)
+      toast({
+        title: t('Cart.Error'),
+        description: t('Cart.Failed to update cart information'),
+        variant: 'destructive',
+      })
+    } finally {
+      setIsRefreshing(false)
+      setPriceChangeInfo((prev) => ({ ...prev, isProcessing: false }))
+    }
+  }, [items.length, refreshCartPrices, refreshCartStock, t, toast])
+
+  const dismissPriceChanges = useCallback(() => {
+    setPriceChangeInfo({
+      hasChanges: false,
+      isProcessing: false,
+      priceChanges: [],
+    })
+    toast({
+      title: t('Cart.Price Changes Accepted'),
+      description: t('Cart.Your cart has been updated with current prices'),
+      variant: 'default',
+    })
+  }, [t, toast])
+
+  // Auto-refresh on component mount
   useEffect(() => {
-    refreshCartStock()
-  }, [refreshCartStock])
+    if (items.length > 0) {
+      checkPricesAndStock()
+    }
+  }, [items.length, checkPricesAndStock])
 
   // Handle error messages from checkout redirect
   useEffect(() => {
@@ -104,21 +303,6 @@ export default function Cart() {
     }
   }, [searchParams, toast, t, router])
 
-  // Handle checkout button click with validation
-  const handleCheckoutClick = (e: React.MouseEvent) => {
-    if (!cartIsReady || hasInvalidItems) {
-      e.preventDefault()
-
-      if (invalidQuantityItems.length > 0) {
-        toast({
-          description: t('Cart.Please fix invalid quantities before checkout'),
-          variant: 'destructive',
-        })
-      }
-      return
-    }
-  }
-
   if (items.length === 0) {
     return <EmptyCart />
   }
@@ -126,12 +310,126 @@ export default function Cart() {
   return (
     <div className='container py-6 md:py-8 lg:py-10'>
       <div className='mb-6'>
-        <h1 className='text-2xl sm:text-3xl font-bold mb-2'>
-          {t('Cart.Shopping Cart')}
-        </h1>
-        <p className='text-muted-foreground'>
-          {items.length} {items.length === 1 ? 'item' : 'items'} in your cart
-        </p>
+        <div className='flex items-center justify-between'>
+          <div>
+            <h1 className='text-2xl sm:text-3xl font-bold mb-2'>
+              {t('Cart.Shopping Cart')}
+            </h1>
+            <p className='text-muted-foreground'>
+              {items.length} {items.length === 1 ? 'item' : 'items'} in your
+              cart
+            </p>
+          </div>
+          {items.length > 0 && (
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={checkPricesAndStock}
+              disabled={isRefreshing}
+              className='flex items-center gap-2'
+            >
+              {isRefreshing ? (
+                <>
+                  <Loader2 className='h-4 w-4 animate-spin' />
+                  {t('Cart.Refreshing')}
+                </>
+              ) : (
+                <>
+                  <RefreshCw className='h-4 w-4' />
+                  {t('Cart.Refresh')}
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+
+        {/* Enhanced Price Change Notification */}
+        {priceChangeInfo.hasChanges && (
+          <div className='mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md'>
+            <div className='flex items-start gap-2'>
+              <AlertTriangle className='h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0' />
+              <div className='flex-1 min-w-0'>
+                <h3 className='text-sm font-medium text-amber-800 dark:text-amber-200 mb-1'>
+                  {t('Cart.Price Changes Detected')}
+                </h3>
+                <div className='space-y-1 mb-2 max-h-20 overflow-y-auto'>
+                  {priceChangeInfo.priceChanges.map((change, index) => (
+                    <div
+                      key={index}
+                      className='text-xs text-amber-700 dark:text-amber-300'
+                    >
+                      <span className='font-medium'>{change.item.name}</span>
+                      {'  '}
+                      <span
+                        className={cn(
+                          'font-medium',
+                          change.changeType === 'increase'
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-green-600 dark:text-green-400'
+                        )}
+                      >
+                        {change.changeType === 'increase' ? '+' : '-'}
+                        {formatPrice(change.priceChange)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={dismissPriceChanges}
+                  disabled={priceChangeInfo.isProcessing}
+                  className='h-6 px-2 text-xs bg-white dark:bg-amber-900/50 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/70'
+                >
+                  {priceChangeInfo.isProcessing ? (
+                    <>
+                      <Loader2 className='h-3 w-3 mr-1 animate-spin' />
+                      {t('Cart.Processing')}
+                    </>
+                  ) : (
+                    t('Cart.Accept Changes')
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Enhanced Validation Notifications - same as cart sidebar */}
+        {validation.hasErrors && (
+          <div className='mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md'>
+            <div className='flex items-start gap-2'>
+              <AlertTriangle className='h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 shrink-0' />
+              <div className='flex-1 min-w-0'>
+                <div className='flex items-center gap-2 mb-1'>
+                  <h3 className='text-sm font-medium text-red-800 dark:text-red-200'>
+                    {t('Cart.Cart Issues Detected')}
+                  </h3>
+                  <Badge
+                    variant='destructive'
+                    className='text-xs px-1.5 py-0.5'
+                  >
+                    {validation.stockIssues.length + validation.errors.length}
+                  </Badge>
+                </div>
+                <div className='space-y-1 text-xs text-red-700 dark:text-red-300'>
+                  {validation.stockIssues.map((issue, index) => (
+                    <div key={index}>
+                      <span className='font-medium'>{issue.itemName}</span>
+                      {' - '}
+                      {t('Cart.Only')} {issue.availableStock}{' '}
+                      {t('Cart.in stock')}, {t('Cart.requested')}{' '}
+                      {issue.requestedQuantity}
+                    </div>
+                  ))}
+                  {validation.errors.map((error, index) => (
+                    <div key={index}>{error}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
@@ -159,93 +457,194 @@ export default function Cart() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {items.map((item) => (
-                      <TableRow
-                        key={item.clientId}
-                        className='hover:bg-muted/30 transition-colors'
-                      >
-                        <TableCell className='p-2'>
-                          <Link
-                            href={`/product/${item.slug}`}
-                            className='block w-[80px] h-[80px] relative overflow-hidden rounded-md border'
-                          >
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              fill
-                              sizes='80px'
-                              className='object-contain'
+                    {items.map((item) => {
+                      // Enhanced validation for individual items - same as cart sidebar
+                      const hasValidationIssue =
+                        validation.invalidItems.includes(
+                          item.clientId || item.product
+                        )
+                      const stockIssue = validation.stockIssues.find(
+                        (issue) =>
+                          issue.itemId === (item.clientId || item.product)
+                      )
+
+                      return (
+                        <TableRow
+                          key={`${item.clientId}-${item.quantity}`}
+                          className={cn(
+                            'hover:bg-muted/30 transition-colors',
+                            hasValidationIssue &&
+                              'bg-red-50/50 dark:bg-red-900/10'
+                          )}
+                        >
+                          <TableCell className='p-2'>
+                            <Link
+                              href={`/product/${item.slug}`}
+                              className='block w-[80px] h-[80px] relative overflow-hidden rounded-md border'
+                            >
+                              <Image
+                                src={item.image}
+                                alt={item.name}
+                                fill
+                                sizes='80px'
+                                className='object-contain'
+                              />
+                              {hasValidationIssue && (
+                                <div className='absolute inset-0 bg-red-500/20 flex items-center justify-center'>
+                                  <AlertTriangle className='h-4 w-4 text-red-600' />
+                                </div>
+                              )}
+                            </Link>
+                          </TableCell>
+                          <TableCell>
+                            <Link
+                              href={`/product/${item.slug}`}
+                              className='font-medium hover:text-primary transition-colors hover:underline'
+                            >
+                              {item.name}
+                            </Link>
+                            <div className='text-sm text-muted-foreground mt-1'>
+                              {item.color && (
+                                <span className='mr-2'>
+                                  {t('Cart.Color')}: {item.color}
+                                </span>
+                              )}
+                              {item.size && (
+                                <span>
+                                  {t('Cart.Size')}: {item.size}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Stock warning - same as cart sidebar */}
+                            {stockIssue && (
+                              <div className='text-xs text-red-600 dark:text-red-400 mt-1 flex items-center gap-1'>
+                                <AlertTriangle className='h-3 w-3' />
+                                {t('Cart.Only')} {stockIssue.availableStock}{' '}
+                                {t('Cart.available')}
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell className='text-right font-medium'>
+                            <ProductPrice
+                              price={item.price}
+                              discountedPrice={item.discountedPrice}
+                              plain
                             />
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          <Link
-                            href={`/product/${item.slug}`}
-                            className='font-medium hover:text-primary transition-colors hover:underline'
-                          >
-                            {item.name}
-                          </Link>
-                          <div className='text-sm text-muted-foreground mt-1'>
-                            {item.color && (
-                              <span className='mr-2'>
-                                {t('Cart.Color')}: {item.color}
-                              </span>
+                            {item.discountedPrice && item.discount && (
+                              <div className='text-xs text-green-600 mt-1'>
+                                {item.discount}% {t('Cart.discount applied')}
+                              </div>
                             )}
-                            {item.size && (
-                              <span>
-                                {t('Cart.Size')}: {item.size}
-                              </span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className='text-right font-medium'>
-                          {formatPrice(item.price)}
-                        </TableCell>
-                        <TableCell>
-                          <Select
-                            value={item.quantity.toString()}
-                            onValueChange={(value) => {
-                              const newQuantity = Number(value)
-                              updateItem(item, newQuantity) // Automatically removes the item if quantity is 0
-                            }}
-                          >
-                            <SelectTrigger className='w-20'>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Array.from({
-                                length:
-                                  item.colors
-                                    .find((c) => c.color === item.color)
-                                    ?.sizes.find((s) => s.size === item.size)
-                                    ?.countInStock || 0,
-                              }).map((_, i) => (
-                                <SelectItem
-                                  key={i + 1}
-                                  value={(i + 1).toString()}
-                                >
-                                  {i + 1}
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={item.quantity.toString()}
+                              onValueChange={(value) => {
+                                const newQuantity = Number(value)
+
+                                // Enhanced validation before update
+                                if (
+                                  newQuantity < 0 ||
+                                  !Number.isInteger(newQuantity)
+                                ) {
+                                  toast({
+                                    title: t('Cart.Invalid Quantity'),
+                                    description: t(
+                                      'Cart.Quantity must be a positive whole number'
+                                    ),
+                                    variant: 'destructive',
+                                  })
+                                  return
+                                }
+
+                                // Check stock availability
+                                const colorObj = item.colors?.find(
+                                  (c) => c.color === item.color
+                                )
+                                const sizeObj = colorObj?.sizes?.find(
+                                  (s) => s.size === item.size
+                                )
+
+                                if (
+                                  newQuantity > 0 &&
+                                  sizeObj &&
+                                  sizeObj.countInStock < newQuantity
+                                ) {
+                                  toast({
+                                    title: t('Cart.Insufficient Stock'),
+                                    description: `${t('Cart.Only')} ${sizeObj.countInStock} ${t('Cart.items available for')} ${item.name}`,
+                                    variant: 'destructive',
+                                  })
+                                  return
+                                }
+
+                                updateItem(item, newQuantity)
+
+                                if (newQuantity === 0) {
+                                  toast({
+                                    title: t('Cart.Item Removed'),
+                                    description: `${item.name} ${t('Cart.has been removed from your cart')}`,
+                                    variant: 'default',
+                                  })
+                                }
+                              }}
+                              disabled={isRefreshing}
+                            >
+                              <SelectTrigger
+                                className={cn(
+                                  'w-20',
+                                  hasValidationIssue &&
+                                    'border-red-300 bg-red-50 dark:bg-red-900/20'
+                                )}
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.from({
+                                  length: Math.min(
+                                    item.colors
+                                      .find((c) => c.color === item.color)
+                                      ?.sizes.find((s) => s.size === item.size)
+                                      ?.countInStock || 0,
+                                    10 // Limit to 10 for UX
+                                  ),
+                                }).map((_, i) => (
+                                  <SelectItem
+                                    key={i + 1}
+                                    value={(i + 1).toString()}
+                                  >
+                                    {i + 1}
+                                  </SelectItem>
+                                ))}
+                                <SelectItem value='0' className='text-red-600'>
+                                  {t('Cart.Remove')}
                                 </SelectItem>
-                              ))}
-                              <SelectItem value='0'>Remove</SelectItem>{' '}
-                              {/* Option to remove */}
-                            </SelectContent>
-                          </Select>
-                        </TableCell>
-                        <TableCell className='text-right font-medium'>
-                          {formatPrice(item.price * item.quantity)}
-                        </TableCell>
-                        <TableCell>
-                          <button
-                            onClick={() => removeItem(item)}
-                            className='text-muted-foreground hover:text-destructive transition-colors'
-                            aria-label='Remove item'
-                          >
-                            <TrashIcon className='w-4 h-4' />
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell className='text-right font-medium'>
+                            <ProductPrice
+                              price={
+                                (item.discountedPrice || item.price) *
+                                item.quantity
+                              }
+                              plain
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <button
+                              onClick={() => removeItem(item)}
+                              className='text-muted-foreground hover:text-destructive transition-colors'
+                              aria-label='Remove item'
+                              disabled={isRefreshing}
+                            >
+                              <TrashIcon className='w-4 h-4' />
+                            </button>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -290,16 +689,32 @@ export default function Cart() {
               </div>
 
               <div className='pt-4'>
-                {/* Show validation warning if cart has issues */}
-                {(hasInvalidItems || invalidQuantityItems.length > 0) && (
+                {/* Enhanced validation warning - same as cart sidebar */}
+                {validation.hasErrors && (
                   <div className='mb-3 p-2 bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300 rounded-md text-sm'>
-                    <div className='font-medium mb-1'>
-                      {t('Cart.Cart Issues')}
+                    <div className='flex items-center gap-2 mb-1'>
+                      <AlertTriangle className='h-4 w-4' />
+                      <span className='font-medium'>
+                        {t('Cart.Cart Issues')}
+                      </span>
+                      <Badge
+                        variant='destructive'
+                        className='text-xs px-1.5 py-0.5'
+                      >
+                        {validation.stockIssues.length +
+                          validation.errors.length}
+                      </Badge>
                     </div>
-                    {invalidQuantityItems.map((item) => (
-                      <div key={`${item.slug}-validation`} className='text-xs'>
-                        • {item.name}: {t('Cart.Invalid quantity')} (
-                        {item.quantity})
+                    {validation.stockIssues.map((issue, index) => (
+                      <div key={index} className='text-xs'>
+                        • {issue.itemName}: {t('Cart.Only')}{' '}
+                        {issue.availableStock} {t('Cart.in stock')},{' '}
+                        {t('Cart.requested')} {issue.requestedQuantity}
+                      </div>
+                    ))}
+                    {validation.errors.map((error, index) => (
+                      <div key={index} className='text-xs'>
+                        • {error}
                       </div>
                     ))}
                   </div>
@@ -310,12 +725,54 @@ export default function Cart() {
                   className={cn(
                     buttonVariants({ size: 'lg' }),
                     'w-full',
-                    (!cartIsReady || hasInvalidItems) &&
+                    (validation.hasErrors || !cartIsReady || isRefreshing) &&
                       'opacity-50 pointer-events-none'
                   )}
-                  onClick={handleCheckoutClick}
+                  onClick={(e) => {
+                    if (validation.hasErrors || !cartIsReady || isRefreshing) {
+                      e.preventDefault()
+
+                      if (isRefreshing) {
+                        toast({
+                          title: t('Cart.Please Wait'),
+                          description: t(
+                            'Cart.Cart is being refreshed, please wait'
+                          ),
+                          variant: 'default',
+                        })
+                      } else if (validation.hasErrors) {
+                        toast({
+                          title: t('Cart.Fix Issues to Checkout'),
+                          description: t(
+                            'Cart.Please fix cart issues before checkout'
+                          ),
+                          variant: 'destructive',
+                        })
+                      } else {
+                        toast({
+                          description: t(
+                            'Cart.Please fix invalid quantities before checkout'
+                          ),
+                          variant: 'destructive',
+                        })
+                      }
+                      return
+                    }
+                  }}
                 >
-                  {t('Cart.Checkout')}
+                  {validation.hasErrors ? (
+                    <>
+                      <AlertTriangle className='h-4 w-4 mr-2' />
+                      {t('Cart.Fix Issues to Checkout')}
+                    </>
+                  ) : isRefreshing ? (
+                    <>
+                      <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                      {t('Cart.Updating')}
+                    </>
+                  ) : (
+                    t('Cart.Checkout')
+                  )}
                 </Link>
               </div>
 
