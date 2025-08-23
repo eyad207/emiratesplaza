@@ -165,7 +165,7 @@ function FooterComponent() {
             <div className='text-center'>
               <p className='text-sm text-gray-300'>© {site.copyright}</p>
               <p className='text-xs text-gray-400 mt-2'>
-                Built with ❤️ for an exceptional shopping experience
+                Built with for an exceptional shopping experience
               </p>
             </div>
           </div>
