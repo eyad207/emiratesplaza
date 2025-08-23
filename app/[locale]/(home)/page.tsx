@@ -1,6 +1,5 @@
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import { HomeCard } from '@/components/shared/home/home-card'
-import { HomeCarousel } from '@/components/shared/home/home-carousel'
 import ProductSlider from '@/components/shared/product/product-slider'
 import { Card, CardContent } from '@/components/ui/card'
 import React from 'react'
@@ -21,7 +20,7 @@ export const revalidate = 300 // revalidate every 5 minutes instead of forcing d
 
 export default async function HomePage() {
   // Parallel data fetching for better performance
-  const [t, { carousels }, tags] = await Promise.all([
+  const [t, {}, tags] = await Promise.all([
     getTranslations('Home'),
     getSetting(),
     connectToDatabase().then(() =>
@@ -94,7 +93,6 @@ export default async function HomePage() {
 
   return (
     <div className='pb-4 sm:pb-6'>
-      <HomeCarousel items={carousels} />
       <div className='px-2 sm:px-3 md:p-4 space-y-3 md:space-y-4 bg-border'>
         <div className='pt-3 sm:pt-4'>
           <HomeCard cards={cards} />
