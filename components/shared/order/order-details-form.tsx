@@ -459,7 +459,7 @@ export default function OrderDetailsForm({
                           )}
                         </div>
 
-                        {/* Quantity and Price */}
+                        {/* Quantity */}
                         <div className='flex justify-between items-center'>
                           <div className='flex items-center gap-2'>
                             <span className='text-sm font-medium'>
@@ -472,10 +472,14 @@ export default function OrderDetailsForm({
                               {item.quantity}
                             </Badge>
                           </div>
+                        </div>
+                        {/* Price */}
+                        <div className='flex justify-between items-center pt-4'>
                           <div className='text-right'>
                             <div className='text-lg font-bold'>
                               <ProductPrice
-                                price={itemsPrice / item.quantity}
+                                price={item.price}
+                                discountedPrice={item.discountedPrice}
                                 plain
                               />{' '}
                             </div>
