@@ -393,6 +393,14 @@
     "ViewAllOrders": "Se alle bestillinger"
   },
   "Account": {
+  "Preferences": "Preferanser",
+  "ManagePreferences": "Administrer språk, valuta og tema-innstillinger",
+  "Currency": "Valuta",
+  "CurrencyDescription": "Velg din foretrukne visningsvaluta.",
+  "Language": "Språk",
+  "LanguageDescription": "Velg ønsket språk for grensesnittet.",
+  "Theme": "Tema",
+  "ThemeDescription": "Bytt mellom lys/mørk og velg en fargeaksent.",
     "Your Account": "Din konto",
     "Your Orders": "Dine bestillinger",
     "Your Account Settings": "Dine kontoinnstillinger",

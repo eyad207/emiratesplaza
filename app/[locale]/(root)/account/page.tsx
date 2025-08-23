@@ -1,7 +1,7 @@
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import RecentOrdersList from '@/components/shared/account/recent-orders-list'
 import { Card, CardContent } from '@/components/ui/card'
-import { PackageCheckIcon, ShieldCheckIcon } from 'lucide-react'
+import { PackageCheckIcon, ShieldCheckIcon, SettingsIcon } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Separator } from '@/components/ui/separator'
@@ -34,6 +34,13 @@ export default async function AccountPage() {
       description: t('Account.Edit Login Name Mobile'), // Translate description
       icon: <ShieldCheckIcon className='w-8 h-8 text-primary' />,
       href: '/account/manage',
+    },
+    {
+      title: t('Account.Preferences') || 'Preferences',
+      description:
+        t('Account.ManagePreferences') || 'Manage language, currency and theme',
+      icon: <SettingsIcon className='w-8 h-8 text-primary' />,
+      href: '/account/preferences',
     },
   ]
 

@@ -444,6 +444,14 @@
     }
   },
   "Account": {
+  "Preferences": "Preferences",
+  "ManagePreferences": "Manage your language, currency and theme preferences",
+  "Currency": "Currency",
+  "CurrencyDescription": "Choose your preferred display currency.",
+  "Language": "Language",
+  "LanguageDescription": "Select your preferred language for the interface.",
+  "Theme": "Theme",
+  "ThemeDescription": "Switch between light/dark and pick a color accent.",
     "Orders": "Orders",
     "TrackReturnBuy": "Track and check ordered items, or buy things again",
     "LoginSecurity": "Login & Security",

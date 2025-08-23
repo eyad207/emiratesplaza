@@ -9,13 +9,10 @@ import {
 } from '@/components/ui/sheet'
 import CartButton from './cart-button'
 import UserButton from './user-button'
-import ThemeSwitcher from './theme-switcher'
-import LanguageSwitcher from './language-switcher'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { SignOut } from '@/lib/actions/user.actions'
-import CurrencySwitcher from './currency-switcher'
 import { NavigationButton } from './navigation-button'
 
 const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
@@ -26,11 +23,6 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
     <div className='flex items-center'>
       {/* Desktop menu - visible above 1000px */}
       <nav className='hidden nav:flex items-center gap-3 lg:gap-4'>
-        <div className='flex items-center gap-2'>
-          <CurrencySwitcher />
-          <LanguageSwitcher />
-          <ThemeSwitcher />
-        </div>
         <div className='flex items-center'>
           <UserButton />
           {!forAdmin && <CartButton />}
@@ -113,18 +105,6 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
                       </Link>
                     </SheetClose>
                   )}
-                </div>
-              </div>
-
-              {/* Preferences Section */}
-              <div className='space-y-4 pt-4 border-t border-white/10'>
-                <h3 className='text-sm font-semibold uppercase tracking-wider text-white/70'>
-                  {t('Header.Preferences')}
-                </h3>
-                <div className='space-y-3'>
-                  <CurrencySwitcher />
-                  <LanguageSwitcher />
-                  <ThemeSwitcher />
                 </div>
               </div>
 

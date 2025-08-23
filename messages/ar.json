@@ -439,6 +439,14 @@
     }
   },
   "Account": {
+  "Preferences": "التفضيلات",
+  "ManagePreferences": "إدارة تفضيلات اللغة، العملة والثيم",
+  "Currency": "العملة",
+  "CurrencyDescription": "اختر عملة العرض المفضلة لديك.",
+  "Language": "اللغة",
+  "LanguageDescription": "اختر اللغة المفضلة لواجهة المستخدم.",
+  "Theme": "السمة",
+  "ThemeDescription": "التبديل بين الوضع الفاتح/الداكن واختيار لون مميز.",
     "Orders": "الطلبات",
     "TrackReturnBuy": "تتبع، إرجاع، أو شراء الأشياء مرة أخرى",
     "LoginSecurity": "تسجيل الدخول والأمان",
