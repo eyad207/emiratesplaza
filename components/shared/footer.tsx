@@ -1,18 +1,11 @@
 'use client'
-import { memo, useCallback } from 'react'
+import { memo } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import useSettingStore from '@/hooks/use-setting-store'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select'
 
 // Lazy-load ChevronUp to reduce initial JS size
 const ChevronUp = dynamic(
@@ -22,18 +15,9 @@ const ChevronUp = dynamic(
 
 function FooterComponent() {
   const {
-    setting: { site, availableCurrencies, currency },
-    setCurrency,
+    setting: { site },
   } = useSettingStore()
   const t = useTranslations()
-
-  const handleCurrencyChange = useCallback(
-    (value: string) => {
-      setCurrency(value)
-      window.scrollTo({ top: 0 })
-    },
-    [setCurrency]
-  )
 
   return (
     <footer className='bg-header text-white mt-20 relative overflow-hidden border-t border-header-darker'>
@@ -61,7 +45,7 @@ function FooterComponent() {
           <div className='max-w-7xl mx-auto py-16 px-6'>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12'>
               {/* Brand Section */}
-              <div className='lg:col-span-2 space-y-6'>
+              <div className='lg:col-span-3 space-y-6'>
                 <div className='flex items-center space-x-4'>
                   <div className='relative group'>
                     <div className='absolute inset-0 bg-primary/20 rounded-full opacity-75 group-hover:opacity-100 filter blur-sm transition-opacity duration-300'></div>
@@ -146,43 +130,6 @@ function FooterComponent() {
                   >
                     Help Center
                   </Link>
-                </div>
-              </div>
-
-              {/* Currency & Settings */}
-              <div className='space-y-6'>
-                <h4 className='text-lg font-semibold text-white'>
-                  Preferences
-                </h4>
-                <div className='space-y-4'>
-                  <div>
-                    <label className='block text-sm text-gray-300 mb-2'>
-                      Currency
-                    </label>
-                    <Select
-                      value={currency}
-                      onValueChange={handleCurrencyChange}
-                    >
-                      <SelectTrigger className='bg-header-darker border-gray-600 text-white hover:bg-gray-700/50 transition-colors duration-200'>
-                        <SelectValue
-                          placeholder={t('Footer.Select a currency')}
-                        />
-                      </SelectTrigger>
-                      <SelectContent className='bg-header border-gray-600'>
-                        {availableCurrencies
-                          ?.filter((x) => x.code)
-                          .map((c, index) => (
-                            <SelectItem
-                              key={index}
-                              value={c.code}
-                              className='text-white hover:bg-primary/20 focus:bg-primary/20'
-                            >
-                              {c.name} ({c.code})
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
             </div>
