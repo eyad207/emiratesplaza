@@ -14,6 +14,9 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { SignOut } from '@/lib/actions/user.actions'
 import { NavigationButton } from './navigation-button'
+import LanguageSwitcher from './language-switcher'
+import CurrencySwitcher from './currency-switcher'
+import ThemeSwitcher from './theme-switcher'
 
 const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
   const t = await getTranslations()
@@ -22,7 +25,7 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
   return (
     <div className='flex items-center'>
       {/* Desktop menu - visible above 1000px */}
-      <nav className='hidden nav:flex items-center gap-3 lg:gap-4'>
+      <nav className='hidden nav:flex items-center gap-2 lg:gap-3'>
         <div className='flex items-center'>
           <UserButton />
           {!forAdmin && <CartButton />}
@@ -106,6 +109,11 @@ const Menu = async ({ forAdmin = false }: { forAdmin?: boolean }) => {
                     </SheetClose>
                   )}
                 </div>
+              </div>
+              <div>
+                <LanguageSwitcher />
+                <CurrencySwitcher />
+                <ThemeSwitcher />
               </div>
 
               {/* Help & Support */}
