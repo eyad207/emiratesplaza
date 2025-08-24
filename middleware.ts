@@ -21,24 +21,37 @@ const intlMiddleware = createMiddleware(routing)
 const { auth } = NextAuth(authConfig)
 
 export default auth((req) => {
+  // Remove locale from pathname for matching
+  const pathnameWithoutLocale =
+    req.nextUrl.pathname.replace(
+      new RegExp(`^/(${routing.locales.join('|')})`),
+      ''
+    ) || '/'
+
   const publicPathnameRegex = RegExp(
-    `^(/(${routing.locales.join('|')}))?(${publicPages
+    `^(${publicPages
       .flatMap((p) => (p === '/' ? ['', '/'] : p))
       .join('|')})/?$`,
     'i'
   )
-  const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname)
+
+  const isPublicPage = publicPathnameRegex.test(pathnameWithoutLocale)
 
   if (isPublicPage) {
-    // return NextResponse.next()
     return intlMiddleware(req)
   } else {
     if (!req.auth) {
-      const newUrl = new URL(
-        `/sign-in?callbackUrl=${encodeURIComponent(req.nextUrl.pathname)}`,
+      // Get the current locale from the pathname
+      const localeMatch = req.nextUrl.pathname.match(
+        new RegExp(`^/(${routing.locales.join('|')})`)
+      )
+      const currentLocale = localeMatch ? localeMatch[1] : routing.defaultLocale
+
+      const signInUrl = new URL(
+        `/${currentLocale}/sign-in?callbackUrl=${encodeURIComponent(req.nextUrl.pathname)}`,
         req.nextUrl.origin
       )
-      return Response.redirect(newUrl)
+      return Response.redirect(signInUrl)
     } else {
       return intlMiddleware(req)
     }
@@ -46,5 +59,15 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/((?!api|_next|.*\\..*).*)'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - *.* (files with extensions)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)',
+  ],
 }
