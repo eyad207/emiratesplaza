@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the implementation of a professional, secure, and fully free AI-powered multilingual search system for the Emirates Plaza e-commerce site. The system enables users to search in any language (Arabic, Norwegian, English) and receive consistent results across all languages.
+This document describes the implementation of a professional, secure, and fully free AI-powered multilingual search system for the Emirates Plaza e-commerce site. The system enables users to search in any language (Arabic, Norwegian, English) and receive consistent results across all languages..
 
 ## Features
 
