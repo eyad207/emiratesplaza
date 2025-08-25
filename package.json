@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "seed": "npx tsx ./lib/db/seed.ts",
+    "add-products": "npx tsx ./scripts/add-products.ts",
+    "add-more-products": "npx tsx ./scripts/add-more-products.ts",
+    "show-products": "npx tsx ./scripts/show-products.ts",
     "email": "email dev",
     "dev": "next dev",
     "build": "next build",
