@@ -66,6 +66,24 @@ export async function deleteProduct(id: string) {
   }
 }
 
+// BULK DELETE
+export async function deleteProducts(ids: string[]) {
+  try {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return { success: false, message: 'No product ids provided' }
+    }
+    await connectToDatabase()
+    const res = await Product.deleteMany({ _id: { $in: ids } })
+    // res.deletedCount could be used to report how many removed
+    revalidatePath('/admin/products')
+    return {
+      success: true,
+      message: `Deleted ${res.deletedCount || 0} products`,
+    }
+  } catch {
+    return { success: false, message: 'Operation failed' }
+  }
+}
 // GET ONE PRODUCT BY ID
 export async function getProductById(productId: string) {
   await connectToDatabase()

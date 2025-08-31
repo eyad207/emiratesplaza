@@ -1,6 +1,20 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { toast } from '@/hooks/use-toast'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Tag,
+  Plus,
+  Search,
+  Package,
+  Trash2,
+  Save,
+  X,
+  Hash,
+  Filter,
+} from 'lucide-react'
 
 export default function TagsPage() {
   const [tags, setTags] = useState<{ name: string; _id: string }[]>([])
@@ -271,174 +285,343 @@ export default function TagsPage() {
   }
 
   return (
-    <div className='p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 min-h-screen'>
-      <div className='max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6'>
-        <h1 className='text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100'>
-          Manage Tags
-        </h1>
+    <div className='relative min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900'>
+      {/* Premium Background Elements */}
+      <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-100/20 via-transparent to-blue-100/20 dark:from-purple-900/10 dark:to-blue-900/10' />
 
-        {/* Add Tag Section */}
-        <div className='flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-6'>
-          <input
-            type='text'
-            value={newTag}
-            onChange={(e) => setNewTag(e.target.value)}
-            placeholder='Enter a new tag'
-            className='flex-1 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
-          />
-          <button
-            onClick={addTag}
-            disabled={loading}
-            className='bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 dark:hover:bg-gray-500 transition disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto'
-          >
-            {loading ? 'Adding...' : 'Add Tag'}
-          </button>
-        </div>
-
-        {/* Tags Table */}
-        <div className='overflow-x-auto'>
-          <table className='w-full border-collapse border border-gray-300 dark:border-gray-700 mb-4 sm:mb-6'>
-            <thead className='bg-gray-100 dark:bg-gray-800'>
-              <tr>
-                <th className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2 text-left text-gray-700 dark:text-gray-300'>
-                  Tag Name
-                </th>
-                <th className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2 text-left text-gray-700 dark:text-gray-300'>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {tags.map((tag) => (
-                <tr
-                  key={tag._id}
-                  className='hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors'
-                >
-                  <td
-                    className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2 text-gray-900 dark:text-gray-100 cursor-pointer'
-                    onClick={() => handleTagSelection(tag._id)}
-                  >
-                    {tag.name}
-                  </td>
-                  <td className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2'>
-                    <button
-                      onClick={() => deleteTag(tag._id)}
-                      className='text-red-600 hover:underline dark:text-red-400'
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {tags.length === 0 && !loading && (
-                <tr>
-                  <td
-                    colSpan={2}
-                    className='border border-gray-300 dark:border-gray-700 px-2 sm:px-4 py-2 text-center text-gray-500 dark:text-gray-400'
-                  >
-                    No tags found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Search and Products */}
-        <div className='mb-4 sm:mb-6'>
-          <h2 className='text-lg font-bold mb-4 text-gray-900 dark:text-gray-100'>
-            Assign Products to Tag
-          </h2>
-          <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300 mb-2'>
-              Search Products
-            </label>
-            <input
-              type='text'
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-                setPage(1) // Reset to the first page when searching
-              }}
-              placeholder='Search products by name'
-              className='w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
-            />
-          </div>
-
-          <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300 mb-2'>
-              Select Tag
-            </label>
-            <select
-              value={selectedTag || ''}
-              onChange={(e) => setSelectedTag(e.target.value)}
-              className='w-full border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
-            >
-              <option value='' disabled>
-                Select a tag
-              </option>
-              {tags.map((tag) => (
-                <option key={tag._id} value={tag._id}>
-                  {tag.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300 mb-2'>
-              Select Products
-            </label>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-              {products.map((product) => (
-                <div key={product._id} className='flex items-center'>
-                  <input
-                    type='checkbox'
-                    id={product._id}
-                    checked={selectedProducts.includes(product._id)}
-                    onChange={() => toggleProductSelection(product._id)}
-                    className='mr-2'
-                  />
-                  <label
-                    htmlFor={product._id}
-                    className='text-gray-900 dark:text-gray-100'
-                  >
-                    {product.name}
-                  </label>
-                </div>
-              ))}
+      <div className='relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl'>
+        {/* Enhanced Header */}
+        <div className='mb-8'>
+          <div className='flex items-start gap-4'>
+            <div className='relative'>
+              <div className='absolute inset-0 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl blur-md opacity-30' />
+              <div className='relative p-4 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl shadow-xl'>
+                <Tag className='h-8 w-8 text-white' />
+              </div>
+            </div>
+            <div>
+              <h1 className='text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent'>
+                Tag Management
+              </h1>
+              <p className='text-lg text-slate-600 dark:text-slate-400 mt-2'>
+                Organize products with tags and manage tag assignments
+              </p>
             </div>
           </div>
-
-          {products.length < totalProducts && (
-            <button
-              onClick={() => setPage((prev) => prev + 1)}
-              className='bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 dark:hover:bg-gray-500 transition w-full sm:w-auto'
-            >
-              Show More
-            </button>
-          )}
-
-          <button
-            onClick={assignProductsToTag}
-            disabled={loading || !selectedTag || selectedProducts.length === 0}
-            className='bg-green-600 text-white ml-4 px-6 py-2 rounded-md hover:bg-green-700 dark:hover:bg-green-500 transition disabled:opacity-50 disabled:cursor-not-allowed mt-4'
-          >
-            {loading ? 'Assigning...' : 'Assign Products'}
-          </button>
-          <button
-            onClick={removeProductsFromTag}
-            disabled={loading || !selectedTag || selectedProducts.length === 0}
-            className='bg-red-600 text-white ml-4 px-6 py-2 rounded-md hover:bg-red-700 dark:hover:bg-red-500 transition disabled:opacity-50 disabled:cursor-not-allowed mt-4'
-          >
-            {loading ? 'Removing...' : 'Remove Products'}
-          </button>
         </div>
 
-        {/* Loading Indicator */}
+        {/* Stats Cards */}
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
+          <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-xl shadow-blue-500/10 dark:shadow-blue-900/20 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300'>
+            <div className='absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-900/20 dark:to-transparent' />
+            <CardContent className='relative p-6'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide'>
+                    Total Tags
+                  </p>
+                  <p className='text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2'>
+                    {tags.length}
+                  </p>
+                </div>
+                <div className='p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg'>
+                  <Hash className='h-6 w-6 text-white' />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-xl shadow-green-500/10 dark:shadow-green-900/20 hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-300'>
+            <div className='absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-900/20 dark:to-transparent' />
+            <CardContent className='relative p-6'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='text-sm font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide'>
+                    Total Products
+                  </p>
+                  <p className='text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2'>
+                    {totalProducts}
+                  </p>
+                </div>
+                <div className='p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg'>
+                  <Package className='h-6 w-6 text-white' />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-xl shadow-purple-500/10 dark:shadow-purple-900/20 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300'>
+            <div className='absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent dark:from-purple-900/20 dark:to-transparent' />
+            <CardContent className='relative p-6'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='text-sm font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide'>
+                    Selected
+                  </p>
+                  <p className='text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2'>
+                    {selectedProducts.length}
+                  </p>
+                </div>
+                <div className='p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg'>
+                  <Filter className='h-6 w-6 text-white' />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Create Tag Section */}
+        <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-2xl shadow-slate-200/50 dark:shadow-slate-900/50 mb-8'>
+          <div className='absolute inset-0 bg-gradient-to-r from-slate-50/50 via-white/50 to-slate-50/50 dark:from-slate-800/50 dark:via-slate-700/50 dark:to-slate-800/50' />
+          <CardHeader className='relative pb-6'>
+            <div className='flex items-center gap-3'>
+              <div className='p-3 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-xl shadow-lg'>
+                <Plus className='h-6 w-6 text-white' />
+              </div>
+              <div>
+                <h2 className='text-2xl font-bold text-slate-900 dark:text-slate-100'>
+                  Create New Tag
+                </h2>
+                <p className='text-slate-600 dark:text-slate-400'>
+                  Add a new tag to organize your products
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className='relative'>
+            <div className='flex flex-col sm:flex-row gap-4'>
+              <div className='flex-1'>
+                <Input
+                  type='text'
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder='Enter tag name...'
+                  className='h-12 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 rounded-xl shadow-sm focus:shadow-md transition-all'
+                />
+              </div>
+              <Button
+                onClick={addTag}
+                disabled={loading || !newTag.trim()}
+                className='bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-8 py-3 rounded-xl font-semibold h-12'
+              >
+                <Plus className='h-5 w-5 mr-2' />
+                {loading ? 'Adding...' : 'Add Tag'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tags List */}
+        <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-2xl shadow-slate-200/50 dark:shadow-slate-900/50 mb-8'>
+          <div className='absolute inset-0 bg-gradient-to-r from-slate-50/50 via-white/50 to-slate-50/50 dark:from-slate-800/50 dark:via-slate-700/50 dark:to-slate-800/50' />
+          <CardHeader className='relative pb-6'>
+            <div className='flex items-center gap-3'>
+              <div className='p-3 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl shadow-lg'>
+                <Hash className='h-6 w-6 text-white' />
+              </div>
+              <div>
+                <h2 className='text-2xl font-bold text-slate-900 dark:text-slate-100'>
+                  Existing Tags
+                </h2>
+                <p className='text-slate-600 dark:text-slate-400'>
+                  Click on a tag to select it for product assignment
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className='relative'>
+            {tags.length > 0 ? (
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                {tags.map((tag) => (
+                  <div
+                    key={tag._id}
+                    className={`group relative overflow-hidden rounded-xl border-2 transition-all duration-200 cursor-pointer ${
+                      selectedTag === tag._id
+                        ? 'border-orange-500 bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 shadow-lg'
+                        : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 hover:border-orange-300 dark:hover:border-orange-600 hover:shadow-md'
+                    }`}
+                    onClick={() => handleTagSelection(tag._id)}
+                  >
+                    <div className='p-4'>
+                      <div className='flex items-center justify-between'>
+                        <div className='flex items-center gap-3'>
+                          <Tag
+                            className={`h-5 w-5 ${
+                              selectedTag === tag._id
+                                ? 'text-orange-600'
+                                : 'text-slate-500'
+                            }`}
+                          />
+                          <span
+                            className={`font-semibold ${
+                              selectedTag === tag._id
+                                ? 'text-orange-900 dark:text-orange-200'
+                                : 'text-slate-900 dark:text-slate-100'
+                            }`}
+                          >
+                            {tag.name}
+                          </span>
+                        </div>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            deleteTag(tag._id)
+                          }}
+                          variant='ghost'
+                          size='sm'
+                          className='h-8 w-8 p-0 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity'
+                        >
+                          <Trash2 className='h-4 w-4 text-red-500' />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className='text-center py-12'>
+                <Tag className='h-16 w-16 text-slate-300 dark:text-slate-600 mx-auto mb-4' />
+                <h3 className='text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2'>
+                  No tags yet
+                </h3>
+                <p className='text-slate-500 dark:text-slate-400'>
+                  Create your first tag to get started organizing products
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Product Assignment Section */}
+        <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-2xl shadow-slate-200/50 dark:shadow-slate-900/50'>
+          <div className='absolute inset-0 bg-gradient-to-r from-slate-50/50 via-white/50 to-slate-50/50 dark:from-slate-800/50 dark:via-slate-700/50 dark:to-slate-800/50' />
+          <CardHeader className='relative pb-6'>
+            <div className='flex items-center gap-3'>
+              <div className='p-3 bg-gradient-to-br from-green-500 to-blue-500 rounded-xl shadow-lg'>
+                <Package className='h-6 w-6 text-white' />
+              </div>
+              <div>
+                <h2 className='text-2xl font-bold text-slate-900 dark:text-slate-100'>
+                  Product Assignment
+                </h2>
+                <p className='text-slate-600 dark:text-slate-400'>
+                  Search and assign products to the selected tag
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className='relative space-y-6'>
+            {/* Search Input */}
+            <div className='relative'>
+              <Search className='absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400' />
+              <Input
+                type='text'
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setPage(1)
+                }}
+                placeholder='Search products by name...'
+                className='pl-12 h-12 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 rounded-xl shadow-sm focus:shadow-md transition-all'
+              />
+            </div>
+
+            {/* Selected Tag Info */}
+            {selectedTag && (
+              <div className='bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4'>
+                <div className='flex items-center gap-2'>
+                  <Tag className='h-5 w-5 text-orange-600' />
+                  <span className='font-semibold text-orange-900 dark:text-orange-200'>
+                    Working with tag:{' '}
+                    {tags.find((t) => t._id === selectedTag)?.name}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Products Grid */}
+            {products.length > 0 && (
+              <div className='space-y-4'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                  {products.map((product) => (
+                    <div
+                      key={product._id}
+                      className={`group flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200 ${
+                        selectedProducts.includes(product._id)
+                          ? 'border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'
+                          : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 hover:border-green-300 dark:hover:border-green-600'
+                      }`}
+                    >
+                      <input
+                        type='checkbox'
+                        id={product._id}
+                        checked={selectedProducts.includes(product._id)}
+                        onChange={() => toggleProductSelection(product._id)}
+                        className='w-5 h-5 text-green-500 border-2 border-slate-300 dark:border-slate-600 rounded focus:ring-2 focus:ring-green-500/20'
+                      />
+                      <label
+                        htmlFor={product._id}
+                        className='flex-1 cursor-pointer font-medium text-slate-900 dark:text-slate-100 group-hover:text-green-700 dark:group-hover:text-green-300 transition-colors'
+                      >
+                        {product.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Load More Button */}
+                {products.length < totalProducts && (
+                  <div className='text-center'>
+                    <Button
+                      onClick={() => setPage((prev) => prev + 1)}
+                      variant='outline'
+                      className='border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 px-8 py-3 rounded-xl'
+                    >
+                      Show More Products
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className='flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-200 dark:border-slate-700'>
+              <Button
+                onClick={assignProductsToTag}
+                disabled={
+                  loading || !selectedTag || selectedProducts.length === 0
+                }
+                className='bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-8 py-3 rounded-xl font-semibold'
+              >
+                <Save className='h-5 w-5 mr-2' />
+                {loading ? 'Assigning...' : 'Assign to Tag'}
+              </Button>
+              <Button
+                onClick={removeProductsFromTag}
+                disabled={
+                  loading || !selectedTag || selectedProducts.length === 0
+                }
+                variant='destructive'
+                className='bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 shadow-lg hover:shadow-xl transition-all duration-200 px-8 py-3 rounded-xl font-semibold'
+              >
+                <X className='h-5 w-5 mr-2' />
+                {loading ? 'Removing...' : 'Remove from Tag'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Loading Overlay */}
         {loading && (
-          <div className='text-center text-gray-500 dark:text-gray-400 mt-4'>
-            Loading...
+          <div className='fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50'>
+            <div className='bg-white dark:bg-slate-800 rounded-xl p-6 shadow-2xl'>
+              <div className='flex items-center gap-3'>
+                <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500' />
+                <span className='font-medium text-slate-900 dark:text-slate-100'>
+                  Loading...
+                </span>
+              </div>
+            </div>
           </div>
         )}
       </div>

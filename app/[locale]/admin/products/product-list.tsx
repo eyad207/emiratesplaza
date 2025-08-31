@@ -15,6 +15,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
   deleteProduct,
+  deleteProducts,
   getAllProductsForAdmin,
   getAllCategories,
   updateStockForProducts,
@@ -23,6 +24,7 @@ import { IProduct } from '@/lib/db/models/product.model'
 import { formatPrice } from '@/lib/currency'
 
 import React, { useEffect, useState, useTransition } from 'react'
+import BulkDeleteDialog from '@/components/shared/bulk-delete-dialog'
 import { Input } from '@/components/ui/input'
 import { formatDateTime, formatId } from '@/lib/utils'
 import {
@@ -166,100 +168,171 @@ const ProductList = () => {
   }, [])
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800'>
-      <div className='container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 max-w-7xl'>
-        {/* Header Section */}
-        <div className='mb-6 sm:mb-8'>
-          <div className='flex items-center gap-3 mb-2'>
-            <div className='p-2 bg-primary/10 rounded-lg'>
-              <Package2 className='h-5 w-5 sm:h-6 sm:w-6 text-primary' />
+    <div className='relative min-h-screen'>
+      {/* Premium Container */}
+      <div className='container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-7xl'>
+        {/* Premium Header Section */}
+        <div className='mb-8 sm:mb-12'>
+          <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6'>
+            <div className='flex items-start gap-4'>
+              <div className='relative'>
+                <div className='absolute inset-0 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-2xl blur-md opacity-30' />
+                <div className='relative p-4 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-2xl shadow-xl'>
+                  <Package2 className='h-7 w-7 sm:h-8 sm:w-8 text-white' />
+                </div>
+              </div>
+              <div>
+                <h1 className='text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent leading-tight'>
+                  Product Management
+                </h1>
+                <p className='text-base sm:text-lg text-slate-600 dark:text-slate-400 mt-2 max-w-2xl'>
+                  Comprehensive inventory control with advanced analytics and
+                  bulk operations
+                </p>
+              </div>
             </div>
-            <h1 className='text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100'>
-              Product Management
-            </h1>
+
+            {/* Quick Actions */}
+            <div className='flex items-center gap-3'>
+              <Button
+                asChild
+                className='bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-3'
+              >
+                <Link href='/admin/products/create'>
+                  <Plus className='h-4 w-4 mr-2' />
+                  <span className='hidden sm:inline'>Create Product</span>
+                  <span className='sm:hidden'>Create</span>
+                </Link>
+              </Button>
+            </div>
           </div>
-          <p className='text-sm sm:text-base text-slate-600 dark:text-slate-400'>
-            Manage your product inventory, pricing, and availability
-          </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 sm:mb-8'>
-          <Card className='bg-white dark:bg-slate-800 shadow-sm border-0 shadow-slate-200/50 dark:shadow-slate-800/50'>
-            <CardContent className='p-6'>
+        {/* Premium Stats Dashboard */}
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8 sm:mb-12'>
+          <Card className='group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl shadow-blue-500/10 dark:shadow-blue-900/20 hover:shadow-2xl hover:shadow-blue-500/20 dark:hover:shadow-blue-900/30 transition-all duration-300'>
+            <div className='absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-900/20 dark:to-transparent' />
+            <CardContent className='relative p-6'>
               <div className='flex items-center justify-between'>
                 <div>
-                  <p className='text-sm font-medium text-slate-600 dark:text-slate-400'>
+                  <p className='text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide'>
                     Total Products
                   </p>
-                  <p className='text-2xl font-bold text-slate-900 dark:text-slate-100'>
+                  <p className='text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2'>
                     {data?.totalProducts || 0}
                   </p>
+                  <p className='text-xs text-slate-500 dark:text-slate-400 mt-1'>
+                    Active inventory items
+                  </p>
                 </div>
-                <div className='p-3 bg-blue-50 dark:bg-blue-900/20 rounded-full'>
-                  <Package className='h-5 w-5 text-blue-600 dark:text-blue-400' />
+                <div className='relative'>
+                  <div className='absolute inset-0 bg-blue-500 rounded-2xl blur-md opacity-20 group-hover:opacity-30 transition-opacity' />
+                  <div className='relative p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg'>
+                    <Package className='h-6 w-6 text-white' />
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className='bg-white dark:bg-slate-800 shadow-sm border-0 shadow-slate-200/50 dark:shadow-slate-800/50'>
-            <CardContent className='p-6'>
+          <Card className='group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl shadow-green-500/10 dark:shadow-green-900/20 hover:shadow-2xl hover:shadow-green-500/20 dark:hover:shadow-green-900/30 transition-all duration-300'>
+            <div className='absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent dark:from-green-900/20 dark:to-transparent' />
+            <CardContent className='relative p-6'>
               <div className='flex items-center justify-between'>
                 <div>
-                  <p className='text-sm font-medium text-slate-600 dark:text-slate-400'>
+                  <p className='text-sm font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide'>
                     Categories
                   </p>
-                  <p className='text-2xl font-bold text-slate-900 dark:text-slate-100'>
+                  <p className='text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2'>
                     {categories.length}
                   </p>
+                  <p className='text-xs text-slate-500 dark:text-slate-400 mt-1'>
+                    Product classifications
+                  </p>
                 </div>
-                <div className='p-3 bg-green-50 dark:bg-green-900/20 rounded-full'>
-                  <Filter className='h-5 w-5 text-green-600 dark:text-green-400' />
+                <div className='relative'>
+                  <div className='absolute inset-0 bg-green-500 rounded-2xl blur-md opacity-20 group-hover:opacity-30 transition-opacity' />
+                  <div className='relative p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg'>
+                    <Filter className='h-6 w-6 text-white' />
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className='bg-white dark:bg-slate-800 shadow-sm border-0 shadow-slate-200/50 dark:shadow-slate-800/50'>
-            <CardContent className='p-6'>
+          <Card className='group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl shadow-purple-500/10 dark:shadow-purple-900/20 hover:shadow-2xl hover:shadow-purple-500/20 dark:hover:shadow-purple-900/30 transition-all duration-300'>
+            <div className='absolute inset-0 bg-gradient-to-br from-purple-50/50 to-transparent dark:from-purple-900/20 dark:to-transparent' />
+            <CardContent className='relative p-6'>
               <div className='flex items-center justify-between'>
                 <div>
-                  <p className='text-sm font-medium text-slate-600 dark:text-slate-400'>
+                  <p className='text-sm font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide'>
                     Selected Items
                   </p>
-                  <p className='text-2xl font-bold text-slate-900 dark:text-slate-100'>
+                  <p className='text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2'>
                     {selectedProducts.length}
                   </p>
+                  <p className='text-xs text-slate-500 dark:text-slate-400 mt-1'>
+                    Items for bulk action
+                  </p>
                 </div>
-                <div className='p-3 bg-purple-50 dark:bg-purple-900/20 rounded-full'>
-                  <CheckSquare className='h-5 w-5 text-purple-600 dark:text-purple-400' />
+                <div className='relative'>
+                  <div className='absolute inset-0 bg-purple-500 rounded-2xl blur-md opacity-20 group-hover:opacity-30 transition-opacity' />
+                  <div className='relative p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg'>
+                    <CheckSquare className='h-6 w-6 text-white' />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className='group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl shadow-orange-500/10 dark:shadow-orange-900/20 hover:shadow-2xl hover:shadow-orange-500/20 dark:hover:shadow-orange-900/30 transition-all duration-300'>
+            <div className='absolute inset-0 bg-gradient-to-br from-orange-50/50 to-transparent dark:from-orange-900/20 dark:to-transparent' />
+            <CardContent className='relative p-6'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='text-sm font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide'>
+                    Low Stock
+                  </p>
+                  <p className='text-3xl font-bold text-slate-900 dark:text-slate-100 mt-2'>
+                    {data?.products.filter((p) => getTotalCountInStock(p) < 10)
+                      .length || 0}
+                  </p>
+                  <p className='text-xs text-slate-500 dark:text-slate-400 mt-1'>
+                    Needs attention
+                  </p>
+                </div>
+                <div className='relative'>
+                  <div className='absolute inset-0 bg-orange-500 rounded-2xl blur-md opacity-20 group-hover:opacity-30 transition-opacity' />
+                  <div className='relative p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg'>
+                    <Package2 className='h-6 w-6 text-white' />
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Controls Section */}
-        <Card className='bg-white dark:bg-slate-800 shadow-sm border-0 shadow-slate-200/50 dark:shadow-slate-800/50 mb-6'>
-          <CardContent className='p-4 sm:p-6'>
-            <div className='flex flex-col space-y-4'>
+        {/* Premium Controls Section */}
+        <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-2xl shadow-slate-200/50 dark:shadow-slate-900/50 mb-8'>
+          <div className='absolute inset-0 bg-gradient-to-r from-slate-50/50 via-white/50 to-slate-50/50 dark:from-slate-800/50 dark:via-slate-700/50 dark:to-slate-800/50' />
+          <CardContent className='relative p-6 sm:p-8'>
+            <div className='flex flex-col space-y-6'>
               {/* Search and Filter Row */}
-              <div className='flex flex-col sm:flex-row gap-3'>
+              <div className='flex flex-col lg:flex-row gap-4'>
                 <div className='relative flex-1'>
-                  <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400' />
+                  <Search className='absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400' />
                   <Input
-                    className='pl-10 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600'
+                    className='pl-12 pr-4 py-3 bg-white/80 dark:bg-slate-700/80 border-slate-200 dark:border-slate-600 rounded-xl shadow-sm focus:shadow-md focus:ring-2 focus:ring-orange-500/20 transition-all text-base'
                     type='text'
                     value={inputValue}
                     onChange={handleInputChange}
-                    placeholder='Search products...'
+                    placeholder='Search products by name, category, or description...'
                   />
                 </div>
-                <div className='relative w-full sm:w-auto'>
-                  <Filter className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none' />
+                <div className='relative'>
+                  <Filter className='absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none z-10' />
                   <select
-                    className='w-full sm:w-auto pl-10 pr-8 py-2 border border-slate-200 dark:border-slate-600 rounded-md bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-slate-100 appearance-none min-w-[160px]'
+                    className='w-full lg:w-64 pl-12 pr-10 py-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-white/80 dark:bg-slate-700/80 text-slate-900 dark:text-slate-100 appearance-none shadow-sm focus:shadow-md focus:ring-2 focus:ring-orange-500/20 transition-all text-base font-medium'
                     value={selectedCategory}
                     onChange={(e) => handleCategoryChange(e.target.value)}
                   >
@@ -274,9 +347,9 @@ const ProductList = () => {
               </div>
 
               {/* Bulk Actions Row */}
-              <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
-                <div className='flex flex-col xs:flex-row items-start xs:items-center gap-3 w-full sm:w-auto'>
-                  <div className='flex items-center gap-2 bg-slate-50 dark:bg-slate-700 rounded-lg p-2 w-full xs:w-auto'>
+              <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4'>
+                <div className='flex flex-wrap items-center gap-3'>
+                  <div className='flex items-center gap-3 bg-slate-100/80 dark:bg-slate-700/80 rounded-xl p-3'>
                     <Input
                       type='number'
                       min='1'
@@ -285,17 +358,16 @@ const ProductList = () => {
                         setBulkQuantity(parseInt(e.target.value, 10))
                       }
                       placeholder='Qty'
-                      className='w-16 xs:w-20 h-8 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600'
+                      className='w-20 h-10 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 rounded-lg text-center font-semibold'
                     />
                     <Button
                       size='sm'
                       onClick={handleUpdateQuantities}
                       disabled={selectedProducts.length === 0}
-                      className='bg-primary hover:bg-primary/90 text-xs sm:text-sm'
+                      className='bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200'
                     >
-                      <RefreshCw className='h-4 w-4 mr-1' />
-                      <span className='hidden xs:inline'>Update Stock</span>
-                      <span className='xs:hidden'>Update</span>
+                      <RefreshCw className='h-4 w-4 mr-2' />
+                      Update Stock
                     </Button>
                   </div>
 
@@ -303,62 +375,68 @@ const ProductList = () => {
                     variant='outline'
                     size='sm'
                     onClick={handleToggleAll}
-                    className='border-slate-200 dark:border-slate-600 w-full xs:w-auto'
+                    className='border-slate-200 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-600 px-6 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200'
                   >
                     {isAllChecked ? (
-                      <CheckSquare className='h-4 w-4 mr-2' />
+                      <CheckSquare className='h-4 w-4 mr-2 text-orange-500' />
                     ) : (
                       <Square className='h-4 w-4 mr-2' />
                     )}
-                    <span className='hidden xs:inline'>
-                      {isAllChecked ? 'Uncheck All' : 'Check All'}
-                    </span>
-                    <span className='xs:hidden'>
-                      {isAllChecked ? 'Uncheck' : 'Check All'}
-                    </span>
+                    {isAllChecked ? 'Uncheck All' : 'Check All'}
                   </Button>
+
+                  <div className='flex items-center gap-2'>
+                    <BulkDeleteDialog
+                      ids={selectedProducts}
+                      action={deleteProducts}
+                      callbackAction={() => {
+                        fetchProducts(inputValue, page, selectedCategory)
+                        setSelectedProducts([])
+                        setIsAllChecked(false)
+                      }}
+                    />
+                  </div>
                 </div>
 
                 <Button
                   asChild
-                  className='bg-primary hover:bg-primary/90 w-full xs:w-auto'
+                  className='bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-8 py-3 rounded-lg font-semibold'
                 >
                   <Link href='/admin/products/create'>
-                    <Plus className='h-4 w-4 mr-2' />
-                    <span className='hidden xs:inline'>Add Product</span>
-                    <span className='xs:hidden'>Add</span>
+                    <Plus className='h-5 w-5 mr-2' />
+                    Add Product
                   </Link>
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
-        {/* Products Table */}
-        <Card className='bg-white dark:bg-slate-800 shadow-sm border-0 shadow-slate-200/50 dark:shadow-slate-800/50'>
-          <CardContent className='p-0'>
+        {/* Premium Products Table */}
+        <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-2xl shadow-slate-200/50 dark:shadow-slate-900/50'>
+          <div className='absolute inset-0 bg-gradient-to-br from-slate-50/50 to-white/50 dark:from-slate-800/50 dark:to-slate-700/50' />
+          <CardContent className='relative p-0'>
             <div className='overflow-x-auto'>
               <Table>
                 <TableHeader>
-                  <TableRow className='border-b border-slate-200 dark:border-slate-700'>
-                    <TableHead className='w-12 px-3 sm:px-6 py-4'>
+                  <TableRow className='border-b border-slate-200/60 dark:border-slate-700/60 bg-gradient-to-r from-slate-50/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-700/80'>
+                    <TableHead className='w-12 px-4 sm:px-6 py-5'>
                       <div className='flex items-center'>
                         {isAllChecked ? (
-                          <CheckSquare className='h-4 w-4 text-primary' />
+                          <CheckSquare className='h-5 w-5 text-orange-500' />
                         ) : (
-                          <Square className='h-4 w-4 text-slate-400' />
+                          <Square className='h-5 w-5 text-slate-400 hover:text-slate-600 transition-colors' />
                         )}
                       </div>
                     </TableHead>
                     <TableHead
                       onClick={() => handleSort('_id')}
-                      className='cursor-pointer px-3 sm:px-6 py-4 font-semibold text-slate-700 dark:text-slate-300 hover:text-primary transition-colors hidden sm:table-cell'
+                      className='cursor-pointer px-4 sm:px-6 py-5 font-bold text-slate-800 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-200 hidden sm:table-cell'
                     >
                       <div className='flex items-center gap-2'>
-                        <span className='hidden lg:inline'>ID</span>
-                        <span className='lg:hidden'>ID</span>
-                        <ArrowUpDown className='h-3 w-3' />
+                        <span className='tracking-wide'>ID</span>
+                        <ArrowUpDown className='h-4 w-4 opacity-60' />
                         {sortField === '_id' && (
-                          <span className='text-primary'>
+                          <span className='text-orange-500 text-lg font-bold'>
                             {sortOrder === 'asc' ? '↑' : '↓'}
                           </span>
                         )}
@@ -366,13 +444,13 @@ const ProductList = () => {
                     </TableHead>
                     <TableHead
                       onClick={() => handleSort('name')}
-                      className='cursor-pointer px-3 sm:px-6 py-4 font-semibold text-slate-700 dark:text-slate-300 hover:text-primary transition-colors'
+                      className='cursor-pointer px-4 sm:px-6 py-5 font-bold text-slate-800 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-200'
                     >
                       <div className='flex items-center gap-2'>
-                        Product
-                        <ArrowUpDown className='h-3 w-3' />
+                        <span className='tracking-wide'>Product</span>
+                        <ArrowUpDown className='h-4 w-4 opacity-60' />
                         {sortField === 'name' && (
-                          <span className='text-primary'>
+                          <span className='text-orange-500 text-lg font-bold'>
                             {sortOrder === 'asc' ? '↑' : '↓'}
                           </span>
                         )}
@@ -380,13 +458,13 @@ const ProductList = () => {
                     </TableHead>
                     <TableHead
                       onClick={() => handleSort('price')}
-                      className='cursor-pointer px-3 sm:px-6 py-4 font-semibold text-slate-700 dark:text-slate-300 hover:text-primary transition-colors'
+                      className='cursor-pointer px-4 sm:px-6 py-5 font-bold text-slate-800 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-200'
                     >
                       <div className='flex items-center gap-2'>
-                        Price
-                        <ArrowUpDown className='h-3 w-3' />
+                        <span className='tracking-wide'>Price</span>
+                        <ArrowUpDown className='h-4 w-4 opacity-60' />
                         {sortField === 'price' && (
-                          <span className='text-primary'>
+                          <span className='text-orange-500 text-lg font-bold'>
                             {sortOrder === 'asc' ? '↑' : '↓'}
                           </span>
                         )}
@@ -394,13 +472,13 @@ const ProductList = () => {
                     </TableHead>
                     <TableHead
                       onClick={() => handleSort('category')}
-                      className='cursor-pointer px-3 sm:px-6 py-4 font-semibold text-slate-700 dark:text-slate-300 hover:text-primary transition-colors hidden md:table-cell'
+                      className='cursor-pointer px-4 sm:px-6 py-5 font-bold text-slate-800 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-200 hidden md:table-cell'
                     >
                       <div className='flex items-center gap-2'>
-                        Category
-                        <ArrowUpDown className='h-3 w-3' />
+                        <span className='tracking-wide'>Category</span>
+                        <ArrowUpDown className='h-4 w-4 opacity-60' />
                         {sortField === 'category' && (
-                          <span className='text-primary'>
+                          <span className='text-orange-500 text-lg font-bold'>
                             {sortOrder === 'asc' ? '↑' : '↓'}
                           </span>
                         )}
@@ -408,13 +486,13 @@ const ProductList = () => {
                     </TableHead>
                     <TableHead
                       onClick={() => handleSort('stock')}
-                      className='cursor-pointer px-3 sm:px-6 py-4 font-semibold text-slate-700 dark:text-slate-300 hover:text-primary transition-colors hidden lg:table-cell'
+                      className='cursor-pointer px-4 sm:px-6 py-5 font-bold text-slate-800 dark:text-slate-200 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-200 hidden lg:table-cell'
                     >
                       <div className='flex items-center gap-2'>
-                        Stock
-                        <ArrowUpDown className='h-3 w-3' />
+                        <span className='tracking-wide'>Stock</span>
+                        <ArrowUpDown className='h-4 w-4 opacity-60' />
                         {sortField === 'stock' && (
-                          <span className='text-primary'>
+                          <span className='text-orange-500 text-lg font-bold'>
                             {sortOrder === 'asc' ? '↑' : '↓'}
                           </span>
                         )}
@@ -583,33 +661,44 @@ const ProductList = () => {
             </div>
           </CardContent>
         </Card>
-        {/* Pagination */}
+        {/* Premium Pagination */}
         {(data?.totalPages ?? 0) > 1 && (
-          <Card className='bg-white dark:bg-slate-800 shadow-sm border-0 shadow-slate-200/50 dark:shadow-slate-800/50 mt-6'>
-            <CardContent className='p-4 sm:p-6'>
+          <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 mt-8'>
+            <div className='absolute inset-0 bg-gradient-to-r from-slate-50/50 to-white/50 dark:from-slate-800/50 dark:to-slate-700/50' />
+            <CardContent className='relative p-6'>
               <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
-                <div className='text-xs sm:text-sm text-slate-600 dark:text-slate-400 text-center sm:text-left'>
-                  Showing {data?.from} to {data?.to} of {data?.totalProducts}{' '}
+                <div className='text-sm font-medium text-slate-600 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-700/80 px-4 py-2 rounded-lg'>
+                  Showing{' '}
+                  <span className='text-orange-600 dark:text-orange-400 font-bold'>
+                    {data?.from}
+                  </span>{' '}
+                  to{' '}
+                  <span className='text-orange-600 dark:text-orange-400 font-bold'>
+                    {data?.to}
+                  </span>{' '}
+                  of{' '}
+                  <span className='text-orange-600 dark:text-orange-400 font-bold'>
+                    {data?.totalProducts}
+                  </span>{' '}
                   products
                 </div>
 
-                <div className='flex items-center gap-2'>
+                <div className='flex items-center gap-3'>
                   <Button
                     variant='outline'
                     size='sm'
                     onClick={() => handlePageChange('prev')}
                     disabled={Number(page) <= 1}
-                    className='border-slate-200 dark:border-slate-600 text-xs sm:text-sm'
+                    className='border-slate-200 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-600 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50'
                   >
-                    <ChevronLeft className='w-3 h-3 sm:w-4 sm:h-4' />
-                    <span className='hidden xs:inline'>Previous</span>
-                    <span className='xs:hidden'>Prev</span>
+                    <ChevronLeft className='w-4 h-4 mr-1' />
+                    Previous
                   </Button>
 
-                  <div className='flex items-center gap-1 px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300'>
-                    <span className='hidden xs:inline'>Page</span> {page}{' '}
-                    <span className='hidden xs:inline'>of</span>
-                    <span className='xs:hidden'>/</span> {data?.totalPages}
+                  <div className='flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-bold rounded-lg shadow-md'>
+                    <span className='text-sm'>
+                      Page {page} of {data?.totalPages}
+                    </span>
                   </div>
 
                   <Button
@@ -617,11 +706,10 @@ const ProductList = () => {
                     size='sm'
                     onClick={() => handlePageChange('next')}
                     disabled={Number(page) >= (data?.totalPages ?? 0)}
-                    className='border-slate-200 dark:border-slate-600 text-xs sm:text-sm'
+                    className='border-slate-200 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-600 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50'
                   >
-                    <span className='hidden xs:inline'>Next</span>
-                    <span className='xs:hidden'>Next</span>
-                    <ChevronRight className='w-3 h-3 sm:w-4 sm:h-4' />
+                    Next
+                    <ChevronRight className='w-4 h-4 ml-1' />
                   </Button>
                 </div>
               </div>
@@ -629,27 +717,34 @@ const ProductList = () => {
           </Card>
         )}
 
-        {/* Empty State */}
+        {/* Premium Empty State */}
         {data?.products.length === 0 && (
-          <Card className='bg-white dark:bg-slate-800 shadow-sm border-0 shadow-slate-200/50 dark:shadow-slate-800/50'>
-            <CardContent className='p-12 text-center'>
-              <div className='flex flex-col items-center gap-4'>
-                <div className='p-4 bg-slate-100 dark:bg-slate-700 rounded-full'>
-                  <Package className='h-8 w-8 text-slate-400' />
+          <Card className='relative overflow-hidden bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-0 shadow-2xl shadow-slate-200/50 dark:shadow-slate-900/50'>
+            <div className='absolute inset-0 bg-gradient-to-br from-slate-50/50 via-white/50 to-slate-100/50 dark:from-slate-800/50 dark:via-slate-700/50 dark:to-slate-800/50' />
+            <CardContent className='relative p-12 text-center'>
+              <div className='flex flex-col items-center gap-6'>
+                <div className='relative'>
+                  <div className='absolute inset-0 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-full blur-xl opacity-20' />
+                  <div className='relative p-6 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-full shadow-xl'>
+                    <Package className='h-12 w-12 text-slate-400 dark:text-slate-500' />
+                  </div>
                 </div>
-                <div>
-                  <h3 className='text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2'>
+                <div className='space-y-4'>
+                  <h3 className='text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent'>
                     No products found
                   </h3>
-                  <p className='text-slate-600 dark:text-slate-400 mb-4'>
+                  <p className='text-slate-600 dark:text-slate-400 text-lg max-w-md mx-auto leading-relaxed'>
                     {inputValue || selectedCategory
-                      ? 'Try adjusting your search criteria or filters.'
-                      : 'Get started by creating your first product.'}
+                      ? "Try adjusting your search criteria or filters to find what you're looking for."
+                      : 'Ready to start building your inventory? Create your first product to get started.'}
                   </p>
                   {!inputValue && !selectedCategory && (
-                    <Button asChild className='bg-primary hover:bg-primary/90'>
+                    <Button
+                      asChild
+                      className='bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-8 py-3 rounded-lg font-semibold text-base'
+                    >
                       <Link href='/admin/products/create'>
-                        <Plus className='h-4 w-4 mr-2' />
+                        <Plus className='h-5 w-5 mr-2' />
                         Create Your First Product
                       </Link>
                     </Button>
