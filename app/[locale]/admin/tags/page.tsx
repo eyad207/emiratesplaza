@@ -618,7 +618,7 @@ export default function TagsPage() {
               <div className='flex items-center gap-3'>
                 <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500' />
                 <span className='font-medium text-slate-900 dark:text-slate-100'>
-                  Loading...
+                  Loading....
                 </span>
               </div>
             </div>
